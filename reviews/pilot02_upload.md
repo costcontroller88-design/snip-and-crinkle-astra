@@ -25,5 +25,5 @@ Watch the full story on our channel: "Say Sorry and Fix It Together!"
 
 ## When
 The 10 current Shorts are the comparison group (last ones planned for 15–16 Oct). Suggested: Short on
-Mon 20 Oct, long video on Tue 21 Oct, both 6:00 PM IST. Compare each at 7 days old against the old Shorts
+Tue 20 Oct, long video on Wed 21 Oct, both 6:00 PM IST. Compare each at 7 days old against the old Shorts
 (viewed vs swiped away, average % viewed, subs gained) and the long video's retention graph.

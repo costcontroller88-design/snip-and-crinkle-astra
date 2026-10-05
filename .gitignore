@@ -5,4 +5,5 @@ assets/fonts/
 *.wav
 *.mp4
 .DS_Store
-.claude/
+.claude/*
+!.claude/agents/

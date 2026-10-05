@@ -1,5 +1,8 @@
 # Snip & Crinkle: Episode Production Guide
 
+> This guide covers Episodes 1–10 (18-second Shorts). From Episode 11 the standard is in `MASTER_PROMPT.md`; the
+> hard rules below still apply to all work.
+
 A wordless YouTube Shorts series for kids worldwide (ages 2–6). Two paper-cut-out friends, **Snip** (lilac bunny, blue star tee, curious, sometimes makes the mistake) and **Crinkle** (caramel bear, yellow striped scarf, kind helper), learn one safety, kindness or healthy-habit lesson per episode. Every video is made entirely in code: paper art (`paperlib.py`, `characters.py`, `scene.py`, `icons.py`), original synthesized music and sound effects (`audio.py`), and ffmpeg. **Episode 1 is the reference: `episodes/ep01_v3_can_snip_wait.py`.** Read it fully before starting.
 
 ## Hard rules (never break)

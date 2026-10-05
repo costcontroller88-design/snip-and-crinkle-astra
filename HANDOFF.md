@@ -1,8 +1,13 @@
 # Handoff: read this first (updated 2026-10-06)
 
-**Current phase: 1 (break the template, build long-form), step: pilot episode APPROVED by the owner ("its looks
-fine", 2026-10-06) and its vertical Short (43 s) delivered; next work package: the owner uploads both (text ready in
-`reviews/pilot02_upload.md`, suggested 20-21 Oct), then plan Episode 11+ in the new style (design first).**
+**How we work (rules, the agent team, the pipeline): `MASTER_PROMPT.md`, which wins over any older section below.
+Plan, dates and topic pipeline: `docs/ROADMAP.md`. This file holds the current state.**
+
+**Current phase: 0 (foundations, to 19 Oct); Phase 1 (test the new style) starts 20 Oct. Step: pilot episode approved
+and its 43 s Short delivered; master prompt and agent team set up (2026-10-06). Next work package: Episode 11, a gentle
+Halloween special (story-designer writes `docs/CHARACTER_BIBLE.md` first; upload by 28 Oct). Waiting on the owner:
+uploads of Ep 9 v3 and Ep 5 v2 (15-16 Oct) and the pilot (20-21 Oct, text in `reviews/pilot02_upload.md`), and a
+yes/no on the "Splash Becomes a Whale" transformation Short.**
 Short: `episodes/pilot02_short.py` re-films the episode's performances through a vertical camera (shot list in
 `reviews/pilot02_short_plan.md`), cuts the episode's sound effects with the pictures and adds its own music bed.
 The episode exposes `render_world(t, d, cam, bg)` and `make_buses()` for this. check_video now allows vertical
@@ -45,7 +50,7 @@ You are continuing work for the owner of the YouTube channel **Snip & Crinkle (@
 ## Strategy research
 Read `docs/research-oct-2026.md` (5 Oct 2026): key points are to vary story engines (inauthentic-content policy), make original long-form 20–30 min compilations the monetization engine, plan for the 1 Feb 2027 YPP bar (8,000 hours or 20M Shorts views), and use plain-language titles ("<Lesson>! Kids Safety Cartoon | Snip & Crinkle").
 
-## How to work
+## How to work (Episodes 1–10, old format; new work follows MASTER_PROMPT.md)
 1. `./setup_cloud.sh` (ffmpeg, Pillow, numpy, Fredoka font).
 2. For each episode: continue its branch, render stills, **look at key frames at full size** (props hidden behind characters is the most common bug), render the MP4, run `python3 tools/check_video.py output/<file>.mp4` until it PASSes, and score with the rubric (overall ≥ 8, no item < 7).
 3. **Deliver MP4s to the owner** by sending the files in the chat (GitHub Releases are blocked in cloud sessions). Also merge finished episode branches into `main`.
