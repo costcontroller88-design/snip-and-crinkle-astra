@@ -1,0 +1,57 @@
+# Snip & Crinkle: Episode Production Guide
+
+A wordless YouTube Shorts series for kids worldwide (ages 2–6). Two paper-cut-out friends, **Snip** (lilac bunny, blue star tee, curious, sometimes makes the mistake) and **Crinkle** (caramel bear, yellow striped scarf, kind helper), learn one safety, kindness or healthy-habit lesson per episode. Every video is made entirely in code: paper art (`paperlib.py`, `characters.py`, `scene.py`, `icons.py`), original synthesized music and sound effects (`audio.py`), and ffmpeg. **Episode 1 is the reference: `episodes/ep01_v3_can_snip_wait.py`.** Read it fully before starting.
+
+## Hard rules (never break)
+1. **Wordless.** No spoken or written words except numerals (1, 2, 3) and the single "?" icon. Story is told by action, icons, music and sound.
+2. **No emoji fonts and no third-party art.** Draw every icon as a paper cut-out (see `icons.py` for the style). No brands, logos or known characters.
+3. **Original audio only**, made with `audio.py` (add new instruments or sound effects in your own file if needed). No samples or downloaded music.
+4. **The lesson must be correct and safe** by mainstream child-safety advice. Dangerous things (hot drinks, roads, sharp objects, medicine) are handled by the **grown-up's paper hand** (`scene.grown_up_hand()`), never by Snip or Crinkle alone. Kids learn to *wait, ask or hold a grown-up's hand*.
+5. **YouTube "made for kids" quality principles:** kind, positive behaviour; nothing scary, violent, gross or product-promoting; a clear beginning, middle and end; no keyword stuffing.
+6. **Not templated.** Each episode needs a different setting or props, a different kind of mistake, and a different funny moment. Repeating the same scenes with only the lesson swapped can get the channel demonetized.
+
+## The 18-second story template
+| Time | Beat | Notes |
+|---|---|---|
+| 0–1s | **Hook** | Close-up (camera zoom ~1.6) on the temptation or problem, with a character already in motion. The signature jingle `A.jingle(music, 0.02)` plays. |
+| 1–2.5s | **Desire / setup** | Make the viewer want what Snip wants (sparkle eyes, a visual flourish). |
+| 2.5–4.5s | **Choice freeze** | Dim the scene. Two bubbles appear: wrong choice (red ring) vs right choice (green ring), with a "?" and tick-tock. Kids shout the answer. |
+| 4.5–6s | **Gentle slapstick** | The wrong path *almost* happens and something funny stops it. No injury, no crying. |
+| 6–8s | **Crinkle helps** | He arrives with a paper sign or demonstration. |
+| 8–11.5s | **Do it right** | Show the correct behaviour step by step, ideally counting 1-2-3 with `scene.numeral`. This doubles as early maths. |
+| 11.5–14s | **Payoff** | The reward is clearly visible (✅ via `icons.check`, then hearts). |
+| 14–16.5s | **Signature paw-bump** | Both paws meet in front, with a small sparkle and the ending jingle `A.jingle(..., ending=True)`. This is the same in every episode. |
+| 16.5–18s | **Seamless loop** | Return to the exact opening state. Crinkle leaves, the temptation reappears, and the camera zooms back to the 0s framing. The last frame must equal the first frame. |
+
+## Technical conventions
+- Canvas 1080×1920, 30 fps, `TABLE_Y = 1440` (or your setting's floor line). Snip scale 1.15, Crinkle scale 1.2; Crinkle's home x is about 785.
+- **Arm angles** are degrees counter-clockwise from hanging down. Left arm out = negative; right arm out = positive. Crinkle's resting left arm is `346` (same as -14) so that raising it swings outward through 270, not across his body.
+- **Draw lesson-critical props in front of the characters.** In v2 the sand timer, steam heart and straw were hidden behind heads. Draw the prop *after* `Character.draw`, and redraw arms in front for paw-bumps (see v3).
+- **Safe zones:** keep faces and key props out of the right column (x > 950, y 980–1700, the like/comment buttons) and out of the bottom band (y > 1560, the title and caption).
+- **Loop:** every periodic function needs a period that divides the duration (breathing 2.0s, ear idle 3.0s, steam phase `int(t * 16 * 13 / DUR)`). The state at t = DUR must equal t = 0.
+- **Blinking, ears, breathing and squash-and-stretch** are already in `Character.draw`. Use `hop_curve()` for hops with squash, and `spring()` for ear wiggles.
+- **Don't edit shared modules** (`paperlib.py`, `characters.py`, `scene.py`, `audio.py`, `icons.py`). Put new backgrounds, props and icons in a new file `episodes/props_<slug>.py` or inside your episode file. This avoids merge conflicts between episodes made in parallel.
+
+## Quality gate (all must pass before you finish)
+1. `python3 episodes/epNN_<slug>.py --stills`, then **look at key frames at full size** (at least 360px wide; tiny thumbnails hide problems). For each beat, ask: is the key prop clearly visible and not hidden? Is the lesson readable with the sound off?
+2. Render the video, then run `python3 tools/check_video.py output/epNN_<slug>.mp4`. It must print `RESULT: PASS`.
+3. **Score honestly** with this rubric (out of 10, overall at least 8): hook, choice clarity, humor, lesson accuracy, lesson visibility, payoff, paw-bump, loop, animation life, safe zones. If any item is below 7, fix it and re-render (up to 3 rounds). Do not inflate scores. Say plainly what is still weak.
+
+## Deliverables (per episode, on branch `episode-NN`)
+- `episodes/epNN_<slug>.py` (plus `episodes/props_<slug>.py` if used)
+- `reviews/epNN.md`: the scorecard table, a list of remaining weaknesses, and the upload text (title with a question and two emoji, a 3-line description, hashtags `#kids #shorts` plus 2–3 topical ones). Emoji are fine in *titles*, just not drawn in the video.
+- `reviews/epNN_keys.png`: a full-size key-frame sheet (about 8 frames, 360px wide each)
+- **Do not commit MP4s or `build/`** (they're git-ignored). Commit and push the branch, and report the scorecard in your final message.
+
+## Episode briefs
+### Episode 2: "Wash Before You Munch?" 🧼 (bathroom)
+Snip runs in from playing (muddy paws shown by brown paper spots) and reaches for an apple or sandwich. **Choice:** apple-with-dirty-paws vs soap bubbles. **Slapstick:** Snip's muddy paw leaves a big muddy print on the snack, or a germ-cartoon (friendly green blobs, not scary) wiggles on the paw. Crinkle shows **soap, scrub (count 1-2-3 with bubbles growing), rinse, dry**. Payoff: clean sparkly paws, then they eat. New setting: a bathroom with a paper sink, mirror and tiles.
+
+### Episode 3: "The Last Cookie?" 🍪 (kitchen, but a different time of day and props)
+One cookie left on a plate, and both reach for it. **Choice:** grab it all vs break it in half. **Slapstick:** a tug-of-war that ends with both tumbling backwards (soft landing, no one hurt). Crinkle (or Snip, to vary who errs) **breaks it in half**. Show the count "1, 2" halves and that both halves are equal. Payoff: both munch happily. Vary the kitchen: evening light, a different wall colour, a cookie jar.
+
+### Episode 4: "Whose Toy Is This?" 🧸 (park)
+Snip finds a lost teddy on a park bench and hugs it. **Choice:** keep it vs give it back. A small new friend (a little paper duckling or chick) is sad and searching. **Slapstick:** Snip hides the teddy behind their back, but its ears pop out. Crinkle helps them **look around and return it**. Payoff: the duckling's happy dance, and hearts. New setting: a park with grass, a tree, a bench and sky.
+
+### Episode 5: "Hold Paws to Cross?" 🚦 (sidewalk and crossing)
+Snip sees a ball, a friend or the playground across the road and wants to run. **Choice:** run now vs stop and hold a grown-up's hand. **Slapstick:** Snip's feet skid to a cartoon stop at the curb (wind-up legs). The **grown-up's paper hand** comes down. They **stop, look left and right (eyes and head turn), and wait for the green walking light**; count 1-2-3 for the light. Payoff: they cross *holding the grown-up's hand* on the zebra crossing. No cars hitting anything. Cars can be seen stopped. New setting: a sidewalk, road, zebra crossing and a pedestrian light drawn with a walking-figure icon.
