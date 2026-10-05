@@ -13,7 +13,9 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from characters import CRINKLE, EYE, SNIP  # noqa: E402
-from paperlib import Cut, grain, heart_pts, mix, place, star_pts  # noqa: E402
+import hires  # noqa: E402
+from hires import Cut  # noqa: E402  (follows hires.RES; 1x unless an episode raises it)
+from paperlib import grain, heart_pts, mix, place, star_pts  # noqa: E402
 
 WORLD_W, WORLD_H = 1920, 1920
 FLOOR_Y = 1500                        # where the characters' feet stand
@@ -38,12 +40,17 @@ POT_AT = (1220, 1352)                 # pot base point (on the stool top)
 
 
 # ---------------------------------------------------------------- background
+def _at(x, y):
+    """Design units -> pixels at the current render scale."""
+    return x * hires.RES, y * hires.RES
+
+
 def _gallery(img):
     """A string of children's drawings pinned with pegs across the wall."""
     pts = [(x, 640 + 50 * math.sin(math.pi * (x - 100) / 1400)) for x in range(100, 1501, 20)]
     s = Cut(1520, 720)
     s.line(pts, 4, (150, 112, 92), sil=True)
-    place(img, s.finish(pivot=(0, 0), border=0, shadow_alpha=0.2), (0, 0))
+    place(img, s.finish(pivot=(0, 0), border=0, shadow_alpha=0.2), _at(0, 0))
     pics = [(330, (255, 214, 92), "sun"), (640, (140, 200, 120), "house"), (950, (120, 190, 236), "fish"),
             (1260, (240, 150, 170), "rainbow")]
     for i, (x, col, kind) in enumerate(pics):
@@ -69,10 +76,10 @@ def _gallery(img):
             for k, rc in enumerate(((240, 112, 104), (255, 196, 72), (120, 196, 120), (100, 160, 236))):
                 p.arc(95, 128, 74 - k * 13, 64 - k * 13, 180, 360, 11, rc)
         spr = p.finish(pivot=(95, 8), border=4, shadow_alpha=0.18)
-        place(img, spr, (x, y + 4), angle=tilt)
+        place(img, spr, _at(x, y + 4), angle=tilt)
         peg = Cut(22, 44)
         peg.rrect(0, 0, 22, 44, 5, (240, 120, 96) if i % 2 else (255, 204, 72))
-        place(img, peg.finish(pivot=(11, 22), border=3), (x, y))
+        place(img, peg.finish(pivot=(11, 22), border=3), _at(x, y))
 
 
 def _window():
@@ -131,8 +138,9 @@ def _bunting():
 
 def background():
     W, H = WORLD_W, WORLD_H
-    k = 2
-    img = Image.new("RGBA", (W * k, H * k), WALL + (255,))
+    R = hires.RES
+    k = 2 * R
+    img = Image.new("RGBA", (int(W * k), int(H * k)), WALL + (255,))
     d = ImageDraw.Draw(img)
     for row in range(22):
         for col in range(18):
@@ -152,7 +160,7 @@ def background():
         for x in range((i % 3) * 210, W, 640):
             d.rectangle([x * k, y * k, (x + 5) * k, (y + 65) * k], fill=WOOD_LINE)
     d.rectangle([0, WALL_BOTTOM * k, W * k, (WALL_BOTTOM + 14) * k], fill=(214, 160, 108))
-    img = grain(img.resize((W, H), Image.LANCZOS), 0.03)
+    img = grain(img.resize((int(W * R), int(H * R)), Image.LANCZOS), 0.03)
     # rug
     rug = Cut(1700, 330)
     rug.ellipse(850, 165, 840, 158, RUG)
@@ -161,12 +169,12 @@ def background():
     for i in range(40):
         a = 2 * math.pi * i / 40
         rug.ellipse(850 + 805 * math.cos(a), 165 + 142 * math.sin(a), 9, 7, TRIM, sil=False)
-    place(img, rug.finish(pivot=(850, 165), border=4, shadow_alpha=0.15), (960, 1580))
-    place(img, _bunting(), (360, 250))
+    place(img, rug.finish(pivot=(850, 165), border=4, shadow_alpha=0.15), _at(960, 1580))
+    place(img, _bunting(), _at(360, 250))
     _gallery(img)
-    place(img, _window(), (1640, 640))
-    place(img, _shelf(), (40, 980))
-    place(img, _plant(), (1860, 1560))
+    place(img, _window(), _at(1640, 640))
+    place(img, _shelf(), _at(40, 980))
+    place(img, _plant(), _at(1860, 1560))
     return img
 
 

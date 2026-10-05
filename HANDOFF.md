@@ -1,12 +1,18 @@
 # Handoff: read this first (updated 2026-10-06)
 
-**Current phase: 1 (break the template, build long-form), step: pilot part 1 v2 done (waiting for the owner's
-yes/no: "did you understand it?"), next work package: pilot part 2.**
-v1 failed the owner's viewing; see `reviews/pilot01.md` and the clarity rules there: close-ups on what matters,
-slow set-up for key actions, choices acted out, "sorry" as actions, NO speech-like voices (effects + music only).
-Part 2 = (a) vertical camera that pans per shot, (b) story part 2 (fix the painting together, 2-3 real gags),
-(c) join both parts into the ~3-minute landscape pilot, (d) a 25-40 s Short cut starting at the dance-in, with a loop.
-Then upload both as the new-style test (see "Pilot and test plan" below).
+**Current phase: 1 (break the template, build long-form), step: rig v2 test clip done (waiting for the owner's
+yes/no: "do they look alive?"), next work package: rebuild the accident (pilot step 2 of 3).**
+The owner's bar (2026-10-06): "more real, everything makes sense, and a wow factor": real-life cause and effect,
+characters that move like they're alive, and a real-cartoon-film look. Plan, agreed with the owner:
+1. DONE: rig v2 (`episodes/rig2.py`: heads turn, elbows + IK, paws hold props, planted walking) and 2x rendering
+   (`episodes/hires.py`; `props_artcorner` follows `hires.RES`). Test: `episodes/rigtest_alive.py` (14 s, PASS).
+2. NEXT: rebuild the accident with rig v2 at 2x: the paint jars sit on the EASEL TRAY; Crinkle dances, bumps the
+   easel, it wobbles, the blue jar tips and paint POURS DOWN the picture (no flying paint); Snip sees it happen;
+   sad; Crinkle starts to sneak off, hears a sniff, stops; the choice as Crinkle's THOUGHT bubble; sorry; hug.
+3. THEN: the fix and the wow: Crinkle sees a whale in the splash; together they paint eye, smile, tail, waves and a
+   boat with the two friends; the camera reveals the new painting (better than the first); they hang it up;
+   paw-bump. Join into one ~2-min landscape episode + a Short.
+Pilot v1/v2 (`episodes/pilot01_sorry_test.py`, old rig, 1x) are kept for reference only.
 
 
 You are continuing work for the owner of the YouTube channel **Snip & Crinkle (@SnipAndCrinkle)**, a wordless kids' Shorts channel made entirely with this code. The owner is not technical and relies on you to make decisions and do the work. They like a thorough analysis from all angles followed by a firm recommendation, and **harsh, honest ratings** (score 1–10 and say what is weak). They are in India.

@@ -183,6 +183,7 @@ EAR_MOODS = {   # Snip's ears show feelings: (left extra, right extra, stretch)
 
 class Perf:
     """One character's performance: a timeline of moves, faces, voice lines and hops."""
+    NUM = NUM
 
     def __init__(self, actor, seed=0, **init):
         self.a = actor
@@ -191,7 +192,7 @@ class Perf:
                          sq=1.0, ear_l=0.0, ear_r=0.0, ear_k=1.0, look_x=0.0, look_y=0.0, alpha=1.0, frizz=0.0,
                          eyes=actor._default[0], mouth=actor._default[1], brows="calm")
         self.init.update(init)
-        self.moves = {c: [] for c in NUM}
+        self.moves = {c: [] for c in self.NUM}
         self.steps = {c: [] for c in TXT}
         self.lines, self.hops, self.wiggles = [], [], []
         self.seed = seed
@@ -274,7 +275,7 @@ class Perf:
         return max([ln.level(t - t0) for t0, ln in self.lines if 0 <= t - t0 < ln.dur] or [0.0])
 
     def state(self, t, drawing=None):
-        s = {c: self._num(c, t) for c in NUM}
+        s = {c: self._num(c, t) for c in self.NUM}
         s.update({c: self._txt(c, t) for c in TXT})
         # hops with squash and stretch
         for t0, t1, n, hgt in self.hops:
@@ -344,7 +345,8 @@ class Perf:
 class Cam:
     """A view into the world. `view` is "land" (1920x1080) or "vert" (1080x1920)."""
 
-    def __init__(self, view, world_w, world_h, land_y0, vert_x0):
+    def __init__(self, view, world_w, world_h, land_y0, vert_x0, res=1.0):
+        self.res = res
         self.view = view
         if view == "land":
             self.w, self.h, self.ox, self.oy = 1920, 1080, 0, land_y0
@@ -353,11 +355,12 @@ class Cam:
         self.world = (world_w, world_h)
 
     def crop_bg(self, bg):
-        return bg.crop((self.ox, self.oy, self.ox + self.w, self.oy + self.h))
+        r = self.res
+        return bg.crop((int(self.ox * r), int(self.oy * r), int((self.ox + self.w) * r), int((self.oy + self.h) * r)))
 
     def S(self, p):
         """World point -> screen point."""
-        return p[0] - self.ox, p[1] - self.oy
+        return (p[0] - self.ox) * self.res, (p[1] - self.oy) * self.res
 
 
 def zoom(img, k, focus):
