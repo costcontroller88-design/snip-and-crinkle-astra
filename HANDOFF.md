@@ -24,6 +24,9 @@ You are continuing work for the owner of the YouTube channel **Snip & Crinkle (@
 - **YouTube uploads (2026-10-05):** Ep 10 published. Scheduled 6:00 PM IST: Ep 1 (6 Oct), Ep 3 (7), Ep 4 (8), Ep 2 (9), Ep 6 (12), Ep 7 (13), Ep 8 (14). All in the public playlist "Snip & Crinkle Stories". Ep 9 v3 and Ep 5 v2 are not uploaded yet (planned: 15 and 16 Oct).
 - **Tips learned:** zooms or fast pans over fine stripes (zebra crossing, gingham cloth) trip the "harsh jump" check; keep zooms slow (≤ ~0.35 zoom/s) or pan sideways instead. Review frames with `python3 tools/review_frames.py <episode.py> out.png t1 t2 …` and measure jumps with `python3 tools/frame_jumps.py <episode.py> t0 t1 …` before a full render. Parallel cloud sessions (one per episode, each on its own branch, never touching shared files) worked well for batches.
 
+## Strategy research
+Read `docs/research-oct-2026.md` (5 Oct 2026): key points are to vary story engines (inauthentic-content policy), make original long-form 20–30 min compilations the monetization engine, plan for the 1 Feb 2027 YPP bar (8,000 hours or 20M Shorts views), and use plain-language titles ("<Lesson>! Kids Safety Cartoon | Snip & Crinkle").
+
 ## How to work
 1. `./setup_cloud.sh` (ffmpeg, Pillow, numpy, Fredoka font).
 2. For each episode: continue its branch, render stills, **look at key frames at full size** (props hidden behind characters is the most common bug), render the MP4, run `python3 tools/check_video.py output/<file>.mp4` until it PASSes, and score with the rubric (overall ≥ 8, no item < 7).
