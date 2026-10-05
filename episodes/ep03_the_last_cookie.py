@@ -46,7 +46,7 @@ PLATE_X = 535
 PLATE_Y = TY + 8
 REST = (PLATE_X, TY - 14 - R)         # cookie centre standing on the plate
 SN_DEMO = 292                         # Snip's spot while Crinkle demonstrates
-SN_FALL = SN_HOME + 32                # where Snip lands (kept in from the left edge)
+SN_FALL = SN_HOME + 50                # where Snip lands (kept in from the left edge)
 
 BG = P.background()
 PLATE = P.plate()
@@ -179,7 +179,7 @@ def snip_state(t):
     elif t < 6.3:                     # SLIP! tumble back onto a soft bottom, rock like a roly-poly
         if t < T_LAND:
             p = ease_out(seg(t, T_SLIP, T_LAND))
-            s.update(x=lerp(SN_HOME + 6, SN_FALL, p), lean=lerp(14, 26, p), hop=46 * math.sin(math.pi * p),
+            s.update(x=lerp(SN_HOME + 6, SN_FALL, p), lean=lerp(14, 20, p), hop=46 * math.sin(math.pi * p),
                      eyes="wide", mouth="O", look=(4, -6))
             s["arm_l"], s["arm_r"] = lerp(-40, -150, p), lerp(70, 150, p)
             s["ears"] = [lerp(18, -14, p), lerp(12, 22, p)]
@@ -187,7 +187,7 @@ def snip_state(t):
         else:
             dt = t - T_LAND
             s["x"] = SN_FALL
-            s["lean"] = 26 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
+            s["lean"] = 20 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
             s["sq"] = 1 - 0.14 * math.exp(-12 * dt)
             down = ease_in_out(seg(t, 5.5, 5.85))
             s["arm_l"], s["arm_r"] = lerp(-150, -14, down), lerp(150, 14, down)
@@ -325,13 +325,13 @@ def crinkle_state(t):
     elif t < 6.3:                     # SLIP! plop onto his soft bottom, rock back up
         if t < T_LAND:
             p = ease_out(seg(t, T_SLIP, T_LAND))
-            s.update(x=CR_HOME, lean=lerp(-14, -18, p), hop=34 * math.sin(math.pi * p),
+            s.update(x=CR_HOME - 10, lean=lerp(-10, -12, p), hop=34 * math.sin(math.pi * p),
                      eyes="wide", mouth="O", look=(-4, -6))
             s["arm_l"], s["arm_r"] = lerp(290, 200, p), lerp(40, 160, p)
         else:
             dt = t - T_LAND
-            s["x"] = CR_HOME
-            s["lean"] = -18 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
+            s["x"] = CR_HOME - 10 * (1 - ease_in_out(seg(t, 5.9, 6.3)))
+            s["lean"] = -12 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
             s["sq"] = 1 - 0.12 * math.exp(-12 * dt)
             down = ease_in_out(seg(t, 5.5, 5.85))
             s["arm_l"], s["arm_r"] = lerp(200, CR_REST_L, down), lerp(160, 2, down)
