@@ -3,11 +3,22 @@
 **How we work (rules, the agent team, the pipeline): `MASTER_PROMPT.md`, which wins over any older section below.
 Plan, dates and topic pipeline: `docs/ROADMAP.md`. This file holds the current state.**
 
-**Current phase: 0 (foundations, to 19 Oct); Phase 1 (test the new style) starts 20 Oct. Step: pilot episode approved
-and its 43 s Short delivered; master prompt and agent team set up (2026-10-06). Next work package: Episode 11, a gentle
-Halloween special (story-designer writes `docs/CHARACTER_BIBLE.md` first; upload by 28 Oct). Waiting on the owner:
-uploads of Ep 9 v3 and Ep 5 v2 (15-16 Oct) and the pilot (20-21 Oct, text in `reviews/pilot02_upload.md`), and a
-yes/no on the "Splash Becomes a Whale" transformation Short.**
+**Current phase: 0 (foundations, to 19 Oct); Phase 1 starts 20 Oct. PAUSED by the owner on 2026-10-06, mid work
+package "Episode 11 + whale Short" (the first full test of the agent team). Resume here:**
+1. **Episode 11** ("friendly glow" Halloween; Lead brief and decisions in `docs/ROADMAP.md` Phase 1, evidence in
+   `docs/benchmark-oct-2026-halloween.md`): re-run the story-designer (it was stopped before writing anything) to
+   write `docs/CHARACTER_BIBLE.md` and `reviews/ep11_plan.md`; then safety gate 1, animator, blind review,
+   packaging, gate 3. Shorts due 18-19 Oct, episode 24 Oct.
+2. **Whale Short** (`episodes/pilot02_whale_short.py`): failed gate 2 twice (blind reviews 7/10, then 6/10:
+   `reviews/pilot02_whale_short_blind*.md`), so per the two-round rule it waits for the owner's decision. Lead's
+   recommendation: rebuild as a native transformation Short (canvas close-ups at 2x with the spotlight, a thought
+   cloud showing the splash with an eye = the idea made visible, each layer held about 1.2 s, the tail cut placed
+   after the outline dots vanish), then one fresh blind review. Draft files in `Videos/` are renamed
+   "DRAFT-failed-review_…".
+3. **Pilot upload text** retitled moment-first by packaging and accepted (`reviews/pilot02_upload.md`).
+4. **Agent system notes from the test:** the named agent types weren't registered in this session; general-purpose
+   agents told to read `.claude/agents/<name>.md` worked. CLAUDE.md no longer imports the master prompt (it leaked
+   story hints into the blind reviewer).
 Short: `episodes/pilot02_short.py` re-films the episode's performances through a vertical camera (shot list in
 `reviews/pilot02_short_plan.md`), cuts the episode's sound effects with the pictures and adds its own music bed.
 The episode exposes `render_world(t, d, cam, bg)` and `make_buses()` for this. check_video now allows vertical
