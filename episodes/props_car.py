@@ -124,7 +124,7 @@ def _bucket():
     return c.finish(pivot=(60, 112), border=4, shadow_alpha=0.2)
 
 
-BEACH_X = 1480          # strip x where the beach starts
+BEACH_X = 1150          # strip x where the beach starts (just off screen at the start)
 SCENE_W = 2800          # scenery strip width
 
 
@@ -135,25 +135,37 @@ def scenery():
     # home street: soft pastel houses and trees
     houses = [(-60, 330, 400, (255, 226, 214), (232, 128, 112), (150, 186, 236), 0),
               (320, 280, 330, (214, 236, 246), (110, 146, 206), (240, 150, 110), 2),
-              (660, 290, 420, (255, 240, 200), (226, 150, 92), (120, 186, 140), 1),
-              (1010, 300, 360, (232, 222, 248), (150, 120, 196), (240, 120, 130), 0)]
+              (660, 290, 420, (255, 240, 200), (226, 150, 92), (120, 186, 140), 1)]
     for x, w, h, wall, roof, door, kind in houses:
         place(img, PS._house(w, h, wall, roof, door, kind), (x, HOUSE_BASE))
-    for x, h, col in ((290, 470, (116, 190, 112)), (630, 420, (130, 200, 120)), (1360, 560, (124, 194, 116))):
+    for x, h, col in ((290, 470, (116, 190, 112)), (630, 420, (130, 200, 120)), (1010, 520, (124, 194, 116))):
         place(img, PS._tree(h, col), (x, HOUSE_BASE + 4))
     place(img, PS._hedge(BEACH_X + 40), (-20, HOUSE_BASE - 60))
-    # the beach: sea, sand, umbrella, palm, bucket
+    # the beach: the sea rises high enough to be seen above the car roof (horizon y=320), with a sandy
+    # shoreline running diagonally up from the left, a sailboat, gulls; palms and umbrellas in front
     d = ImageDraw.Draw(img)
-    sea_y, sand_y = 800, 885
-    d.rectangle([BEACH_X, sea_y, SCENE_W, sand_y], fill=(64, 168, 222, 255))
-    d.rectangle([BEACH_X, sea_y, SCENE_W, sea_y + 14], fill=(44, 140, 200, 255))
-    for x in range(BEACH_X + 20, SCENE_W, 110):
-        for k, yy in enumerate((828, 860)):
-            xx = x + 50 * k
-            d.arc([xx, yy - 12, xx + 60, yy + 12], 200, 340, fill=(240, 250, 255, 255), width=5)
+    hz, sand_y = 320, 885
+    shore = [(BEACH_X - 60, 1100), (BEACH_X - 60, 700), (BEACH_X + 300, hz)]
+    d.polygon(shore + [(SCENE_W, hz), (SCENE_W, 1100)], fill=(64, 168, 222, 255))
+    d.polygon([(BEACH_X + 300, hz), (SCENE_W, hz), (SCENE_W, hz + 16), (BEACH_X + 286, hz + 16)], fill=(44, 140, 200, 255))
+    for row, yy in enumerate(range(hz + 50, 860, 70)):
+        for x in range(BEACH_X + 40 + 55 * (row % 2), SCENE_W, 120):
+            if x > BEACH_X - 60 + (1100 - yy) * 0.0 and yy > hz + (BEACH_X + 300 - x) * (700 - hz) / 360:
+                d.arc([x, yy - 12, x + 60, yy + 12], 200, 340, fill=(240, 250, 255, 255), width=5)
+    d.polygon([(BEACH_X - 60, 1100), (BEACH_X - 60, 700), (BEACH_X + 300, hz), (BEACH_X + 470, hz),
+               (BEACH_X + 140, 1100)], fill=(250, 220, 150, 255))                      # sandy headland
+    d.line([(BEACH_X + 470, hz), (BEACH_X + 140, 1100)], fill=(244, 206, 130, 255), width=8)
     d.polygon([(BEACH_X - 120, 1100), (BEACH_X + 60, sand_y + 6), (SCENE_W, sand_y), (SCENE_W, 1100)],
               fill=(250, 220, 150, 255))
     d.rectangle([BEACH_X, sand_y, SCENE_W, sand_y + 10], fill=(244, 206, 130, 255))
+    # sailboat on the horizon and a few gulls
+    bx = BEACH_X + 760
+    d.polygon([(bx - 60, hz - 4), (bx + 60, hz - 4), (bx + 44, hz + 18), (bx - 44, hz + 18)], fill=(232, 96, 90, 255))
+    d.polygon([(bx - 4, hz - 8), (bx - 4, hz - 120), (bx - 56, hz - 12)], fill=(255, 250, 240, 255))
+    d.polygon([(bx + 4, hz - 8), (bx + 4, hz - 96), (bx + 44, hz - 12)], fill=(255, 214, 120, 255))
+    for gx, gy in ((BEACH_X + 420, 190), (BEACH_X + 480, 160), (BEACH_X + 1040, 220)):
+        d.arc([gx - 26, gy - 10, gx, gy + 14], 200, 340, fill=(90, 100, 120, 255), width=5)
+        d.arc([gx, gy - 10, gx + 26, gy + 14], 200, 340, fill=(90, 100, 120, 255), width=5)
     img = grain(img, 0.025)
     place(img, _palm(620), (BEACH_X + 130, 1000))
     place(img, _umbrella(320), (BEACH_X + 560, 960))
@@ -653,3 +665,37 @@ def engine(dur=5.0, vel=1.0, start=0.8, stop=1.0):
     n = np.convolve(_rng.normal(0, 1, len(t)), np.ones(60) / 60, mode="same")
     env = np.minimum(1, t / 0.15) * np.minimum(1, (dur - t) / 0.2) * (0.55 + 0.45 * speed)
     return vel * 0.5 * env * putt * (tone + 1.5 * n)
+
+
+def music_note(col=(120, 96, 200)):
+    """A paper eighth note (an icon, not a word) floating out of the car on the happy ride."""
+    c = Cut(120, 170)
+    c.ellipse(38, 134, 28, 21, col, theta=-20)
+    c.rrect(56, 22, 68, 136, 6, col)
+    c.polygon([(62, 22), (104, 46), (104, 74), (66, 54)], col)
+    return c.finish(pivot=(60, 90), border=4, shadow_alpha=0.18)
+
+
+class BeachBallWipe:
+    """A giant paper beach ball that rolls across the screen and hides the jump back to the start.
+    Pastel wedges and a slow spin keep the frame-to-frame change gentle."""
+    R = 1180
+
+    def __init__(self):
+        R = self.R
+        D = 2 * R + 40
+        c = Cut(D, D)
+        cx = cy = D / 2
+        cols = [(250, 150, 140), (255, 250, 240), (140, 196, 236), (255, 222, 130), (255, 250, 240), (150, 214, 160)]
+        for i, col in enumerate(cols):
+            a0, a1 = math.radians(i * 60), math.radians((i + 1) * 60)
+            pts = [(cx, cy)] + [(cx + R * math.cos(a0 + (a1 - a0) * k / 24), cy + R * math.sin(a0 + (a1 - a0) * k / 24))
+                                for k in range(25)]
+            c.polygon(pts, col)
+        c.ellipse(cx, cy, 150, 150, (255, 250, 240))
+        c.ellipse(cx, cy, 70, 70, (250, 150, 140), sil=False)
+        c.ellipse(cx - R * 0.42, cy - R * 0.45, R * 0.16, R * 0.08, (255, 255, 255), sil=False, theta=-35)
+        self.spr = c.finish(pivot=(cx, cy), border=8, shadow_alpha=0.22, shadow_blur=8)
+
+    def draw(self, f, cx, cy, angle):
+        place(f, self.spr, (cx, cy), angle=angle)

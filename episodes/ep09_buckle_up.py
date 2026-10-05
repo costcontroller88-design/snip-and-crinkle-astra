@@ -57,11 +57,13 @@ T_SN_GRAB, T_SN_MID, T_SN_PASS, T_SN_CLICK = 8.05, 8.35, 8.62, 9.0
 T_CR_GRAB, T_CR_MID, T_CR_PASS, T_CR_CLICK = 9.15, 9.42, 9.68, 10.0
 T_THUMB = 10.55                       # count 3: thumbs-up
 T_WHEEL = 11.2                        # hand back on the wheel
-T_GO, RU, T_STOP, RD = 11.55, 1.0, 16.3, 1.2
-V = 360.0                             # cruising scroll speed (px/s)
+T_GO, RU, T_STOP, RD = 11.55, 0.8, 14.55, 1.1   # drive off ... and stop AT the beach before the paw-bump
+ARRIVE_O = PC.BEACH_X + 120            # scroll offset where the beach fills the view
+V = ARRIVE_O / (RU / 2 + (T_STOP - T_GO - RU - RD) + RD / 2)   # cruising scroll speed (px/s), ~620
 COUNTS = (T_SN_CLICK, T_CR_CLICK, T_THUMB + 0.05)
 HEART_PLAN = ((12.4, 160, 720), (12.6, 450, 640), (12.8, 820, 700), (13.0, 640, 600))
-T_IRIS0, T_IRIS1, T_RESET, T_OPEN1 = 16.55, 17.1, 17.18, 17.9
+T_BALL0, T_COVER0, T_RESET, T_COVER1, T_BALL1 = 16.45, 16.95, 17.05, 17.15, 17.75   # beach-ball wipe (loop)
+NOTE_PLAN = ((11.9, 150, 560, 0), (12.5, 900, 520, 1), (13.0, 420, 500, 2), (13.5, 760, 540, 0))
 
 SKY = PC.sky()
 CLOUDS = PC.clouds(W_CLOUDS := scene.W + 600)
@@ -98,7 +100,8 @@ CHECK = icons.check(130)
 SPARKLE = scene.sparkle()
 NUMS = [scene.numeral(1, (244, 112, 104)), scene.numeral(2, (255, 196, 52)), scene.numeral(3, (84, 182, 222))]
 HEARTS = [scene.heart(c, 110) for c in ((240, 72, 98), (255, 120, 150), (244, 92, 120), (255, 150, 170))]
-IRIS = PS.HeartIris()
+BALL = PC.BeachBallWipe()
+NOTES = [PC.music_note(c) for c in ((120, 96, 200), (236, 104, 120), (60, 150, 200))]
 SNIP = Character("snip", 1.15)
 CR = Character("crinkle", 1.2)
 
@@ -338,8 +341,14 @@ def snip_state(t):
         s["tilt"] = 6 * math.sin(2 * math.pi * 1.0 * (t - T_GO)) * ease_in_out(seg(t, 12.0, 12.4))
         e = 7 * math.sin(2 * math.pi * 2.0 * (t - T_GO))
         s["ears"] = [e, -e]
-        if 13.6 <= t:
+        wave = ease_in_out(seg(t, 11.95, 12.25)) * (1 - ease_in_out(seg(t, 13.25, 13.55)))
+        if wave > 0:                       # waves out of the window at the passing houses
+            s["arm_l"] = lerp(-14, -138 + 22 * math.sin(2 * math.pi * 2.6 * (t - 11.95)), wave)
+            s["look"] = (-10, -4)
+        s["head_dy"] = -5 * abs(math.sin(2 * math.pi * 1.0 * (t - T_GO)))   # bops to the beat
+        if 13.9 <= t:                      # the sea! (car rolls to a stop at the beach)
             s.update(eyes="sparkle", mouth="grin", look=(-10, -2))
+            s["head_dy"] = -10 * math.sin(math.pi * seg(t, 14.05, 14.35))
     elif t < 16.15:                        # PAW-BUMP (seated)
         s.update(eyes="happy", mouth="grin")
         wind = ease_in_out(seg(t, 14.8, 15.1))
@@ -415,7 +424,8 @@ def crinkle_state(t):
     elif t < 14.6:                         # the happy ride
         s.update(eyes="happy", mouth="grin", look=(-6, -4))
         s["head_dy"] = 6 * math.sin(2 * math.pi * 2.0 * (t - T_GO))
-        if 13.6 <= t:
+        s["lean"] = 5 * math.sin(2 * math.pi * 1.0 * (t - T_GO)) * ease_in_out(seg(t, T_GO, T_GO + 0.4)) * (1 - seg(t, 13.8, 14.1))
+        if 13.9 <= t:
             s.update(eyes="sparkle", look=(-10, -2))
     elif t < 16.15:                        # PAW-BUMP
         s.update(eyes="happy", mouth="grin", look=(-6, 2))
@@ -641,6 +651,13 @@ def render_frame(t):
             place(f, HEARTS[i], (x + 12 * math.sin(t * 3 + i), y - 150 * p + b), scale=pop_scale(t, t0, 0.25),
                   alpha=1 - ease_in_out(seg(t, 13.9, 14.3)), angle=10 * math.sin(t * 2.5 + i))
 
+    # music notes bob out of the car on the happy ride
+    for i, (t0, x, y, ci) in enumerate(NOTE_PLAN):
+        if t0 <= t < t0 + 1.4:
+            p = seg(t, t0, t0 + 1.4)
+            place(f, NOTES[ci], (x + 30 * math.sin(t * 4 + i), y - 260 * p + b), scale=pop_scale(t, t0, 0.25) * 0.9,
+                  alpha=1 - ease_in_out(seg(p, 0.6, 1.0)), angle=12 * math.sin(t * 5 + i))
+
     # paw-bump: both touching paws in front, sparkle
     if 15.1 <= t < 16.3:
         place(f, SNIP.arm_r, shoulder(SNIP, sn, "r"), angle=sn["arm_r"] + sn["lean"], sy=sn["str_r"])
@@ -680,18 +697,20 @@ def render_frame(t):
     if T_THUMB + 0.1 <= t < T_THUMB + 0.9:
         place(out, CHECK, (700, 470), scale=pop_scale(t, T_THUMB + 0.1, 0.25) * (1 - ease_in_out(seg(t, T_THUMB + 0.7, T_THUMB + 0.9))))
 
-    # heart iris back to the start (loop)
-    if T_IRIS0 <= t < T_OPEN1:
-        if t < T_IRIS1:
-            size = lerp(4300, 0, ease_in_out(seg(t, T_IRIS0, T_IRIS1)) ** 0.7)
-            ctr = (500, 900)
-        elif t < T_RESET + 0.06:
-            size, ctr = 0, IRIS_OPEN_AT
-        else:
-            size = lerp(0, 4300, ease_in_out(seg(t, T_RESET + 0.06, T_OPEN1)) ** 1.6)
-            ctr = IRIS_OPEN_AT
-        out = IRIS.apply(out, ctr, size)
+    # a giant beach ball rolls across and hides the jump back to the start (loop)
+    if T_BALL0 <= t < T_BALL1:
+        out = out.copy()
+        BALL.draw(out, ball_x(t), 960 + 40 * math.sin(math.pi * seg(t, T_BALL0, T_BALL1)), -1.6 * (t - T_BALL0) * 30)
     return out
+
+
+def ball_x(t):
+    """Ball centre: rolls in from the right, lingers while it covers the whole screen, rolls out left."""
+    if t < T_COVER0:
+        return lerp(scene.W + BALL.R + 30, 600, ease_in_out(seg(t, T_BALL0, T_COVER0)) ** 0.8)
+    if t < T_COVER1:
+        return lerp(600, 480, seg(t, T_COVER0, T_COVER1))
+    return lerp(480, -BALL.R - 30, ease_in_out(seg(t, T_COVER1, T_BALL1)) ** 1.25)
 
 
 def draw_belt_path(f, t, base):
@@ -729,10 +748,9 @@ CAM_KEYS = [
     (0.0,) + CAM0, (1.0, 1.47, 330, 1000), (2.3, 1.0, 540, 960), (4.6, 1.0, 540, 960),
     (5.0, 1.08, 470, 920), (6.1, 1.08, 470, 920), (6.5, 1.0, 540, 960), (7.75, 1.0, 540, 960),
     (8.25, 1.14, 482, 1060), (10.1, 1.14, 482, 1060), (10.55, 1.0, 540, 960), (14.7, 1.0, 540, 960),
-    (15.05, 1.1, 480, 1010), (16.3, 1.1, 480, 1010), (T_IRIS1, 1.0, 540, 960), (T_RESET, 1.0, 540, 960),
+    (15.05, 1.1, 480, 1010), (16.3, 1.1, 480, 1010), (16.9, 1.0, 540, 960), (T_RESET, 1.0, 540, 960),
     (T_RESET + 0.01,) + CAM0, (DUR,) + CAM0]
 
-IRIS_OPEN_AT = _iris_open_at()
 
 
 def camera(f, t):
@@ -840,18 +858,22 @@ def build_audio(path):
         sfx.add(tt, A.pop(0.45))
     sfx.add(12.4, A.twinkle(0.6))
     sfx.add(13.7, PS.chirp(0.5))
+    sfx.add(14.2, A.whoosh(0.9, 0.35))                       # sea waves as we pull up
+    for tt, _, _, _ in NOTE_PLAN:
+        sfx.add(tt, A.pop(0.3))
     music.add(13.0, A.shaker(0.4))
     # paw-bump (signature)
     sfx.add(14.85, A.snare_roll(0.6, 0.8))
     sfx.add(15.45, A.boop(0.9))
     A.jingle(music, 15.47, 1.0, ending=True)
     sfx.add(15.5, A.twinkle(0.8))
-    # car stops at the beach, heart iris, back to the start
+    # at the beach; a giant beach ball rolls by, back to the start
     A.strum(music, 16.3, "F", 0.5)
     A.strum(music, 16.8, "G7", 0.5)
-    sfx.add(T_IRIS0, PS.slide_whistle(500, 1400, 0.55, 0.6))
-    sfx.add(T_IRIS1, A.pop(0.7))
-    sfx.add(T_RESET + 0.1, PS.slide_whistle(1400, 700, 0.5, 0.5))
+    sfx.add(T_BALL0, A.whoosh(0.6, 0.7))                    # here comes the beach ball ...
+    sfx.add(T_COVER0 - 0.05, A.boing(0.8, 180))             # BOING
+    sfx.add(T_COVER1, A.whoosh(0.55, 0.6))                  # ... and rolls away
+    sfx.add(T_BALL1 - 0.1, A.pop(0.5))
     for tt in (17.25, 17.75):
         sfx.add(tt, A.boing(0.45, 300))
     sfx.add(17.45, A.uh_oh(0.6))
