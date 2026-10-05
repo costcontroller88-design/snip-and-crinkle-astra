@@ -12,8 +12,15 @@ You are continuing work for the owner of the YouTube channel **Snip & Crinkle (@
   - Ep 3 `episodes/ep03_the_last_cookie.py` (evening kitchen, tug-of-war tumble, break in half and share)
   - Ep 4 `episodes/ep04_whose_toy_is_this.py` (park, teddy ears pop up, give the toy back to the duckling)
   - Ep 5 `episodes/ep05_hold_paws_to_cross.py` (street, wind-up legs skid, wait for green, look both ways, hold a grown-up's hand)
+- **Episodes 6–10 are finished** (made in five parallel cloud sessions, one per episode, then checked and merged into `main` by the coordinating session). Each scored 8/10 overall with no item below 7 and passes `tools/check_video.py` (re-verified by re-rendering). Reviews in `reviews/ep06.md` … `reviews/ep10.md`.
+  - Ep 6 `episodes/ep06_achoo_elbow_sneeze.py` (playroom, block tower blown down by a sneeze, sneeze into the elbow)
+  - Ep 7 `episodes/ep07_helmet_on.py` (garden, tricycle, helmet popped off by the ears, helmet + strap click + wiggle test)
+  - Ep 8 `episodes/ep08_your_turn_swing.py` (playground, twist-and-spin dizzy gag, take turns with Pip, gentle pushes)
+  - Ep 9 `episodes/ep09_buckle_up.py` (car cut-away, bouncing on the booster, click-click-thumbs-up before the car moves)
+  - Ep 10 `episodes/ep10_hot_sunny_day.py` (beach, hot-sand hops, noodle ears, hat + shade + water sips)
+- **Delivered:** the MP4s for Episodes 6–10 were sent to the owner in the Claude chat (2026-10-05); Episodes 9 and 10 take ~12 min each to render.
 - **Delivered:** the MP4s for Episodes 1–5 were sent to the owner directly in the Claude chat (2026-10-05). GitHub Releases could not be created: cloud sessions get "Creating, editing, or deleting releases is not permitted for this session type" (HTTP 403). MP4s are git-ignored; re-render any episode with `python3 episodes/<file>.py` (~5 min each).
-- **Tips learned:** zooms or fast pans over fine stripes (zebra crossing, gingham cloth) trip the "harsh jump" check; keep zooms slow (≤ ~0.35 zoom/s) or pan sideways instead. Review single frames with `render_frame(t)` to review before a full render (~5 min per episode).
+- **Tips learned:** zooms or fast pans over fine stripes (zebra crossing, gingham cloth) trip the "harsh jump" check; keep zooms slow (≤ ~0.35 zoom/s) or pan sideways instead. Review frames with `python3 tools/review_frames.py <episode.py> out.png t1 t2 …` and measure jumps with `python3 tools/frame_jumps.py <episode.py> t0 t1 …` before a full render. Parallel cloud sessions (one per episode, each on its own branch, never touching shared files) worked well for batches.
 
 ## How to work
 1. `./setup_cloud.sh` (ffmpeg, Pillow, numpy, Fredoka font).
