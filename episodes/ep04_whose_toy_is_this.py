@@ -773,6 +773,10 @@ def build_audio(path):
     sfx.add(12.35, A.boing(0.3, 340))
     # paw-bump
     sfx.add(14.0, A.boing(0.35, 300))
+    for tt, ch, m in ((13.95, "F", 41), (14.45, "G", 43)):   # keep the music going into the paw-bump
+        A.strum(music, tt, ch, 0.6)
+        music.add(tt, A.bass(M(m), 0.5, 0.6))
+    sfx.add(14.62, A.boing(0.3, 320))
     sfx.add(14.85, A.snare_roll(0.6, 0.8))
     sfx.add(15.45, A.boop(0.9))
     A.jingle(music, 15.47, 1.0, ending=True)
