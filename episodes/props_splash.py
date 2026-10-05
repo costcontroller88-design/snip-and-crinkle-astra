@@ -306,3 +306,13 @@ def slosh_drop(r):
     c.ellipse(r + 3, r + 3, r, r * 0.9, BLUE)
     c.ellipse(r + 3 - r * 0.3, r + 3 - r * 0.3, r * 0.3, r * 0.22, mix(BLUE, (255, 255, 255), 0.4), sil=False)
     return c.finish(pivot=(r + 3, r + 3), border=3, shadow_alpha=0.2)
+
+
+def blue_nose():
+    """Crinkle's nose after the brush boops it: the whole nose bright blue, with a shine and two speckles."""
+    c = Cut(80, 56)
+    c.ellipse(40, 28, 30, 21, BLUE)
+    c.ellipse(31, 21, 9, 4.5, mix(BLUE, (255, 255, 255), 0.55), sil=False)
+    c.ellipse(70, 40, 4, 4, BLUE)
+    c.ellipse(9, 44, 3, 3, BLUE)
+    return c.finish(pivot=(40, 28), border=0, shadow_alpha=0.0)

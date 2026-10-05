@@ -85,7 +85,8 @@ CLOUD = S.thought_cloud().scaled(0.95)
 BUB_HIDE = P.bubble_hide().scaled(1.2)
 BUB_SORRY = P.bubble_sorry().scaled(1.2)
 QMARK = S.question().scaled(0.9)
-NOSE_DOT = S.nose_dot()
+BLUE_NOSE = S.blue_nose().scaled(1.2)
+SPECKS = [S.slosh_drop(r) for r in (7, 6, 5, 5)]
 SPARK = S.sparkle()
 SPARK_S = S.sparkle((255, 240, 160))
 HEARTS = [S.heart(c) for c in ((240, 72, 98), (255, 120, 150), (244, 92, 120))]
@@ -105,23 +106,38 @@ def paw_for_tip(tip, u, L):
 
 # ---------------------------------------------------------------- tool tracks
 class Track:
-    """Piecewise-linear point track: [(t, (x, y)), ...]; None outside its span."""
+    """Piecewise-linear point track: [(t, (x, y)), ...] spans; tells where a tool tip should point."""
 
     def __init__(self):
         self.spans = []
 
     def add(self, keys):
-        self.spans.append(sorted(keys))
+        keys = sorted(keys)
+        for span in self.spans:                    # a stroke that starts where another ends continues it
+            if abs(span[-1][0] - keys[0][0]) < 1e-6:
+                span.extend(keys[1:])
+                return
+        self.spans.append(keys)
 
     def at(self, t):
+        info = self.info(t)
+        return info[0] if info else None
+
+    def info(self, t):
+        """(tip, span_start, span_end) while inside a span, else None."""
         for keys in self.spans:
             if keys[0][0] <= t <= keys[-1][0]:
                 for (t0, p0), (t1, p1) in zip(keys, keys[1:]):
                     if t0 <= t <= t1:
                         k = 0 if t1 == t0 else (t - t0) / (t1 - t0)
-                        return lerp(p0[0], p1[0], k), lerp(p0[1], p1[1], k)
-                return keys[-1][1]
+                        return (lerp(p0[0], p1[0], k), lerp(p0[1], p1[1], k)), keys[0][0], keys[-1][0]
+                return keys[-1][1], keys[0][0], keys[-1][0]
         return None
+
+    def last_end(self, t):
+        """(end time, end tip) of the latest span that ended before t."""
+        ends = [(keys[-1][0], keys[-1][1]) for keys in self.spans if keys[-1][0] < t]
+        return max(ends) if ends else None
 
 
 SN_TIP, CR_TIP = Track(), Track()
@@ -320,29 +336,64 @@ CR.reach(64.8, 65.1, "l", (SWAP[0] - 10, SWAP[1]), "io")
 T_SWAP = 65.15                                                             # brush changes to the left paw
 CR.to(65.3, 65.6, "io", arm_r=10, elb_r=-14)
 CR.reach(65.3, 65.6, "l", (CR_P - 150, 1250), "io")
-# thinking... the brush tip touches his nose: a blue dot. Snip giggles.
-CR.to(66.0, 66.4, "io", look_x=-12, look_y=-4, tilt=6).face(66.0, eyes="normal", brows="think", mouth="hum")
-CR.arms_front.append((66.3, 67.6))
+# ---- the blue-nose gag: its own little sequence of close-ups (Crinkle / Snip / Crinkle / both)
+# Crinkle thinks, tapping his chin with the brush; the third tap boops his nose: it turns blue. He doesn't notice.
+CR.to(65.8, 66.1, "io", turn=-0.3, look_x=-10, look_y=-4)               # turned enough that the brush is in front
+CR.face(66.0, eyes="normal", brows="think", mouth="hum")
+CR.to(66.1, 66.4, "io", tilt=6)
+CR.arms_front.append((66.1, 68.0))
 NOSE_LOCAL = (0, -96)
-CR.reach(66.3, 66.9, "l", (CR_P - 16, 1205), "io")                         # paw to chin, brush up to the nose
-T_DOT = 66.9
-CR.to(67.3, 67.6, "io", arm_l=-60, elb_l=40)
-SN.to(67.6, 67.9, "io", look_x=12, look_y=0).face(67.8, eyes="happy", brows="up", mouth="smile_open")
-SN.hop(68.0, 68.25, 1, 10).hop(68.25, 68.5, 1, 10).hop(68.5, 68.75, 1, 10)  # giggles
-CR.to(68.2, 68.5, "io", look_x=-12, look_y=0, tilt=0).face(68.2, eyes="wide", brows="up", mouth="o")
-CR.to(68.6, 68.9, "io", look_x=0, look_y=12).face(68.6, eyes="normal")      # cross-eyed look at his nose
-CR.face(69.0, eyes="happy", brows="up", mouth="smile_open")
-CR.hop(69.0, 69.25, 1, 10).hop(69.25, 69.5, 1, 10).hop(69.5, 69.75, 1, 10)  # laughs too
-SN.face(69.0, eyes="happy")
-# both look at the painting: tilt... tilt... idea!
-SN.to(70.0, 70.3, "io", look_x=-2, look_y=-4, turn=0.4).face(70.0, eyes="normal", brows="calm", mouth="smile")
-CR.to(70.0, 70.3, "io", look_x=-12, look_y=-4).face(70.0, eyes="normal", brows="think", mouth="hum")
-CR.to(70.3, 70.7, "io", tilt=12).to(70.9, 71.3, "io", tilt=-10)
-T_IDEA = 71.6
+_st = CR.state(66.6)
+NOSE_W = CR.a.face_point(_st, NOSE_LOCAL)
+CHIN_W = CR.a.face_point(_st, (-4, -12))
+U_GAG = (0.42, -0.91)                                                     # brush held upright, bristles to the face
+
+
+def _cl(p):
+    return p[0] - CANVAS_XY[0], p[1] - CANVAS_XY[1]                       # stroke() takes canvas-local points
+
+
+T_DOT = 67.25
+stroke(CR, "l", [_cl(CHIN_W), _cl((CHIN_W[0] - 4, CHIN_W[1] + 26)), _cl(CHIN_W), _cl((CHIN_W[0] - 4, CHIN_W[1] + 26)),
+                 _cl(NOSE_W)], CR_TIP, U_GAG, L_CR, 66.4, T_DOT, ease_in=0.3)
+stroke(CR, "l", [_cl(NOSE_W), _cl((CHIN_W[0] - 30, CHIN_W[1] + 90))], CR_TIP, U_GAG, L_CR, 67.4, 67.8, ease_in=0.15)
+CR.to(67.4, 67.7, "io", tilt=-5)                                          # still thinking: hmm...
+CR.to(68.0, 68.4, "io", arm_l=-60, elb_l=40)
+# Snip glances over, notices, tries not to laugh (cheeks puffed, paw over mouth)... then giggles
+SN.to(67.55, 67.8, "io", look_x=12, look_y=0, turn=0.5).face(67.55, eyes="normal", brows="calm", mouth="smile")
+SN.face(67.95, eyes="wide", brows="up", mouth="o")
+SN.no_blink.append((67.9, 68.6))
+SN.arms_front.append((68.15, 69.3))
+_sn = SN.state(68.3)
+SN.reach(68.15, 68.4, "l", SN.a.face_point(_sn, (4, -80)), "io")
+SN.face(68.38, eyes="closed", brows="up", mouth="blow")
+SN.wiggle(68.38, "sq", 0.03, 8.0, 6.0)
+T_GIGGLE = 68.5
+SN.face(T_GIGGLE, eyes="happy", brows="up", mouth="smile_open")
+SN.hop(T_GIGGLE, T_GIGGLE + 0.25, 1, 10).hop(T_GIGGLE + 0.25, T_GIGGLE + 0.5, 1, 10).hop(T_GIGGLE + 0.5, T_GIGGLE + 0.75, 1, 10)
+SN.to(69.3, 69.6, "io", arm_l=-10, elb_l=14)
+SN.hop(70.0, 70.25, 1, 8).hop(70.25, 70.5, 1, 8).hop(70.85, 71.1, 1, 8)
+# Crinkle: puzzled... looks down at his own nose... it's blue! ...and laughs too
+CR.to(69.0, 69.25, "io", look_x=-12, look_y=0, tilt=0).face(69.0, eyes="normal", brows="up", mouth="o")
+CR.to(69.4, 69.65, "io", look_x=-2, look_y=12).face(69.4, eyes="normal", brows="think", mouth="hum")
+T_SEES = 69.75
+CR.face(T_SEES, eyes="wide", brows="up", mouth="O").hop(T_SEES, T_SEES + 0.25, 1, 14)
+CR.no_blink.append((69.3, 70.1))
+T_LAUGH = 70.1
+CR.face(T_LAUGH, eyes="happy", brows="up", mouth="smile_open")
+CR.to(T_LAUGH, T_LAUGH + 0.3, "io", look_y=0)
+CR.hop(T_LAUGH, T_LAUGH + 0.25, 1, 10).hop(T_LAUGH + 0.25, T_LAUGH + 0.5, 1, 10).hop(T_LAUGH + 0.5, T_LAUGH + 0.75, 1, 10)
+CR.reach(T_LAUGH, T_LAUGH + 0.3, "r", (CR_P + 20, 1390), "io")           # paw on his tummy, laughing
+CR.to(70.9, 71.2, "io", arm_r=10, elb_r=-14)
+# both look back at the painting: tilt... tilt... idea!
+SN.to(71.2, 71.5, "io", look_x=-2, look_y=-4, turn=0.4).face(71.2, eyes="normal", brows="calm", mouth="smile")
+CR.to(71.2, 71.4, "io", look_x=-12, look_y=-4, turn=-0.6).face(71.2, eyes="normal", brows="think", mouth="hum")
+CR.to(71.25, 71.55, "io", tilt=12).to(71.6, 71.9, "io", tilt=-10)
+T_IDEA = 72.0
 CR.to(T_IDEA, T_IDEA + 0.3, "back", tilt=0).face(T_IDEA, eyes="sparkle", brows="up", mouth="smile_open")
 CR.hop(T_IDEA, T_IDEA + 0.35, 1, 22)
 CR.to(T_IDEA, T_IDEA + 0.35, "snap", arm_r=150, elb_r=-20)
-CR.to(72.3, 72.7, "io", arm_r=10, elb_r=-14)
+CR.to(72.5, 72.8, "io", arm_r=10, elb_r=-14)
 # shot 16: the trace (Crinkle: tail and back; Snip joins: nose and belly)
 n_belly, n_tail = 29, len(S.TAIL_EDGE)
 CR_PATH = OUTLINE[n_belly - 6:n_belly + n_tail + 12]
@@ -445,7 +496,10 @@ SHOTS = [
     (44.0, (1190, 1080), 1.1),                  # 13 the thought
     (50.6, (690, 1130), 1.3),                   # 14 sorry, hug
     (58.6, (960, 1100), 1.0),                   # 15 "I'll fix it", the brush
-    (65.8, (820, 1110), 1.2),                   # 16 the nose dot, the idea
+    (65.8, (1140, 1110), 1.9),                  # 16a Crinkle thinks... boop: a blue nose
+    (67.6, (480, 1075), 1.9),                   # 16b Snip notices, tries not to laugh, giggles
+    (69.0, (1140, 1100), 1.9),                  # 16c Crinkle: puzzled, looks at his nose, laughs
+    (70.8, (820, 1110), 1.2),                   # 16d both laugh; back to the painting; idea!
     (73.0, CANVAS_MID, 1.75),                   # 17 the trace
     (79.8, (820, 1110), 1.2),                   # 18 Snip gets it
     (83.0, cv(112, 168), 1.9),                  # 19 eye
@@ -531,11 +585,26 @@ def brush_holder(name, t):
     return (CR, "r") if t < T_SWAP else (CR, "l")
 
 
-def tool_angle(perf, side, st, tip_track, t):
+def _blend_angle(a, b, k):
+    d = (b - a + 180) % 360 - 180
+    return a + d * k
+
+
+def tool_angle(perf, side, st, tip_track, t, ease=0.3):
+    """The tool follows the forearm, except while painting (it aims at the tip track); it eases between the two."""
     W, fa = perf.paw(t, side, st)
-    tip = tip_track.at(t) if tip_track else None
-    if tip is not None:
-        return W, math.degrees(math.atan2(tip[0] - W[0], tip[1] - W[1]))
+    if tip_track is None:
+        return W, fa
+    info = tip_track.info(t)
+    if info:
+        tip, t0, _ = info
+        aim = math.degrees(math.atan2(tip[0] - W[0], tip[1] - W[1]))
+        return W, _blend_angle(fa, aim, ease_in_out(seg(t, t0, t0 + ease)))
+    end = tip_track.last_end(t)
+    if end and t - end[0] < ease:
+        tip = end[1]
+        aim = math.degrees(math.atan2(tip[0] - W[0], tip[1] - W[1]))
+        return W, _blend_angle(aim, fa, ease_in_out(seg(t, end[0], end[0] + ease)))
     return W, fa
 
 
@@ -593,6 +662,20 @@ def draw_brush(f, t, who, st_of):
     track = SN_TIP if who == "sn" else CR_TIP
     W, ang = tool_angle(perf, side, st, track, t)
     place(f, BRUSH_SN if who == "sn" else BRUSH_CR, CAM.S(W), angle=ang)
+
+
+def draw_blue_nose(f, t, cr):
+    nx, ny = CR.a.face_point(cr, NOSE_LOCAL)
+    ht = max(-1.0, min(1.0, cr["turn"] + cr.get("hturn", 0.0)))
+    w = 0.6 + 0.4 * math.cos(math.radians(R.THETA_HEAD * ht))
+    k = ease_out_back(seg(t, T_DOT, T_DOT + 0.15))
+    place(f, BLUE_NOSE, CAM.S((nx, ny)), angle=cr["lean"] + cr["tilt"], sx=w * k, sy=k, shadow=False)
+    q = seg(t, T_DOT, T_DOT + 0.35)                            # tiny paint specks fly off the boop
+    if 0 < q < 1:
+        for i, spr in enumerate(SPECKS):
+            a = math.radians(200 + i * 45)
+            place(f, spr, CAM.S((nx + 70 * q * math.cos(a), ny + 70 * q * math.sin(a) + 40 * q * q)),
+                  scale=1 - 0.5 * q, shadow=False)
 
 
 def dim_k(t):
@@ -674,10 +757,10 @@ def render_frame(t, view="land"):
         for tool in tools_behind:
             _draw_tool(f, tq, tool, st_of)
         perf.draw(f, tq, CAM, st=st)
+        if who == "cr" and tq >= T_DOT:
+            draw_blue_nose(f, tq, cr)
         for tool in tools_front:
             _draw_tool(f, tq, tool, st_of)
-        if who == "cr" and tq >= T_DOT:
-            place(f, NOSE_DOT, CAM.S(CR.a.face_point(cr, NOSE_LOCAL)), shadow=False)
     k = dim_k(tq)
     if k > 0.001:
         f.alpha_composite(Image.new("RGBA", f.size, (40, 30, 50, int(110 * k))))
@@ -816,9 +899,18 @@ def build_audio(path):
         sfx.add(tt, A.pop(0.35))
     # the fix: bouncy determined music
     groove(58.6, [("C", 48), ("G", 43), ("F", 41), ("C", 48)] * 3, vel=0.34, inst=MX.toy_piano)
+    for tt in (66.61, 67.04):
+        sfx.add(tt, A.woodblock(True, 0.3))                       # tap, tap (on the chin)
+    sfx.add(T_DOT, A.boop(0.9))
     sfx.add(T_DOT, A.pop(0.6))
-    sfx.add(68.0, giggle_snd(0.8))
-    sfx.add(69.0, giggle_snd(0.7))
+    sfx.add(T_DOT + 0.02, splat_snd(0.18))
+    sfx.add(67.95, A.glock(M(100), 0.5, 0.35))                   # Snip notices
+    sfx.add(68.38, A.blow(0.3, 0.35))                            # pfff (holding it in)
+    sfx.add(T_GIGGLE, giggle_snd(0.8))
+    sfx.add(69.0, A.boop(0.35))
+    sfx.add(T_SEES, A.boing(0.45, 500))
+    sfx.add(T_LAUGH, giggle_snd(0.7))
+    sfx.add(70.85, giggle_snd(0.45))
     sfx.add(T_IDEA, A.chime_up(0.9, (84, 88, 91, 96)))
     # the trace: a soft rising glide while the dots appear, then the whale twinkle
     music.add(73.0, A.pad([M(48), M(55), M(64)], 6.6, 0.3))
@@ -870,8 +962,9 @@ KEYS = [(2.0, "1 Snip paints"), (5.6, "2 the painting"), (10.0, "3 something mis
         (23.6, "7 the block"), (24.5, "8 trip!"), (24.85, "8 slosh"), (26.0, "8 phew"), (29.8, "9 the painting"),
         (31.5, "10 Snip: shock"), (33.9, "10 sad"), (36.8, "11 uh-oh"), (39.1, "12 puts it down"),
         (41.4, "12 tiptoes away"), (43.0, "12 the sniff"), (46.4, "13 sneak or sorry?"), (53.5, "14 sorry"),
-        (56.8, "14 hug"), (59.2, "15 I'll fix it"), (63.0, "15 a brush"), (67.2, "16 blue nose"),
-        (68.3, "16 Snip giggles"), (72.0, "16 idea!"), (75.0, "17 trace"), (79.4, "17 a whale!"),
+        (56.8, "14 hug"), (59.2, "15 I'll fix it"), (63.0, "15 a brush"), (66.8, "16a thinking (tap, tap)"),
+        (67.3, "16a boop!"), (68.3, "16b Snip: pfff"), (68.7, "16b giggles"), (69.55, "16c looks at his nose"),
+        (69.85, "16c it's blue!"), (70.4, "16c laughs"), (72.2, "16d idea!"), (75.0, "17 trace"), (79.4, "17 a whale!"),
         (84.4, "19 eye"), (88.2, "20 tail"), (90.0, "21 together"), (93.4, "22 spout"), (96.6, "23 waves"),
         (99.1, "24 boat"), (102.7, "25 rainbow"), (106.0, "27 reveal"), (109.0, "27 reveal (close)"),
         (110.5, "28 Snip amazed"), (111.5, "29 Crinkle amazed"), (114.5, "30 paw-bump"), (118.5, "31 ta-da")]
