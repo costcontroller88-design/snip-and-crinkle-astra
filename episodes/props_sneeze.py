@@ -19,7 +19,7 @@ from paperlib import Cut, grain, heart_pts, mix, place, star_pts  # noqa: E402
 
 W, H = 1080, 1920
 FLOOR_Y = 1440
-BLOCK = 92                      # block edge (front face)
+BLOCK = 80                      # block edge (front face); 4 blocks + star = a tower as tall as Snip's face
 
 WALL = (255, 226, 200)
 WALL_STRIPE = (255, 236, 216)
@@ -196,7 +196,9 @@ def big_puff():
 def tiny_puff():
     c = Cut(110, 80)
     for (x, y, r) in ((30, 44, 18), (56, 34, 22), (80, 46, 16)):
-        c.ellipse(x, y, r, r * 0.85, PUFF)
+        c.ellipse(x + 2, y + 3, r, r * 0.85, PUFF_DARK)
+    for (x, y, r) in ((30, 44, 18), (56, 34, 22), (80, 46, 16)):
+        c.ellipse(x, y, r * 0.86, r * 0.72, PUFF, sil=False)
     return c.finish(pivot=(55, 40), border=3, shadow_alpha=0.12)
 
 
@@ -261,6 +263,8 @@ def _mini_snip(c, cx, cy, s):
         c.ellipse(cx + dx * s, cy - 44 * s, 11 * s, 30 * s, fur, sil=False, theta=th)
         c.ellipse(cx + dx * s, cy - 40 * s, 5 * s, 20 * s, SNIP["ear_in"], sil=False, theta=th)
     c.ellipse(cx, cy, 36 * s, 31 * s, fur, sil=False)
+    for ex in (-12, 12):                                    # eyes squeezed shut (sneezing)
+        c.arc(cx + ex * s, cy - 6 * s, 6 * s, 4 * s, 200, 340, 3 * s, (38, 32, 44))
     c.ellipse(cx, cy + 6 * s, 4 * s, 3 * s, SNIP["nose"], sil=False)
 
 
@@ -277,12 +281,65 @@ def choice_bubble(kind, ring):
             c.ellipse(x, y, 6, 6, (150, 214, 88), sil=False)
         c.ellipse(82, 150, 6, 7, (120, 40, 60), sil=False)
     else:                                                   # into the elbow: arm across the face, tiny puff
-        _mini_snip(c, 112, 140, 1.15)
-        c.line([(176, 196), (112, 152), (164, 124)], 18, SNIP["fur"])
-        c.ellipse(176, 196, 13, 12, SNIP["tee"], sil=False)
-        for (x, y, r) in ((90, 160, 7), (82, 150, 6)):
-            c.ellipse(x, y, r, r, PUFF_DARK, sil=False)
+        _mini_snip(c, 116, 132, 1.35)
+        c.line([(196, 214), (124, 160), (200, 128)], 30, SNIP["fur"])     # arm across nose and mouth
+        c.line([(196, 214), (124, 160), (200, 128)], 4, (190, 176, 214))
+        c.line([(196, 214), (124, 160), (200, 128)], 26, SNIP["fur"])
+        c.ellipse(198, 214, 20, 18, SNIP["tee"], sil=False)
+        c.ellipse(210, 120, 10, 9, PUFF_DARK, sil=False)                  # only a teeny puff at the elbow
+        c.ellipse(208, 118, 7, 6, PUFF, sil=False)
     return c.finish(pivot=(125, 125), border=7)
+
+
+# ---------------------------------------------------------------- friendly germs, scarf tail
+GERM_COLORS = ((150, 214, 88), (104, 200, 170), (186, 214, 70), (130, 206, 120))
+
+
+def germ(color, mood="smile", seed=0):
+    """A tiny round smiley germ (friendly, never gross). mood: smile | giggle | gasp."""
+    c = Cut(84, 80)
+    cx, cy = 42, 42
+    bumps = 7 + seed % 3
+    pts = [(cx + (24 + 3 * math.sin(bumps * a + seed)) * math.cos(a),
+            cy + (22 + 3 * math.sin(bumps * a + seed)) * math.sin(a)) for a in np.linspace(0, 2 * math.pi, 60)]
+    c.ellipse(cx - 27, cy - 10, 5, 10, color, theta=35)
+    c.ellipse(cx + 27, cy - 10, 5, 10, color, theta=-35)
+    c.polygon(pts, color)
+    hi = tuple(min(255, v + 45) for v in color)
+    c.ellipse(cx - 9, cy - 13, 6, 3, hi, sil=False, theta=-20)
+    for ex in (-8, 8):
+        if mood == "giggle":
+            c.arc(cx + ex, cy - 2, 5, 4, 200, 340, 3, (38, 32, 44))
+        else:
+            c.ellipse(cx + ex, cy - 3, 6, 7, (255, 255, 255), sil=False)
+            c.ellipse(cx + ex + 1, cy - 2, 3.5, 4.5, (38, 32, 44), sil=False)
+    if mood == "gasp":
+        c.ellipse(cx, cy + 10, 4, 5, (110, 40, 60), sil=False)
+    elif mood == "giggle":
+        c.chord(cx, cy + 6, 8, 8, 0, 180, (110, 40, 60))
+    else:
+        c.arc(cx, cy + 5, 7, 5, 20, 160, 3, (38, 32, 44))
+    return c.finish(pivot=(cx, cy), border=4)
+
+
+def scarf_tail():
+    """Crinkle's scarf end flapping in the sneeze wind. Pivot = the knot (left end)."""
+    c = Cut(190, 70)
+    pts = [(10 + x, 35 + 9 * math.sin(x / 26)) for x in range(0, 170, 6)]
+    c.line(pts, 34, CRINKLE["scarf"])
+    for x in (50, 100, 150):
+        y = 35 + 9 * math.sin((x - 10) / 26)
+        c.rrect(x - 7, y - 16, x + 7, y + 16, 3, CRINKLE["stripe"], sil=False)
+    return c.finish(pivot=(10, 35), border=4)
+
+
+def pop_ring():
+    """A small burst of dots used when a germ pops away."""
+    c = Cut(120, 120)
+    for i in range(8):
+        a = 2 * math.pi * i / 8
+        c.ellipse(60 + 42 * math.cos(a), 60 + 42 * math.sin(a), 8, 8, (255, 255, 255))
+    return c.finish(pivot=(60, 60), border=3, shadow_alpha=0.12)
 
 
 # ---------------------------------------------------------------- sounds (all synthesized, wordless)
