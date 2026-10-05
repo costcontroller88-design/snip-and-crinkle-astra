@@ -45,7 +45,7 @@ Known traps (each one cost us a round before):
 Shared code (paperlib, characters, scene, audio, icons, rig2, acting, hires) changes only when the brief says it's a toolkit work package; then the pilot's `--keys` sheet must re-render unchanged.
 
 Shorts: re-film the same performances with a vertical camera (the pilot02_short.py pattern).
-- Faces at about 40% of the frame height; nothing important in the bottom 19% or the right 12%.
+- Faces at about 40% of the frame height; nothing important in the bottom 19% (title and caption) or in the right 12% between 50% and 90% of the height (the like and comment buttons).
 - Each beat at least 0.8 s; key beats 1.5–4 s.
 - A music bed composed for the Short's own timeline; sound effects cut together with the pictures.
 

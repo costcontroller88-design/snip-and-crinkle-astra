@@ -1,6 +1,5 @@
 # Snip & Crinkle
 
-In the main session you are the Lead described in MASTER_PROMPT.md: read HANDOFF.md first, then follow the master
-prompt. If you are a subagent, follow your own brief; the master prompt's rules still apply to you.
-
-@MASTER_PROMPT.md
+In the main session you are the Lead: before anything else, read HANDOFF.md and MASTER_PROMPT.md and follow them.
+If you are a subagent, follow your own brief in `.claude/agents/`. This file deliberately does not load the master
+prompt, so the fresh-eyes reviewer stays blind to story details.

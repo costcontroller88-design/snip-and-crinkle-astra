@@ -38,21 +38,28 @@ E = S.E
 
 OUT_W, OUT_H = S.OUT_W, S.OUT_H
 CM = E.CANVAS_MID
-CANV = (CM[0], CM[1] + 0.06 * OUT_H / 2.0, 2.0)          # locked canvas: centre at ~44% of the height
+CANV = (782, CM[1] + 0.06 * OUT_H / 2.0, 2.0)     # canvas close-up (the wipe): centre at ~44% of the height
+LOCK = (CM[0] + 20, CM[1] + 0.06 * OUT_H / 1.35, 1.35)    # locked painting shot: both faces stay whole
+WIDE = (CM[0] + 20, CM[1] + 0.06 * OUT_H / 1.2, 1.2)      # the ruined picture with both friends reacting
 LAYER_ORDER = ("face", "tail", "spout", "waves", "boat", "bubbles", "rainbow")
 WIPE = (0.5, 1.4)                                         # wipe runs between these local times of the wipe shot
 
-# (source start, source end, framing) or ("wipe", duration, framing, source before, source after)
+# (source start, source end, framing[, "idea"]) or ("wipe", duration, framing, source before, source after)
 SEGS = [
     (24.0, 25.7, S.frame(1000, 1150, 1.3)),               # 1 trip, SPLAT
-    (29.0, 30.6, CANV),                                   # 2 the ruined picture
-    (36.2, 37.4, S.frame(1170, S.FY_CR, 1.8)),            # 3 uh-oh
-    (66.4, 67.7, (1150, 1150, 2.0)),                      # 4 thinking... tap, boop: he paints his own nose
-    (71.9, 72.8, (1150, 1100, 1.5)),                      # 5 idea!
-    (77.0, 79.9, CANV),                                   # 6 a whale!
-    *[(E.LAYER_T[n] - 0.3, E.LAYER_T[n] + 0.5, CANV) for n in LAYER_ORDER],   # 7-13 one layer per cut
-    ("wipe", 2.0, CANV, 30.6, 111.0),                     # 14 before -> after
-    (113.8, 116.4, S.frame(800, 1100, 1.4)),              # 15 paw-bump
+    (29.0, 30.6, WIDE),                                   # 2 the ruined picture; both react
+    (31.4, 32.4, S.frame(420, S.FY_SN, 1.8)),             # 3 Snip: shock
+    (36.2, 37.4, S.frame(1170, S.FY_CR, 1.8)),            # 4 Crinkle: uh-oh
+    (66.4, 67.7, (1150, 1150, 2.0)),                      # 5 thinking... tap, boop: he paints his own nose
+    (69.5, 70.8, S.frame(1150, S.FY_CR, 1.55)),           # 6 he sees his blue nose and laughs
+    (71.9, 72.8, (1150, 1100, 1.5), "idea"),              # 7 idea! (a glow behind the sparkle)
+    (77.0, 79.9, LOCK),                                   # 8 a whale!
+    *[(E.LAYER_T[n] - 0.3, E.LAYER_T[n] + 0.5, LOCK) for n in LAYER_ORDER],   # 9-15 one layer per cut
+    ("wipe", 2.0, CANV, (32.5, 63.0), 111.0),             # 16 before -> after (the painting only). The ruined
+                                                          #    picture doesn't change between 30.6 and 73.4: its
+                                                          #    left half from 32.5 and right half from 63.0 are
+                                                          #    the moments when nobody stands in front of them
+    (113.8, 116.4, S.frame(800, 1100, 1.4)),              # 17 paw-bump
 ]
 OUT = []
 _t = 0.0
@@ -70,17 +77,51 @@ def seg_at(t):
     return OUT[-1]
 
 
-def film(src, fr):
-    """The world at source time `src`, framed by (cx, cy, zoom) for the vertical frame."""
-    d = K.drawing_of(src)
+def view_box(fr):
+    """Camera offset and the world rectangle (x0, y0, w, h) that a framing shows."""
     cx, cy, z = fr
     ox = int(min(max(cx - 540, 0), E.P.WORLD_W - 1080))
-    f = E.render_world(d / K.DPS, d, S.VCam(ox), S._bg(ox))
     cw, ch = 1080 / z, 1920 / z
     x0 = min(max(cx - cw / 2, ox), ox + 1080 - cw)
     y0 = min(max(cy - ch / 2, 0), 1920 - ch)
+    return ox, x0, y0, cw, ch
+
+
+def idea_glow(f, ox, tq, d):
+    """A warm glow over the wall behind the idea sparkle (redrawn on top), so it reads as Crinkle's idea and not
+    as part of the drawing pinned behind it."""
+    k = seg(tq, E.T_IDEA, E.T_IDEA + 0.9)
+    if not 0 < k < 1:
+        return f
+    hx, hy = E.CR.a.head_pivot(E.CR.state(tq, d))
+    p = (hx + 40, hy - 420)
+    px, py, r = (p[0] - ox) * S.RES, p[1] * S.RES, 135 * S.RES
+    mask = Image.new("L", f.size, 0)
+    ImageDraw.Draw(mask).ellipse([px - r, py - r, px + r, py + r], fill=int(240 * math.sin(math.pi * k)))
+    mask = mask.filter(ImageFilter.GaussianBlur(22 * S.RES))
+    f = f.copy()
+    f.paste(Image.new(f.mode, f.size, (255, 247, 214) + ((255,) if f.mode == "RGBA" else ())), (0, 0), mask)
+    E.place(f, E.SPARK, S.VCam(ox).S(p), scale=0.45 * math.sin(math.pi * k), angle=50 * k)
+    return f
+
+
+def film(src, fr, idea=False):
+    """The world at source time `src`, framed by (cx, cy, zoom) for the vertical frame."""
+    d = K.drawing_of(src)
+    ox, x0, y0, cw, ch = view_box(fr)
+    f = E.render_world(d / K.DPS, d, S.VCam(ox), S._bg(ox))
+    if idea:
+        f = idea_glow(f, ox, d / K.DPS, d)
     box = ((x0 - ox) * S.RES, y0 * S.RES, (x0 - ox + cw) * S.RES, (y0 + ch) * S.RES)
     return f.resize((OUT_W, OUT_H), Image.LANCZOS, box=box).convert("RGB")
+
+
+def canvas_rect(fr):
+    """The painting's rectangle in output pixels for a framing."""
+    ox, x0, y0, cw, ch = view_box(fr)
+    z = OUT_W / cw
+    (u0, v0), (u1, v1) = E.CANVAS_XY, E.cv(E.S.CANVAS_W, E.S.CANVAS_H)
+    return int((u0 - x0) * z), int((v0 - y0) * z), int((u1 - x0) * z), int((v1 - y0) * z)
 
 
 def _star(d, x, y, r, fill):
@@ -92,28 +133,48 @@ def _star(d, x, y, r, fill):
     d.polygon(pts, fill=fill)
 
 
+_SPOT = {}
+
+
+def spotlight(im, fr):
+    """Fade everything around the painting to soft cream: the painting is the star (and the friends standing
+    just outside the frame don't show as slivers at its edges)."""
+    if fr not in _SPOT:
+        x0, y0, x1, y1 = canvas_rect(fr)
+        m = Image.new("L", (OUT_W, OUT_H), 235)
+        ImageDraw.Draw(m).rounded_rectangle([x0 - 70, y0 - 110, x1 + 70, y1 + 520], 120, fill=0)
+        _SPOT[fr] = m.filter(ImageFilter.GaussianBlur(70))
+    out = im.copy()
+    out.paste(Image.new("RGB", im.size, (250, 243, 228)), (0, 0), _SPOT[fr])
+    return out
+
+
 def wipe_frame(t_loc, fr, s_before, s_after):
-    """Before on the right, after on the left of a sparkling line that sweeps left to right."""
+    """On the painting only: the ruined picture (dimmed) on the right, the finished one on the left of a
+    sparkling line that sweeps left to right. Everything outside the painting comes from the 'after' frame."""
     k = ease_in_out(seg(t_loc, *WIPE))
-    before, after = film(s_before, fr), film(s_after, fr)
+    out = spotlight(film(s_after, fr), fr)
+    if k >= 1:
+        return out
+    x0, y0, x1, y1 = canvas_rect(fr)
+    xm = (x0 + x1) // 2
+    before = film(s_before[0], fr).crop((x0, y0, x1, y1))
+    before.paste(film(s_before[1], fr).crop((xm, y0, x1, y1)), (xm - x0, 0))
     gray = before.convert("L").convert("RGB")
     before = Image.blend(Image.blend(before, gray, 0.45), Image.new("RGB", before.size, (40, 36, 52)), 0.22)
+    x = int(x0 + k * (x1 - x0))
+    out.paste(before.crop((x - x0, 0, x1 - x0, y1 - y0)), (x, y0))
     if k <= 0:
-        return before
-    if k >= 1:
-        return after
-    x = int(k * OUT_W)
-    out = before.copy()
-    out.paste(after.crop((0, 0, x, OUT_H)), (0, 0))
+        return out
     glow = Image.new("L", (OUT_W, OUT_H), 0)
-    ImageDraw.Draw(glow).rectangle([x - 14, 0, x + 14, OUT_H], fill=200)
+    ImageDraw.Draw(glow).rectangle([x - 14, y0 - 30, x + 14, y1 + 30], fill=200)
     glow = glow.filter(ImageFilter.GaussianBlur(16))
     out.paste(Image.new("RGB", (OUT_W, OUT_H), (255, 252, 236)), (0, 0), glow)
     d = ImageDraw.Draw(out)
-    d.rectangle([x - 4, 0, x + 4, OUT_H], fill=(255, 255, 250))
-    for i, (yy, r) in enumerate(((560, 34), (840, 46), (1130, 30), (1380, 40))):
+    d.rectangle([x - 4, y0 - 20, x + 4, y1 + 20], fill=(255, 255, 250))
+    for i, (f, r) in enumerate(((0.0, 34), (0.35, 46), (0.7, 30), (1.0, 40))):
         wob = 1 + 0.25 * math.sin(2 * math.pi * (3 * t_loc + i * 0.3))
-        _star(d, x, yy, r * wob, (255, 236, 140) if i % 2 else (255, 255, 255))
+        _star(d, x, y0 - 20 + f * (y1 - y0 + 40), r * wob, (255, 236, 140) if i % 2 else (255, 255, 255))
     return out
 
 
@@ -123,8 +184,8 @@ def render_frame(t, view="vert"):
     if sg[0] == "wipe":
         _, _, fr, s_before, s_after = sg
         return wipe_frame(t_out - o0, fr, s_before, s_after)
-    s0, s1, fr = sg
-    return film(min(s1 - 1e-3, s0 + (t_out - o0)), fr)
+    s0, s1, fr = sg[:3]
+    return film(min(s1 - 1e-3, s0 + (t_out - o0)), fr, idea="idea" in sg[3:])
 
 
 # ---------------------------------------------------------------- sound
@@ -183,13 +244,15 @@ def build_audio(path):
             music.add(t0 + i * step, A.pad([M(m) for m in ch], step + 0.4, vel))
 
     A.jingle(music, 0.0, 0.7)
-    pads(o[1], o[3], [(57, 60, 64), (53, 57, 60)], 0.45)                          # 2-3 oh no
-    groove(o[3], o[5], [("C", 48), ("G", 43)], vel=0.28, inst=MX.toy_piano, bass=False)   # 4-5 boop, idea
-    groove(o[5], w0, [("C", 48), ("F", 41), ("G", 43), ("C", 48)], vel=0.3)       # 6-13 painting
-    pads(w0, o[iw + 1], [(48, 55, 64, 67), (53, 57, 65, 69)], 0.5)                # 14 before -> after
+    i_boop = next(i for i, x in enumerate(OUT) if x[2][0] == 66.4)
+    i_whale = next(i for i, x in enumerate(OUT) if x[2][0] == 77.0)
+    pads(o[1], o[i_boop], [(57, 60, 64), (53, 57, 60), (57, 60, 64)], 0.45)       # 2-4 oh no
+    groove(o[i_boop], o[i_whale], [("C", 48), ("G", 43)], vel=0.28, inst=MX.toy_piano, bass=False)  # 5-7 boop, idea
+    groove(o[i_whale], w0, [("C", 48), ("F", 41), ("G", 43), ("C", 48)], vel=0.3)   # 8-15 painting
+    pads(w0, o[iw + 1], [(48, 55, 64, 67), (53, 57, 65, 69)], 0.5)                # 16 before -> after
     for i, m in enumerate((72, 76, 79, 84)):
         music.add(w0 + WIPE[0] + i * 0.3, MX.melodica(M(m), 0.4, 0.3))
-    groove(o[iw + 1], DUR, [("C", 48), ("F", 41), ("G", 43)], vel=0.34)          # 15 finale
+    groove(o[iw + 1], DUR, [("C", 48), ("F", 41), ("G", 43)], vel=0.34)          # 17 finale
     t_bump = out_time(E.T_PAWS)
     if t_bump is not None:
         A.jingle(music, t_bump + 0.02, 1.0, ending=True)

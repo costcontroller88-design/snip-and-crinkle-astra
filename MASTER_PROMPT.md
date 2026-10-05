@@ -72,11 +72,10 @@ EPISODE_GUIDE > research docs.
    sounds. Every video now gets a blind review (fresh-eyes reviewer) before the owner sees it.
 2. **Wordless clarity:** use close-ups on what matters. Set up and slow down the key action (wobble, then fall) and
    hold the result. Act choices out (a thought cloud showing both options). Show "sorry" as an action (help, fix, give).
-3. **Small gags need close-ups.** The blue-nose joke was invisible in a medium shot. Anything smaller than about a
+3. **Small gags need close-ups.** A small face gag in the pilot was invisible in a medium shot. Anything smaller than about a
    tenth of the frame gets a close-up of at least 1.2 s.
 4. **The owner's bar:** real cause and effect; characters that move like they're alive (turn, walk, bend elbows,
-   hold things); a sharp, rich cartoon-film look; a wow ending that grows out of the story, not magic ("the mistake
-   becomes a masterpiece").
+   hold things); a sharp, rich cartoon-film look; a wow ending that grows out of the story, not magic.
 5. **Design first, deliver finished.** Showing half-fixed rounds cost time and trust. Plan everything, check every
    movement against the rig, build once, review internally (two rounds at most), and deliver only the finished
    piece. Don't list weaknesses you could have fixed; mention only true limits, in one line.
@@ -169,7 +168,8 @@ The fresh-eyes reviewer scores each item 1–10 (7 = good enough to upload, 9 = 
 - comedy
 - lesson shown as an action
 - wow/payoff
-- look (sharp, nothing hidden, Shorts safe zones)
+- look (sharp, nothing hidden; Shorts: nothing important in the bottom 19%, or in the right 12% between 50% and 90%
+  of the height)
 - sound (every action has a sound, no silent gaps, -14 LUFS)
 
 The safety-checker adds lesson accuracy.
@@ -200,6 +200,8 @@ owner plainly and recommend cutting, simplifying or a new story.
 
    Episode props go in `episodes/props_<slug>.py`.
 6. **Don't use an agent for a small job;** do it yourself. A subagent starts cold: give it file paths, not memories.
+   Never put an unreleased episode's story into this file or CLAUDE.md: anything here can reach the fresh-eyes
+   reviewer and spoil its blind review.
 7. **End:** update HANDOFF.md's first line and anything else that changed, commit, push, report.
 
 ## 11. Briefing a subagent
@@ -349,7 +351,7 @@ Known traps (each one cost us a round before):
 Shared code (paperlib, characters, scene, audio, icons, rig2, acting, hires) changes only when the brief says it's a toolkit work package; then the pilot's `--keys` sheet must re-render unchanged.
 
 Shorts: re-film the same performances with a vertical camera (the pilot02_short.py pattern).
-- Faces at about 40% of the frame height; nothing important in the bottom 19% or the right 12%.
+- Faces at about 40% of the frame height; nothing important in the bottom 19% (title and caption) or in the right 12% between 50% and 90% of the height (the like and comment buttons).
 - Each beat at least 0.8 s; key beats 1.5–4 s.
 - A music bed composed for the Short's own timeline; sound effects cut together with the pictures.
 
@@ -391,7 +393,7 @@ Method:
    - comedy (fewer than one funny moment per 20 s caps it at 6);
    - lesson shown as an action;
    - wow/payoff;
-   - look (sharp, nothing hidden; in vertical videos nothing important in the bottom 19% or the right 12%);
+   - look (sharp, nothing hidden; in vertical videos nothing important in the bottom 19%, or in the right 12% between 50% and 90% of the height where the like and comment buttons sit);
    - sound (loudness about -14 LUFS, no silent gaps).
 
    Overall is your honest judgment, not the average.
@@ -417,7 +419,7 @@ Read first: the episode's plan (story card); docs/benchmark-oct-2026.md (what wi
 
 Titles (for each video):
 - About 40–60 characters.
-- Lead with the exciting moment ("Oops! The Splash Becomes a Whale!"), add plain lesson words when they fit, then "| Snip & Crinkle | Kids Cartoon". Use "Kids Safety Cartoon" only for safety lessons.
+- Lead with the exciting moment ("Oops! The Bubbles Fill the Whole Bath!"), add plain lesson words when they fit, then "| Snip & Crinkle | Kids Cartoon". Use "Kids Safety Cartoon" only for safety lessons.
 - 1–2 emoji.
 - Never name other brands or characters; never promise what the video doesn't show.
 - Give 2 options and mark your pick. Alternate title styles across uploads so the growth-analyst can compare them.

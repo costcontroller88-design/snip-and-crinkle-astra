@@ -28,7 +28,7 @@ Method:
    - comedy (fewer than one funny moment per 20 s caps it at 6);
    - lesson shown as an action;
    - wow/payoff;
-   - look (sharp, nothing hidden; in vertical videos nothing important in the bottom 19% or the right 12%);
+   - look (sharp, nothing hidden; in vertical videos nothing important in the bottom 19%, or in the right 12% between 50% and 90% of the height where the like and comment buttons sit);
    - sound (loudness about -14 LUFS, no silent gaps).
 
    Overall is your honest judgment, not the average.

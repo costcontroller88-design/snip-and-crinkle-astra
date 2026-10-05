@@ -18,16 +18,20 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 - [growth-analyst] Free name check for "Snip & Crinkle" (India trademark registry search, YouTube, app stores).
 - [story-designer] `docs/CHARACTER_BIBLE.md` for Snip, Crinkle and Pip.
 - [animator, toolkit] Pip in rig v2.
-- [owner decision] "Oops! The Splash Becomes a Whale!": a 15–20 s transformation Short cut from the pilot, for
-  22 Oct. Recommended, because it tests the benchmark's strongest Shorts pattern against our story Short.
+- [owner: YES, 6 Oct] The whale transformation Short cut from the pilot, for 22 Oct: it tests the benchmark's strongest
+  Shorts pattern against our story Short. Built 6 Oct (`episodes/pilot02_whale_short.py`).
 
 ## Phase 1: Test the new style (20 Oct – 15 Nov)
-- Uploads at 6:00 PM IST: Tue 20 Oct pilot Short, Wed 21 Oct pilot episode, Thu 22 Oct transformation Short (if approved).
-- Episode 11: a gentle Halloween special (no scares; nothing sharp in a child's paw), uploaded by 28 Oct with its
-  two Shorts.
+- Uploads at 6:00 PM IST, one a day: Sun 18 and Mon 19 Oct the two Episode 11 Shorts; Tue 20 Oct pilot Short;
+  Wed 21 Oct pilot episode; Thu 22 Oct whale Short; Sat 24 Oct the Episode 11 episode.
+- Episode 11: a gentle "friendly glow" Halloween (accepted from the growth-analyst's scan, 6 Oct): Pip is a little
+  unsure as evening falls; Snip and Crinkle give a pumpkin a friendly face, the grown-up's hand does any cutting and
+  places a battery light, and the glow comforts Pip. Shorts first (the 2025 hits went up 11-16 days before Halloween);
+  judge it against new story-cartoon Halloween uploads (16k-91k), not songs.
 - Episode 12: a hygiene routine (hand washing or brushing teeth), with a dirty → clean transformation Short, by 4 Nov.
-- Diwali (Sun 8 Nov) special only if Episodes 11 and 12 are on time (anything with fire is in the grown-up's hand);
-  otherwise Episode 13 is the next topic below, by about 11 Nov.
+- Diwali (Sun 8 Nov): a Short, not a special: "Rangoli: a blank floor becomes colourful", LED lamps in the grown-up's
+  hand, no fire or fireworks, posted 3-5 Nov. World Kindness Day (Fri 13 Nov) and Children's Day in India (Sat 14 Nov)
+  wrap kindness Shorts; World Children's Day (Fri 20 Nov) suits a Pip Short.
 - First Studio review around 20 Oct (most baseline Shorts are 7 days old by then), then every 2 weeks.
 - Gate (28 Oct – 4 Nov): the pilot videos at 7 days old against the baseline medians (Shorts: viewed vs swiped away,
   % viewed; long video: retention). No conclusion under about 300 views each. If the new style wins, it is the
@@ -35,7 +39,7 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 
 ## Phase 2: Build the library (mid-Nov 2026 – 4 Jan 2027)
 - About 1 mini-episode and 3 Shorts a week, following the topic pipeline below.
-- Winter special by about 20 Dec. First 20–30 min compilation in late December (holiday TV viewing), made from about
+- Winter special by about 20 Dec (story design starts by Mon 23 Nov). First 20–30 min compilation in late December (holiday TV viewing), made from about
   10 new-style mini-episodes, with its own intro and outro.
 - Market scan early each month (next: early Nov).
 - Day-90 check, 4 Jan 2027: under 100 subscribers OR under 50 long-form hours → keep the characters, redesign the
@@ -65,9 +69,9 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 - A printables page for parents and teachers (adults only, no data from children); parent-facing social clips only.
 
 ## Topic pipeline (by demand)
-1. Halloween special (gentle: painting pumpkins, costumes, a friendly surprise): by 28 Oct
+1. Halloween "friendly glow" (Episode 11): Shorts 18-19 Oct, episode 24 Oct
 2. Washing hands, brushing teeth or bath time (routine, with a dirty → clean Short)
-3. Diwali lights (optional, 8 Nov)
+3. Diwali rangoli Short (blank floor → colourful; LED lamps, no fire): 3-5 Nov
 4. Colour mixing in the art corner (blank → colourful Short)
 5. Trying a new vegetable (unbranded food)
 6. Tidying toys (messy → tidy Short)
@@ -81,4 +85,27 @@ Kindness lessons (sharing, saying sorry, taking turns, gentle hands) ride inside
 as `MASTER_PROMPT.md` section 6 says.
 
 ## Suggestions from the growth-analyst
-(none yet)
+
+Halloween scan, 6 Oct 2026 (evidence: `docs/benchmark-oct-2026-halloween.md`). Accepted by the Lead on 6 Oct and
+folded into Phase 1 and the topic pipeline above.
+- **Episode 11 angle: "friendly glow", not pumpkin carving.** A plain pumpkin gets a paper/paint face and glows (battery
+  light placed by the grown-up's paper hand); a small, unsure friend (Pip) is comforted ("fear becomes fun", all pretend).
+  Why: the biggest kids' Halloween Shorts are glow crafts with a friendly-monster hook (329M, 268.6M, 13.4M), and a lit
+  jack-o'-lantern is on 3 of the top 5 all-time thumbnails; character pumpkin-carving Shorts from kids' brands only got
+  7k-1.2M, so do not expect the carve itself to carry reach. Engine E or C fits (the story-designer picks; it must differ from the pilot's). Bright, warm scenes; no dark
+  room, masks, fangs, jump scare, real flame or knife; "spooky" at most, never "scary".
+- **Shorts for Episode 11:** a 20-30 s "Plain Pumpkin Becomes a Glowing Friend! 🎃✨" transformation Short (the 2025 hits ran
+  19-30 s), and optionally a costume-reveal Short (a paw jumps, a colour, a costume; KIDZOKI's got 315.5k in 4 days).
+  Ship the Shorts first and as early as the schedule allows: last year's hits went up 11-16 days before Halloween (15-20
+  Oct 2025), and the big channels began 11 Sep - 4 Oct 2026. 28 Oct is the last good day, not the best one.
+- **Expectation for Episode 11:** new story-cartoon Halloween uploads from Booba and Oddbods got 16k-91k in 2-20 days;
+  song/play brands got 0.5M-7.6M. Judge us against the first band. Under about 300 views, say "too early".
+- **Packaging:** lead with the result, plain "Halloween"/"Pumpkin" words, one emoji pair, no "Scary", no other brands
+  (example: "Pumpkin Glow-Up! 🎃✨ | Snip & Crinkle | Kids Cartoon"); put "autumn" in the description (Booba's "Hello,
+  Autumn!" got about 3.5x its Halloween videos). Thumbnail: big friendly face plus one glowing pumpkin, bright colours.
+- **Calendar (details in the benchmark file):** Diwali is Sun 8 Nov (33 days of lead). If we do it, make it a Short, not a
+  special: "Rangoli: a blank floor becomes colourful" with LED lamps in the grown-up's hand, no fire or fireworks, posted
+  about 3-5 Nov (last year's Indian Diwali kids' hits went up 2-3 days before Diwali). World Kindness Day is Fri 13 Nov and
+  Children's Day (India) Sat 14 Nov, good wrappers for the kindness Shorts; World Children's Day is Fri 20 Nov (a Pip
+  Short). Start the winter special's story design by Mon 23 Nov to make 20 Dec.
+

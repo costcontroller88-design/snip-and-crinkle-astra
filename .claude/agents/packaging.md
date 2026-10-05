@@ -11,7 +11,7 @@ Read first: the episode's plan (story card); docs/benchmark-oct-2026.md (what wi
 
 Titles (for each video):
 - About 40–60 characters.
-- Lead with the exciting moment ("Oops! The Splash Becomes a Whale!"), add plain lesson words when they fit, then "| Snip & Crinkle | Kids Cartoon". Use "Kids Safety Cartoon" only for safety lessons.
+- Lead with the exciting moment ("Oops! The Bubbles Fill the Whole Bath!"), add plain lesson words when they fit, then "| Snip & Crinkle | Kids Cartoon". Use "Kids Safety Cartoon" only for safety lessons.
 - 1–2 emoji.
 - Never name other brands or characters; never promise what the video doesn't show.
 - Give 2 options and mark your pick. Alternate title styles across uploads so the growth-analyst can compare them.
