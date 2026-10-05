@@ -9,9 +9,16 @@ fi
 python3 -m pip install --quiet pillow numpy
 mkdir -p assets/fonts
 if [ ! -f "assets/fonts/Fredoka[wdth,wght].ttf" ]; then
-  curl -fsSL -o "assets/fonts/Fredoka[wdth,wght].ttf" \
-    "https://github.com/google/fonts/raw/main/ofl/fredoka/Fredoka%5Bwdth,wght%5D.ttf"
-  curl -fsSL -o "assets/fonts/OFL.txt" "https://github.com/google/fonts/raw/main/ofl/fredoka/OFL.txt"
+  if ! { curl -fsSL -o "assets/fonts/Fredoka[wdth,wght].ttf" \
+           "https://github.com/google/fonts/raw/main/ofl/fredoka/Fredoka%5Bwdth,wght%5D.ttf" &&
+         curl -fsSL -o "assets/fonts/OFL.txt" "https://github.com/google/fonts/raw/main/ofl/fredoka/OFL.txt"; }; then
+    # raw.githubusercontent can be blocked in cloud sessions: fetch just that folder with git instead
+    tmp="$(mktemp -d)"
+    GIT_LFS_SKIP_SMUDGE=1 git clone -q --depth 1 --filter=blob:none --sparse https://github.com/google/fonts "$tmp/fonts"
+    git -C "$tmp/fonts" sparse-checkout set ofl/fredoka
+    cp "$tmp/fonts/ofl/fredoka/Fredoka[wdth,wght].ttf" "$tmp/fonts/ofl/fredoka/OFL.txt" assets/fonts/
+    rm -rf "$tmp"
+  fi
 fi
 python3 -c "import paperlib; print('font:', paperlib.ROUND_FONT)"
 echo "setup ok"
