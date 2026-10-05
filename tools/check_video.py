@@ -59,8 +59,8 @@ def main(path):
     want = (1920, 1080) if LANDSCAPE else (1080, 1920)
     if (vid["width"], vid["height"]) != want:
         fails.append(f"not {want[0]}x{want[1]}")
-    if not LANDSCAPE and not 12 <= dur <= 30:
-        fails.append("duration outside 12–30s")
+    if not LANDSCAPE and not 12 <= dur <= 180:
+        fails.append("duration outside 12–180s (YouTube Shorts limit)")
     if lufs is None or abs(lufs + 14) > 1.0:
         fails.append("loudness not -14±1 LUFS")
     if silences:

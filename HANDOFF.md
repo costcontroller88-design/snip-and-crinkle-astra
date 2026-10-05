@@ -1,7 +1,12 @@
 # Handoff: read this first (updated 2026-10-06)
 
-**Current phase: 1 (break the template, build long-form), step: pilot episode DONE and delivered (waiting for the
-owner's verdict), next work package: a 25-40 s vertical Short cut from it + upload plan for the new-style test.**
+**Current phase: 1 (break the template, build long-form), step: pilot episode APPROVED by the owner ("its looks
+fine", 2026-10-06) and its vertical Short (43 s) delivered; next work package: the owner uploads both (text ready in
+`reviews/pilot02_upload.md`, suggested 20-21 Oct), then plan Episode 11+ in the new style (design first).**
+Short: `episodes/pilot02_short.py` re-films the episode's performances through a vertical camera (shot list in
+`reviews/pilot02_short_plan.md`), cuts the episode's sound effects with the pictures and adds its own music bed.
+The episode exposes `render_world(t, d, cam, bg)` and `make_buses()` for this. check_video now allows vertical
+videos up to 180 s (Shorts limit).
 How to work now (owner's rule, 2026-10-06): design the whole thing first (shot list + every movement checked against
 the rig), build in one go, review internally (1-fps sheet, motion strips, full-size close-ups, numeric checks,
 check_video) for at most two rounds, and show the owner only the finished piece. No fixable weakness reaches them.

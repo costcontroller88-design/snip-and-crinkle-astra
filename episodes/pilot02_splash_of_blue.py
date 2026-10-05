@@ -729,10 +729,21 @@ def draw_fx(f, t, sn, cr):
         place(f, SPARK_S, S_((JAR_BLUE[0] + 30, JAR_BLUE[1] - 90)), scale=0.2 * math.sin(math.pi * q), angle=50 * q)
 
 
-def render_frame(t, view="land"):
-    d = K.drawing_of(t)
-    tq = d / K.DPS
-    f = BG.copy()
+def render_world(tq, d, cam=None, bg=None):
+    """The scene at time tq seen through `cam` (default: the landscape camera), before any shot zoom.
+    Used by the episode and by the vertical Short cut (which passes its own camera and background)."""
+    global CAM
+    prev = CAM
+    if cam is not None:
+        CAM = cam
+    try:
+        return _render_world(tq, d, bg if bg is not None else BG)
+    finally:
+        CAM = prev
+
+
+def _render_world(tq, d, bg):
+    f = bg.copy()
     draw_room_props(f, tq)
     draw_canvas(f, tq)
     sn, cr = SN.state(tq, d), CR.state(tq, d)
@@ -771,6 +782,13 @@ def render_frame(t, view="land"):
     kb = ease_out(seg(tq, T_TRIP, T_TRIP + 0.35))
     place(f, BLOCK_SPR, CAM.S((BLOCK[0] - 46 * kb, BLOCK[1] - 30 * math.sin(math.pi * kb))), angle=90 * kb)
     draw_fx(f, tq, sn, cr)
+    return f
+
+
+def render_frame(t, view="land"):
+    d = K.drawing_of(t)
+    tq = d / K.DPS
+    f = render_world(tq, d)
     centre, z = shot_at(tq)
     if z > 1.0001:
         f = K.zoom(f, z, CAM.S(centre))
@@ -819,7 +837,8 @@ def giggle_snd(vel=1.0):
     return out
 
 
-def build_audio(path):
+def make_buses():
+    """The episode's music and sound-effect buses (the Short cuts its effects from these)."""
     M = A.midi
     music, sfx = A.Mix(DUR), A.Mix(DUR)
     beat = 0.6
@@ -949,6 +968,11 @@ def build_audio(path):
         for tt in perf.footfalls():
             soft = 0.25 if 40.6 <= tt <= 42.6 else 0.5
             sfx.add(tt, A.tap(soft))
+    return music, sfx
+
+
+def build_audio(path):
+    music, sfx = make_buses()
     m = A.reverb(music.normalized(), 0.22)
     s = A.reverb(sfx.normalized(), 0.08)
     nm = lambda x: x / max(1e-9, abs(x).max())  # noqa: E731
