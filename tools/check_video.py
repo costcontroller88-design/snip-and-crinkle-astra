@@ -2,6 +2,7 @@
 
     python3 tools/check_video.py output/ep02_xxx.mp4                 (vertical Short, must loop)
     python3 tools/check_video.py output/x.mp4 --landscape --no-loop  (1920x1080 long-form or test scene)
+    ... --cuts 3.0,5.2,8.95                                          (deliberate camera cuts: not "harsh")
 
 Checks: duration, vertical size, loudness (YouTube ~ -14 LUFS), silent gaps,
 the biggest frame-to-frame jump (harsh cuts), and the loop seam (last -> first frame).
@@ -36,6 +37,9 @@ def frame_stats(path, w=270, h=480):
                           "-pix_fmt", "gray", "-"], capture_output=True).stdout
     fr = np.frombuffer(raw, np.uint8).reshape(-1, h, w).astype(np.float32)
     d = np.abs(np.diff(fr, axis=0)).mean(axis=(1, 2))
+    for c in CUTS:                       # ignore the frame changes right at a deliberate cut
+        i = int(round(c * 30))
+        d[max(0, i - 4):i + 4] = 0
     return len(fr), float(np.median(d)), float(d.max()), int(d.argmax()), float(np.abs(fr[-1] - fr[0]).mean())
 
 
@@ -70,6 +74,7 @@ def main(path):
 
 
 LANDSCAPE = "--landscape" in sys.argv
+CUTS = ([float(x) for x in sys.argv[sys.argv.index("--cuts") + 1].split(",")] if "--cuts" in sys.argv else [])
 LOOP = "--no-loop" not in sys.argv
 
 if __name__ == "__main__":

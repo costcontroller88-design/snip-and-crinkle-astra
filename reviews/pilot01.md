@@ -1,4 +1,22 @@
-# Pilot part 1: "Oops! Say Sorry" test scene (27 s, landscape)
+# Pilot part 1: "Oops! Say Sorry" test scene (landscape)
+
+## v2 (34 s), after the owner's viewing
+The owner watched v1 and could not understand it: neither the sounds nor the story (the old Shorts were clear to
+them). Viewing v1 at 1 frame per second confirmed it: one far wide shot, a 0.3 s accident, 4-5 s stretches with
+nothing moving, tiny choice icons, a too-subtle "sorry", and instrument voices that sound like talking. My v1
+"story clarity 8" was wrong.
+
+v2 changes: 11 camera shots with close-ups (painting, wobbling pot, splat, Snip's face, Crinkle's face); the pot
+rocks 3 times before it tips; the paint flies to a slide-whistle effect, SPLAT, sad trombone; Crinkle's paws fly
+up ("oops") and go to his cheeks, drawn in front of his face ("uh-oh"); he tiptoes away glancing back, hears a
+sniff and stops; the choice (sneak away or say sorry) with fitted bubbles; he walks back, head down, paws
+together, opens his arms; hug, hearts, paw-bump. **No voices**: sound effects and music only, like the old Shorts.
+`check_video.py --landscape --no-loop --cuts <shot times>`: PASS (-15.0 LUFS, no gaps, biggest non-cut change 17).
+
+v2 self-score: story clarity 8, acting 8, pacing 8, lesson 9, humour 6, hook 6, vertical framing 4 (not redone).
+These self-scores proved unreliable once; **the owner's yes/no on v2 is the real test.**
+
+## v1 (27 s) record
 
 File: `output/pilot01_sorry_test_land.mp4` (render with `python3 episodes/pilot01_sorry_test.py`; `--keys` for
 `reviews/pilot01_keys.png`, `--still T [--vert]` for one full-size frame). `tools/check_video.py --landscape --no-loop`: **PASS**

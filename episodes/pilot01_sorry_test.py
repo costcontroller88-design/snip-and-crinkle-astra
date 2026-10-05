@@ -1,20 +1,20 @@
-"""Pilot test scene: "Oops! Say Sorry" (first half of the pilot long-form episode).
+"""Pilot test scene v2: "Oops! Say Sorry" (first half of the pilot long-form episode).
 
-The pilot's job is to prove the new standard before Episode 11: instrument voices with lip-sync,
-eyebrows and bigger acting (wind-up and overshoot), Snip's ears showing feelings, drawing on twos
-with a paper wobble, slower toddler pacing, Crinkle asking the viewer and waiting, and one world
-filmed in both landscape (long-form) and vertical (Shorts).
+v1 failed the owner's first viewing (2026-10-06): one far wide shot, a half-second accident, long still
+stretches, tiny choice pictures, a too-subtle "sorry", and instrument "voices" that sounded like talking
+nobody could follow. The owner found the old Shorts clear, so v2 tells the same story the way they do:
+close-ups on what matters, the accident set up and slowed down, the choice acted out, "sorry" shown as
+actions, and no voices at all (only sound effects and music). Kept from v1: eyebrows, ear feelings,
+wind-up/overshoot acting, drawing on twos and the parallel renderer.
 
-Story engine B (Crinkle makes the mistake). Snip hums while finishing a painting, steps back proudly.
-Crinkle dances in, giggles back at Snip, and his big happy arm swoosh knocks the paint pot: a blue
-blob sails over Snip's head and SPLATS on the painting. Snip gasps; the ears droop; a sad slide-whistle
-"aww". Crinkle: uh-oh, paws to mouth. He turns to the viewer and asks (hum, shrug): sneak away, or say
-sorry? Long pause while he looks at each choice and back at the viewer. Then he walks over, paw on
-heart, a slow sorry hum; Snip's ears lift, a small "ok", a hug with hearts. Crinkle gets an idea...
-(the second half, fixing the painting together, comes next session).
+Shots: wide (Snip paints) -> close-up of the painting -> Snip proud -> wide (Crinkle dances in, swoosh,
+bump) -> close-up: the pot wobbles 3 times and tips -> wide: the paint sails over Snip's head (slide
+whistle), SPLAT -> close-up of the ruined painting (sad trombone) -> close-up of Snip: shock, then the
+ears droop -> close-up of Crinkle: uh-oh -> Crinkle tiptoes away, hears a sniff, stops -> the choice
+(sneak away or say sorry?) and a wait -> he walks back, head down, paws together, opens his arms -> hug,
+hearts, paw-bump.
 
 Run:  python3 episodes/pilot01_sorry_test.py              (landscape render -> output/)
-      python3 episodes/pilot01_sorry_test.py --vert       (vertical render)
       python3 episodes/pilot01_sorry_test.py --keys       (key frames -> reviews/pilot01_keys.png)
       python3 episodes/pilot01_sorry_test.py --still T    (one full-size frame -> build/)
 """
@@ -38,10 +38,10 @@ import scene  # noqa: E402
 import voices as V  # noqa: E402
 from paperlib import ease_in_out, ease_out, ease_out_back, lerp, place, seg, smooth_curve  # noqa: E402
 
-DUR = 27.0
+DUR = 34.0
 FLOOR = P.FLOOR_Y
 SN_X, SN_BACK = 900, 960
-CR_X, CR_START, CR_NEAR = 1480, 2200, 1330
+CR_X, CR_START, CR_SNEAK, CR_NEAR = 1480, 2200, 1640, 1330
 SN_HUG, CR_HUG = 1020, 1300
 
 CAMS = {v: K.Cam(v, P.WORLD_W, P.WORLD_H, P.LAND_Y0, P.VERT_X0) for v in ("land", "vert")}
@@ -65,12 +65,13 @@ BONK = scene.sparkle((255, 230, 120))
 BUB_HIDE = P.bubble_hide()
 BUB_SORRY = P.bubble_sorry()
 QMARK = icons.question()
-IDEA = scene.sparkle()
-HEARTS = [scene.heart(c, 74) for c in ((240, 72, 98), (255, 120, 150), (244, 92, 120))]
+SPARKLE = scene.sparkle()
+HEARTS = [scene.heart(c, 80) for c in ((240, 72, 98), (255, 120, 150), (244, 92, 120))]
+TWINKLES = [scene.sparkle((255, 236, 140)) for _ in range(3)]
 
 SN_ACT = K.Actor("snip", 1.15)
 CR_ACT = K.Actor("crinkle", 1.2)
-BRUSH_LEN = 166                        # paw to bristle tip
+BRUSH_LEN = 166
 
 
 def aim_from(actor, x, side, target, lean=0.0, y=FLOOR):
@@ -85,157 +86,188 @@ def brush_tip(x, arm, lean=0.0):
 
 
 # ---------------------------------------------------------------- timing
-T_DAB1, T_DAB2 = 1.3, 2.2
+T_DAB1, T_DAB2, T_DAB3 = 1.3, 2.2, 3.9
 DAB1_A, DAB2_A = -148.0, -162.0
 FLOWER_AT = brush_tip(SN_X, DAB1_A, 2.0)
-FLOWER_AT = (FLOWER_AT[0], FLOWER_AT[1] + 20)          # the flower head sits where the brush touched
+FLOWER_AT = (FLOWER_AT[0], FLOWER_AT[1] + 20)
 HEART_AT = brush_tip(SN_X, DAB2_A, 2.0)
 SUN_AT, FRIENDS_AT = (528, 992), (598, 1148)
+CANVAS_MID = ((P.CANVAS[0] + P.CANVAS[2]) / 2, (P.CANVAS[1] + P.CANVAS[3]) / 2)
 SPLAT_AT = (648, 1116)
-T_BUMP, T_SPLAT = 5.62, 6.06
-POT_TOP = (P.POT_AT[0] - 10, P.POT_AT[1] - 120)
-T_DIM0, T_DIM1, T_UNDIM0, T_UNDIM1 = 11.3, 11.75, 16.8, 17.5
-T_RED, T_GREEN, T_Q, T_PICK = 11.6, 11.9, 12.1, 16.3
-T_HUG0, T_HUG1 = 21.9, 23.8
-HEART_PLAN = ((22.25, 1110, 830), (22.5, 1210, 780), (22.75, 1010, 800))
-T_IDEA = 25.0
-ZOOM_FOCUS_WORLD = (CR_X, 1060)
+T_BUMP = 8.9
+T_TIP, T_LAUNCH, T_SPLAT = 10.3, 10.45, 11.9
+POT_MOUTH = (P.POT_AT[0] - 70, P.POT_AT[1] - 70)
+T_TAKE = 14.0                                   # Snip's big reaction (on the cut to the close-up)
+T_SNIFF = 21.5
+T_DIM0, T_DIM1, T_UNDIM0, T_UNDIM1 = 23.1, 23.5, 26.3, 26.9
+T_RED, T_GREEN, T_Q, T_PICK = 23.35, 23.65, 23.9, 26.0
+T_HUG0, T_HUG1 = 30.1, 31.5
+T_BUMP_PAWS = 32.1
+HEART_PLAN = ((30.4, 1110, 830), (30.65, 1210, 780), (30.9, 1010, 800))
+PAW_MEET = (1145, 1215)
+
+# Shots: (start, centre in world, zoom). Cuts are instant; the last one runs to the end.
+SNIP_HEAD = (SN_BACK, 1020)
+CR_HEAD = (CR_X, 1060)
+SHOTS = [
+    (0.0, (960, 1100), 1.0),                   # wide: Snip paints
+    (3.0, CANVAS_MID, 1.75),                   # close-up: the painting (and the last dab)
+    (5.2, (SN_BACK, 1120), 1.35),              # Snip, proud
+    (6.6, (960, 1100), 1.0),                   # wide: Crinkle dances in, swoosh, bump
+    (8.95, (1300, 1200), 1.8),                 # close-up: the pot wobbles... and tips
+    (11.0, (960, 1100), 1.0),                  # wide: the paint sails over Snip's head, SPLAT
+    (12.1, CANVAS_MID, 1.75),                  # close-up: the ruined painting
+    (13.95, SNIP_HEAD, 1.7),                   # close-up: Snip
+    (17.4, CR_HEAD, 1.6),                      # close-up: Crinkle, uh-oh
+    (19.6, (1460, 1110), 1.2),                 # Crinkle sneaks away... stops
+    (22.9, (1300, 1100), 1.1),                 # the choice
+    (27.0, (1150, 1120), 1.15),                # sorry, hug, paw-bump
+]
+
+
+def shot_at(t):
+    cur = SHOTS[0]
+    for s in SHOTS:
+        if t >= s[0]:
+            cur = s
+    return cur
+
 
 # ---------------------------------------------------------------- Snip's performance
 SN = K.Perf(SN_ACT, seed=1, x=SN_X, y=FLOOR, lean=2.0, arm_l=-140.0, arm_r=14.0, eyes="happy", mouth="smile",
             brows="calm", look_x=-10.0, ear_l=-4.0, ear_r=4.0, ear_k=1.04)
-SN.say(0.45, V.snip("hum"))
-SN.say(1.75, V.snip("hum2", 0.85))
 (SN.to(0.25, 0.6, "io", arm_l=-152).to(0.6, 0.95, "io", arm_l=-138).to(0.95, T_DAB1, "antic", arm_l=DAB1_A)
    .to(T_DAB1, 1.6, "out", arm_l=-140).to(1.6, T_DAB2, "antic", arm_l=DAB2_A).to(T_DAB2, 2.55, "out", arm_l=-150))
 SN.face(0.0, eyes="happy").face(1.2, eyes="normal").face(2.4, eyes="sparkle")
 SN.wiggle(T_DAB1, "ear_r", 9).wiggle(T_DAB2, "ear_l", -9)
-# step back, ta-da!
-SN.to(2.6, 3.0, "io", x=SN_BACK, arm_l=-30, lean=0).hop(2.6, 3.0, 1, 22)
-SN.to(3.0, 3.35, "snap", arm_r=140, arm_l=-100).ears(3.0, 3.3, "perk")
-SN.face(3.0, eyes="happy", brows="up", mouth="smile_open")
-SN.say(3.05, V.snip("ta_da"))
-SN.to(3.9, 4.3, "io", arm_r=14, arm_l=-20)
-# Crinkle's dancing in: look over, giggle
-SN.to(4.0, 4.3, "out", look_x=10, lean=-3).face(4.0, eyes="normal", brows="up", mouth="smile")
-SN.say(4.5, V.snip("giggle", 0.9))
-SN.face(4.5, eyes="happy")
-# back to admiring the painting (so the bump happens behind Snip's back)
-SN.to(5.2, 5.5, "io", look_x=-10, lean=2).face(5.2, eyes="sparkle", brows="calm", mouth="smile")
-SN.ears(5.2, 5.6, "happy")
-# SPLAT: gasp, ears shoot up, fur frizz, a little jump
-SN.face(T_SPLAT + 0.02, eyes="wide", brows="up", mouth="O")
-SN.ears(T_SPLAT + 0.02, T_SPLAT + 0.22, "alarm", "snap").hop(T_SPLAT + 0.02, T_SPLAT + 0.36, 1, 28)
-SN.to(T_SPLAT + 0.02, T_SPLAT + 0.18, "out", frizz=0.9).to(T_SPLAT + 0.3, T_SPLAT + 0.6, "io", frizz=0.0)
-SN.to(T_SPLAT, T_SPLAT + 0.2, "back", arm_l=-60, arm_r=60)
-SN.say(T_SPLAT + 0.05, V.snip("gasp"))
-SN.no_blink.append((T_SPLAT, T_SPLAT + 0.8))
-# sadness: ears droop slowly, glassy eyes, a falling "aww"
-SN.to(6.7, 7.3, "io", arm_l=-12, arm_r=12, head_dy=12, lean=3, look_x=-10, look_y=4)
-SN.ears(6.8, 8.2, "droop", "io")
-SN.face(6.9, eyes="glassy", brows="sad", mouth="frown")
-SN.say(7.0, V.snip("aww"))
-SN.say(8.3, V.snip("sniff", 0.8))
-SN.wiggle(8.3, "head_dy", -3, 6.0, 6.0)
-# Crinkle comes over and says sorry: Snip turns to him, ears lift a little
-SN.to(19.0, 19.5, "io", look_x=10, look_y=0, lean=-1)
-SN.ears(19.4, 20.0, "sad", "io")
-SN.face(19.6, eyes="normal", brows="sad", mouth="frown")
-SN.face(21.2, mouth="smile", brows="calm")
-SN.to(21.2, 21.6, "out", head_dy=0)
-SN.say(21.3, V.snip("mm_ok", 0.9))
-SN.ears(21.5, 22.1, "up", "back")
+# close-up of the painting: a last little dab, then hold
+SN.to(3.3, T_DAB3, "antic", arm_l=-150).to(T_DAB3, 4.3, "out", arm_l=-140)
+# step back, proud
+SN.to(5.2, 5.6, "io", x=SN_BACK, arm_l=-30, lean=0).hop(5.2, 5.6, 1, 22)
+SN.to(5.6, 5.95, "snap", arm_r=140, arm_l=-100).ears(5.6, 5.9, "perk")
+SN.face(5.6, eyes="happy", brows="up", mouth="smile_open")
+SN.to(6.6, 7.0, "io", arm_r=14, arm_l=-20)
+# Crinkle dances in: Snip looks over and waves
+SN.to(7.0, 7.3, "out", look_x=10, lean=-3).face(7.0, eyes="normal", brows="up", mouth="smile")
+SN.to(7.3, 7.55, "back", arm_r=150).to(7.55, 7.75, "io", arm_r=120).to(7.75, 7.95, "io", arm_r=150)
+SN.to(7.95, 8.25, "io", arm_r=14)
+# back to admiring the painting (so the bump and the flying paint happen behind Snip's back)
+SN.to(8.2, 8.5, "io", look_x=-10, lean=2).face(8.2, eyes="happy", brows="calm", mouth="smile")
+SN.ears(8.2, 8.6, "happy")
+SN.wiggle(9.6, "lean", 2.0, 0.8, 0.4)                                  # contented sway
+# SPLAT: a flinch in the wide shot...
+SN.face(T_SPLAT + 0.03, eyes="wide", brows="up", mouth="o")
+SN.ears(T_SPLAT + 0.03, T_SPLAT + 0.2, "alarm", "snap")
+SN.no_blink.append((T_SPLAT, T_TAKE + 1.0))
+# ...and the big take on the close-up: gasp, ears shoot up, fur frizz, a jump
+SN.face(T_TAKE, eyes="wide", brows="up", mouth="O")
+SN.hop(T_TAKE, T_TAKE + 0.4, 1, 34).wiggle(T_TAKE, "ear_k", 0.12, 4.0, 3.0)
+SN.to(T_TAKE, T_TAKE + 0.16, "out", frizz=1.0).to(T_TAKE + 0.5, T_TAKE + 0.9, "io", frizz=0.0)
+SN.to(T_TAKE, T_TAKE + 0.2, "back", arm_l=-70, arm_r=70)
+# sadness: ears droop slowly, wet eyes, frown
+SN.to(14.7, 15.3, "io", arm_l=-12, arm_r=12, head_dy=14, lean=3, look_x=-10, look_y=4)
+SN.ears(14.6, 16.3, "droop", "io")
+SN.face(14.8, eyes="glassy", brows="sad", mouth="frown")
+SN.wiggle(16.7, "head_dy", -4, 6.0, 6.0).wiggle(16.95, "head_dy", -4, 6.0, 6.0)      # sniff sniff
+SN.wiggle(T_SNIFF, "head_dy", -5, 6.0, 6.0).wiggle(T_SNIFF + 0.25, "head_dy", -5, 6.0, 6.0)
+# Crinkle comes back: Snip looks up at him, ears lift, smile
+SN.to(28.9, 29.3, "io", look_x=10, look_y=0, lean=-1, head_dy=6)
+SN.ears(29.2, 29.8, "sad", "io")
+SN.face(29.3, eyes="normal", brows="sad", mouth="frown")
+SN.face(29.7, mouth="smile", brows="calm")
+SN.to(29.7, 30.0, "out", head_dy=0)
+SN.ears(29.8, 30.3, "up", "back")
 # hug
 SN.to(T_HUG0, T_HUG0 + 0.4, "back", x=SN_HUG, lean=-6, arm_r=100).face(T_HUG0, eyes="happy", mouth="smile")
 SN.to(T_HUG1, T_HUG1 + 0.4, "io", x=SN_BACK, lean=0, arm_r=14)
-SN.face(T_HUG1 + 0.2, eyes="normal")
-# Crinkle's idea: Snip looks at the painting, curious, then excited
-SN.to(24.9, 25.2, "out", look_x=-10, look_y=0).ears(24.9, 25.3, "curious")
-SN.say(25.25, V.snip("hm_q"))
-SN.face(25.9, eyes="sparkle", brows="up", mouth="smile_open").ears(25.9, 26.2, "perk")
-SN.to(25.9, 26.2, "back", look_x=8)
+SN.face(T_HUG1 + 0.2, eyes="happy", brows="up", mouth="smile_open")
+# paw-bump
+SN.to(T_BUMP_PAWS - 0.35, T_BUMP_PAWS, "snap", arm_r=aim_from(SN_ACT, SN_BACK, "r", PAW_MEET), look_x=8)
+SN.to(T_BUMP_PAWS + 0.9, T_BUMP_PAWS + 1.3, "io", arm_r=14, look_x=0)
+SN.face(T_BUMP_PAWS + 0.9, eyes="happy")
 
 # ---------------------------------------------------------------- Crinkle's performance
 CR = K.Perf(CR_ACT, seed=2, x=CR_START, y=FLOOR, arm_l=-150.0, arm_r=150.0, eyes="happy", mouth="smile",
             brows="up")
-CR.say(3.5, V.crinkle("dance"))
-CR.to(3.7, 5.0, "lin", x=CR_X).hop(3.7, 5.0, 4, 46)
+CR.to(6.8, 8.1, "lin", x=CR_X).hop(6.8, 8.1, 4, 46)
 for i in range(4):
-    t0 = 3.7 + i * 0.325
+    t0 = 6.8 + i * 0.325
     CR.to(t0, t0 + 0.32, "io", arm_l=-150 + 28 * (i % 2 == 0), arm_r=150 - 28 * (i % 2 == 1),
           lean=4 * (1 if i % 2 else -1))
-CR.to(5.0, 5.3, "out", arm_l=-172, arm_r=172, lean=-3)                  # wind up the big swoosh...
+CR.to(8.1, 8.55, "out", arm_l=-172, arm_r=172, lean=-3)                 # wind up the big swoosh...
 BUMP_A = aim_from(CR_ACT, CR_X, "l", (P.POT_AT[0] + 4, P.POT_AT[1] - 70), lean=5)
-CR.to(5.3, T_BUMP, "in", arm_l=BUMP_A, arm_r=70, lean=5)                # ...whoosh, right into the pot
+CR.to(8.55, T_BUMP, "in", arm_l=BUMP_A, arm_r=70, lean=5)               # ...right into the pot
 CR.face(T_BUMP + 0.01, eyes="wide", brows="up", mouth="O")
-CR.wiggle(T_BUMP, "arm_l", 8).to(T_BUMP, T_BUMP + 0.3, "back", lean=0)
-CR.say(T_BUMP + 0.06, V.crinkle("oops"))
-CR.to(T_BUMP, T_BUMP + 0.1, "out", look_x=-10, look_y=8)
-CR.to(5.78, 5.95, "io", look_x=-12, look_y=-10)                        # follows the flying paint
-CR.to(T_SPLAT, T_SPLAT + 0.12, "out", look_x=-12, look_y=0)
-CR.to(6.3, 6.8, "io", arm_l=-14, arm_r=14)
-CR.face(6.7, eyes="normal", brows="worry", mouth="wobble")
-CR.to(6.6, 7.0, "io", look_x=-10, look_y=2)
-# uh-oh: paws on cheeks
-MOUTH_L = (CR_X - 100, 1165)
-MOUTH_R = (CR_X + 100, 1165)
-CR.to(8.4, 8.75, "back", arm_l=aim_from(CR_ACT, CR_X, "l", MOUTH_L), arm_r=aim_from(CR_ACT, CR_X, "r", MOUTH_R),
-      head_dy=6)
-CR.face(8.4, eyes="wide", brows="worry")
-CR.say(8.75, V.crinkle("uh_oh"))
-CR.to(9.6, 10.0, "io", arm_l=-14, arm_r=14, head_dy=0)
-# turns to the viewer and asks
-CR.to(10.0, 10.4, "out", look_x=0, look_y=0, tilt=6).face(10.0, eyes="normal", brows="worry", mouth="flat")
-CR.to(10.45, 10.8, "back", arm_l=-62, arm_r=62).wiggle(10.45, "head_dy", -4, 3.0, 4.0)
-CR.say(10.6, V.crinkle("hm_q"))
-CR.to(11.2, 11.5, "io", arm_l=-14, arm_r=14)
-# the choice: look at each bubble, back at the viewer, a little nod -- and wait
-CR.to(12.4, 12.7, "io", look_x=-12, look_y=-8, tilt=10).face(12.4, brows="worry")
-CR.to(13.6, 13.9, "io", look_x=12, look_y=-8, tilt=-8).face(13.6, brows="calm")
-CR.to(14.8, 15.1, "io", look_x=0, look_y=0, tilt=3).face(14.8, brows="up", mouth="smile")
-CR.wiggle(15.3, "head_dy", 7, 2.2, 2.5)
-CR.no_blink.append((15.2, 16.2))
-# the answer: yes, say sorry
-CR.say(16.35, V.crinkle("mm_hm"))
-CR.wiggle(16.35, "head_dy", 8, 2.5, 3.0)
-CR.face(16.8, brows="sorry", mouth="flat")
-CR.to(16.8, 17.1, "io", tilt=0, look_x=-10, look_y=2)
-CR.to(17.4, 18.5, "io", x=CR_NEAR).hop(17.4, 18.5, 3, 16)
-PAW_HEART = aim_from(CR_ACT, CR_NEAR, "r", (CR_NEAR - 10, 1300))
-CR.to(18.5, 18.9, "back", arm_r=PAW_HEART, head_dy=14, tilt=6)
-CR.face(18.8, eyes="closed", brows="sorry", mouth="flat")
-CR.say(18.9, V.crinkle("sorry"))
-CR.face(20.85, eyes="glassy", brows="worry", mouth="smile")
-CR.to(20.9, 21.3, "back", arm_l=-62, arm_r=62, head_dy=0, tilt=0)         # opens his arms: a hug?
+CR.to(T_BUMP + 0.08, T_BUMP + 0.35, "back", arm_l=-155, arm_r=155, lean=0)   # paws fly up: oops!
+CR.to(T_BUMP, T_BUMP + 0.12, "out", look_x=-12, look_y=8)               # stares at the wobbling pot
+CR.no_blink.append((T_BUMP, 12.0))
+CR.to(T_LAUNCH, T_LAUNCH + 0.25, "io", look_x=-12, look_y=-10)          # follows the flying paint
+CR.to(11.2, 11.6, "io", look_x=-12, look_y=0)
+CR.to(11.4, 11.9, "io", arm_l=-14, arm_r=14)
+CR.face(12.0, eyes="wide", brows="worry", mouth="wobble")
+# close-up on Crinkle: looks at the painting, at sad Snip... uh-oh, paws on cheeks
+CR.set(17.4, look_x=-12, look_y=2)
+CR.face(17.4, eyes="wide", brows="worry", mouth="wobble")
+CR.to(17.9, 18.15, "io", look_x=-10, look_y=6)
+CR.arms_front.append((18.3, 19.7))
+CR.to(18.3, 18.65, "back", arm_l=aim_from(CR_ACT, CR_X, "l", (CR_X - 100, 1165)),
+      arm_r=aim_from(CR_ACT, CR_X, "r", (CR_X + 100, 1165)), head_dy=6)
+CR.face(18.3, mouth="O")
+CR.to(19.4, 19.7, "io", arm_l=-14, arm_r=14, head_dy=0)
+# sneaks away (tiptoe), hears a sniff, stops and looks back
+CR.face(19.7, eyes="normal", brows="worry", mouth="flat")
+CR.to(19.7, 20.0, "out", arm_l=-120, arm_r=120, look_x=-12, lean=-6)     # glances back at Snip as he goes
+CR.to(20.0, 21.3, "lin", x=CR_SNEAK).hop(20.0, 21.3, 4, 18)
+CR.to(T_SNIFF + 0.05, T_SNIFF + 0.3, "back", look_x=-14, look_y=2, lean=4, arm_l=-14, arm_r=14)
+CR.face(T_SNIFF + 0.05, eyes="wide", brows="sad")
+CR.face(22.3, eyes="glassy", brows="sad", mouth="frown")
+CR.to(22.3, 22.7, "io", lean=0, head_dy=8)
+# the choice: look at the viewer, at each choice, back at the viewer -- and wait
+CR.to(23.4, 23.7, "io", look_x=0, look_y=0, head_dy=0, tilt=6).face(23.4, eyes="normal", brows="worry", mouth="flat")
+CR.to(24.1, 24.4, "io", look_x=-12, look_y=-8, tilt=10)
+CR.to(24.8, 25.1, "io", look_x=12, look_y=-8, tilt=-8)
+CR.to(25.4, 25.7, "io", look_x=0, look_y=0, tilt=3).face(25.4, brows="up", mouth="smile")
+CR.no_blink.append((25.4, 26.3))
+CR.wiggle(T_PICK, "head_dy", 9, 2.5, 3.0)                               # nod: yes, say sorry
+CR.face(26.5, brows="sorry", mouth="flat")
+CR.to(26.5, 26.8, "io", tilt=0, look_x=-12, look_y=2)
+# walks back, head down, paws together: sorry
+CR.to(27.0, 28.1, "io", x=CR_NEAR).hop(27.0, 28.1, 3, 16)
+PAWS_L = aim_from(CR_ACT, CR_NEAR, "l", (CR_NEAR + 6, 1370))
+PAWS_R = aim_from(CR_ACT, CR_NEAR, "r", (CR_NEAR - 6, 1370))
+CR.to(28.2, 28.6, "io", arm_l=PAWS_L, arm_r=PAWS_R, head_dy=16, tilt=5, look_y=8)
+CR.face(28.3, eyes="closed", brows="sorry", mouth="frown")
+CR.wiggle(28.7, "lean", 2.5, 1.2, 0.8)                                  # shy little sway
+CR.face(29.3, eyes="glassy", brows="worry", mouth="smile")
+CR.to(29.3, 29.7, "back", arm_l=-62, arm_r=62, head_dy=0, tilt=0, look_y=0, look_x=-10)   # opens his arms
 CR.to(T_HUG0, T_HUG0 + 0.4, "back", x=CR_HUG, lean=6, arm_l=-60, arm_r=30).face(T_HUG0, eyes="happy", brows="calm")
 CR.to(T_HUG1, T_HUG1 + 0.4, "io", x=CR_NEAR, lean=0, arm_l=-14, arm_r=14)
-CR.face(T_HUG1 + 0.2, eyes="normal", mouth="smile")
-# an idea!
-CR.to(24.0, 24.35, "io", look_x=-12, look_y=0, arm_r=aim_from(CR_ACT, CR_NEAR, "r", (CR_NEAR + 30, 1170)))
-CR.face(24.0, brows="focus", mouth="hum")
-CR.face(T_IDEA, eyes="sparkle", brows="up", mouth="smile_open")
-CR.to(T_IDEA, T_IDEA + 0.35, "snap", arm_r=150, arm_l=-150).hop(T_IDEA, T_IDEA + 0.35, 1, 24)
-CR.say(T_IDEA + 0.1, V.crinkle("fix_it"))
-CR.to(26.0, 26.4, "io", arm_l=-120, arm_r=120)
+CR.face(T_HUG1 + 0.2, eyes="happy", brows="up", mouth="smile_open")
+CR.to(T_BUMP_PAWS - 0.35, T_BUMP_PAWS, "snap", arm_l=aim_from(CR_ACT, CR_NEAR, "l", PAW_MEET), look_x=-8)
+CR.to(T_BUMP_PAWS + 0.9, T_BUMP_PAWS + 1.3, "io", arm_l=-14, look_x=0)
 
 
 # ---------------------------------------------------------------- props over time
 def pot_pose(t):
-    """(angle, base point, paint level index) of the pot on the stool."""
+    """(angle, base point, paint level index): rocks 3 times after the bump, then tips over."""
     if t < T_BUMP:
         return 0.0, P.POT_AT, 4
-    k = ease_out_back(seg(t, T_BUMP, T_BUMP + 0.22), 1.2)
+    if t < T_TIP:
+        dt = t - T_BUMP
+        ang = 13 * math.sin(2 * math.pi * dt / 0.46) * (1 - 0.25 * dt)
+        lift = 70 * abs(math.sin(math.radians(ang))) * 0.5
+        return ang, (P.POT_AT[0], P.POT_AT[1] - lift), 4
+    k = ease_out_back(seg(t, T_TIP, T_TIP + 0.22), 1.2)
     ang = 90 * k
     base = (P.POT_AT[0] - 8 * k, P.POT_AT[1] - 66 * math.sin(math.radians(min(ang, 90))))
-    lvl = 4 if t < T_BUMP + 0.12 else 1
-    return ang, base, lvl
+    return ang, base, (4 if t < T_LAUNCH else 1)
 
 
-BLOB_PATH = smooth_curve(POT_TOP, (1000, 190), SPLAT_AT, 40)
+BLOB_PATH = smooth_curve(POT_MOUTH, (1010, 210), SPLAT_AT, 60)
 
 
 def blob_pose(t):
-    p = seg(t, T_BUMP + 0.04, T_SPLAT)
+    p = seg(t, T_LAUNCH, T_SPLAT)
     if not 0 < p < 1:
         return None
     i = min(len(BLOB_PATH) - 2, int(p * (len(BLOB_PATH) - 1)))
@@ -253,10 +285,6 @@ def dim_k(t):
     return ease_in_out(seg(t, T_DIM0, T_DIM1)) * (1 - ease_in_out(seg(t, T_UNDIM0, T_UNDIM1)))
 
 
-def zoom_k(t):
-    return 1 + 0.16 * ease_in_out(seg(t, 10.0, 11.0)) * (1 - ease_in_out(seg(t, 17.3, 18.4)))
-
-
 # ---------------------------------------------------------------- drawing
 def draw_set(f, t, cam):
     S = cam.S
@@ -271,10 +299,15 @@ def draw_set(f, t, cam):
         place(f, FLOWER, S(FLOWER_AT), scale=pop(t, T_DAB1))
     if t >= T_DAB2:
         place(f, PHEART, S(HEART_AT), scale=pop(t, T_DAB2))
+    if 3.2 <= t < 5.2:                          # the painting twinkles in its close-up
+        for i, (x, y) in enumerate(((520, 960), (720, 1010), (600, 1210))):
+            k = math.sin(math.pi * seg(t, 3.3 + 0.35 * i, 4.2 + 0.35 * i))
+            if k > 0.02:
+                place(f, TWINKLES[i], S((x, y)), scale=0.22 * k)
     if t >= T_SPLAT:
         place(f, SPLAT, S(SPLAT_AT), scale=0.35 + 0.65 * ease_out_back(seg(t, T_SPLAT, T_SPLAT + 0.14)))
         for i, (dx, dy) in enumerate(((-60, 70), (10, 88), (74, 66))):
-            k = ease_out(seg(t, T_SPLAT + 0.2 + 0.15 * i, T_SPLAT + 1.6 + 0.2 * i))
+            k = ease_out(seg(t, T_SPLAT + 0.2 + 0.2 * i, T_SPLAT + 2.0 + 0.25 * i))
             if k > 0.02:
                 place(f, DRIPS[i], S((SPLAT_AT[0] + dx, SPLAT_AT[1] + dy)), sy=k, shadow=False)
 
@@ -292,11 +325,11 @@ def draw_bubbles(f, t, cam):
     red_out = ease_in_out(seg(t, T_PICK, T_PICK + 0.3))
     pulse = 1 + 0.22 * math.sin(math.pi * seg(t, T_PICK, T_PICK + 0.45))
     bob = 6 * math.sin(2 * math.pi * t / 1.6)
-    place(f, BUB_HIDE, S((CR_X - 290, 800 + bob)), scale=pop(t, T_RED) * (1 - red_out), alpha=1 - out)
-    place(f, BUB_SORRY, S((CR_X + 290, 800 - bob)), scale=pop(t, T_GREEN) * pulse, alpha=1 - out)
+    place(f, BUB_HIDE, S((1150, 750 + bob)), scale=pop(t, T_RED) * (1 - red_out), alpha=1 - out)
+    place(f, BUB_SORRY, S((1650, 750 - bob)), scale=pop(t, T_GREEN) * pulse, alpha=1 - out)
     if t >= T_Q:
         sway = 6 * math.sin(2 * math.pi * t / 1.0)
-        place(f, QMARK, S((CR_X, 745)), angle=sway, scale=pop(t, T_Q) * (1 - red_out), alpha=1 - out)
+        place(f, QMARK, S((1400, 730)), angle=sway, scale=pop(t, T_Q) * (1 - red_out), alpha=1 - out)
 
 
 def draw_hearts(f, t, cam):
@@ -322,14 +355,13 @@ def render_frame(t, view="land"):
     draw_brush(f, tq, cam, sn)
     k = dim_k(tq)
     if k > 0.001:
-        shade = Image.new("RGBA", f.size, (40, 30, 50, int(110 * k)))
-        f.alpha_composite(shade)
+        f.alpha_composite(Image.new("RGBA", f.size, (40, 30, 50, int(110 * k))))
     if not hug:
         CR.draw(f, tq, cam, st=cr)
     bp = blob_pose(tq)
     if bp:
         for i, drop in enumerate(DROPS):
-            tb = blob_pose(tq - 0.035 * (i + 1))
+            tb = blob_pose(tq - 0.05 * (i + 1))
             if tb:
                 place(f, drop, cam.S(tb[0]))
         place(f, BLOB, cam.S(bp[0]), angle=bp[1])
@@ -337,16 +369,17 @@ def render_frame(t, view="land"):
     if 0 < kb < 1:
         place(f, BONK, cam.S((P.POT_AT[0] + 50, P.POT_AT[1] - 90)), scale=0.45 * math.sin(math.pi * kb))
     draw_hearts(f, tq, cam)
-    if tq >= T_IDEA:
-        place(f, IDEA, cam.S((CR_NEAR + 10, 760)), scale=0.55 * pop(tq, T_IDEA), angle=12 * math.sin(tq * 4),
-              alpha=1 - ease_in_out(seg(tq, 26.2, 26.8)))
+    kp = seg(tq, T_BUMP_PAWS, T_BUMP_PAWS + 0.6)
+    if 0 < kp < 1:
+        place(f, SPARKLE, cam.S(PAW_MEET), scale=0.5 * math.sin(math.pi * kp), angle=40 * kp)
     draw_bubbles(f, tq, cam)
     if view == "land":
-        f = K.zoom(f, zoom_k(tq), cam.S(ZOOM_FOCUS_WORLD))
+        _, centre, z = shot_at(tq)
+        f = K.zoom(f, z, cam.S(centre))
     return f
 
 
-# ---------------------------------------------------------------- sound
+# ---------------------------------------------------------------- sound (no voices: effects and music only)
 def splat_snd(vel=1.0):
     t = A._t(0.55)
     n = np.random.default_rng(5).normal(0, 1, len(t))
@@ -355,92 +388,122 @@ def splat_snd(vel=1.0):
     return vel * (1.5 * wet + 0.9 * thump)
 
 
+def sniff_snd(vel=1.0):
+    t = A._t(0.12)
+    n = np.random.default_rng(9).normal(0, 1, len(t))
+    y = (A._lowpass(n, 4) - A._lowpass(n, 30)) * np.sin(np.pi * t / 0.12) ** 2
+    return vel * 0.9 * y
+
+
+def slide_whistle():
+    """Cartoon flight sound for the paint (an effect, not a voice): up, then a long fall."""
+    return V.SNIP.say([V.S(0.35, -7, 12, gap=0.0), V.S(1.0, 12, -10)], 0.9).y
+
+
 def build_audio(path):
     M = A.midi
-    music, sfx, vox = A.Mix(DUR), A.Mix(DUR), A.Mix(DUR)
+    music, sfx = A.Mix(DUR), A.Mix(DUR)
     beat = 0.6
 
-    def arp(t0, chord, beats, vel=0.42, inst=A.marimba, octave=0):
+    def arp(t0, chord, beats, vel=0.42, inst=A.marimba):
         notes = MX.CHORDS[chord]
         for b in range(beats * 2):
-            music.add(t0 + b * beat / 2, inst(M(notes[b % len(notes)] + octave), 0.55, vel * (1 if b % 2 == 0 else 0.7)))
+            music.add(t0 + b * beat / 2, inst(M(notes[b % len(notes)]), 0.55, vel * (1 if b % 2 == 0 else 0.7)))
 
     A.jingle(music, 0.0, 0.9)
-    # happy painting groove (C F C G)
-    for t0, ch, root in ((0.9, "C", 48), (2.1, "F", 41), (3.3, "C", 48), (4.5, "G", 43)):
+    # happy painting groove, then a bouncier dance when Crinkle arrives
+    for t0, ch, root in ((0.9, "C", 48), (2.1, "F", 41), (3.3, "C", 48), (4.5, "F", 41), (5.7, "C", 48),
+                         (6.9, "G", 43), (8.1, "C", 48)):
         arp(t0, ch, 2)
         music.add(t0, A.bass(M(root), 0.5, 0.7))
         music.add(t0 + 2 * beat, A.bass(M(root), 0.4, 0.5))
-    for i in range(14):
+    for i in range(26):
         music.add(0.9 + i * beat / 2, A.shaker(0.4))
-    for tt in (T_DAB1, T_DAB2):
+    for tt, m in ((T_DAB1, 91), (T_DAB2, 96), (T_DAB3, 98)):
         sfx.add(tt, A.pop(0.7))
-        sfx.add(tt, A.glock(M(91 if tt == T_DAB1 else 96), 0.8, 0.45))
-    sfx.add(3.05, A.twinkle(0.6))
-    sfx.add(2.95, A.tap(0.5))
+        sfx.add(tt, A.glock(M(m), 0.8, 0.45))
+    sfx.add(3.4, A.twinkle(0.7))
+    sfx.add(5.55, A.tap(0.5))
+    sfx.add(5.65, A.chime_up(0.7))
     for i in range(4):
-        sfx.add(3.7 + i * 0.325 + 0.3, A.tap(0.55))
-    # bump, flight, splat
-    sfx.add(T_BUMP, A.woodblock(False, 0.9))
+        sfx.add(6.8 + i * 0.325 + 0.3, A.tap(0.6))
+        sfx.add(6.8 + i * 0.325 + 0.15, A.boing(0.25, 420 + 40 * i))
+    for tt in (7.35, 7.75):
+        sfx.add(tt, A.woodblock(True, 0.4))
+    # the swoosh, the bump, the wobble (tock-tock-tock), the tip, the flight, SPLAT
+    sfx.add(8.6, A.whoosh(0.35, 0.7))
+    sfx.add(T_BUMP, A.woodblock(False, 1.0))
     sfx.add(T_BUMP + 0.01, A.glock(M(100), 0.4, 0.35))
-    sfx.add(T_BUMP + 0.18, A.tap(0.7))
-    sfx.add(T_BUMP + 0.05, A.whoosh(0.42, 0.8))
+    for i in range(3):
+        sfx.add(T_BUMP + 0.12 + i * 0.46, A.woodblock(i % 2 == 0, 0.8 - 0.1 * i))
+        sfx.add(T_BUMP + 0.35 + i * 0.46, A.woodblock(i % 2 == 1, 0.7 - 0.1 * i))
+    music.add(T_BUMP + 0.1, A.pad([M(55), M(59), M(62)], 1.5, 0.35))            # suspense: hold a chord
+    sfx.add(T_TIP + 0.15, A.tap(0.8))
+    sfx.add(T_LAUNCH - 0.05, slide_whistle())
     sfx.add(T_SPLAT, splat_snd(1.0))
-    sfx.add(T_SPLAT + 0.05, A.boing(0.35, 300))
-    # sad: soft pads
-    music.add(6.35, A.pad([M(57), M(60), M(64)], 2.8, 0.5))
-    music.add(9.0, A.pad([M(53), M(57), M(60)], 2.6, 0.45))
-    for tt, m in ((7.1, 76), (7.7, 72), (8.3, 69)):
-        music.add(tt, A.glock(M(m), 1.0, 0.18))
+    sfx.add(T_SPLAT + 0.05, A.boing(0.3, 300))
+    sfx.add(12.3, A.wah_down(1.0))                                               # sad trombone: oh no
+    # Snip's take, then sadness
+    sfx.add(T_TAKE, A.boing(0.6, 520))
+    sfx.add(T_TAKE, A.pop(0.6))
+    music.add(14.6, A.pad([M(57), M(60), M(64)], 3.0, 0.5))
+    for tt, m in ((15.0, 76), (15.6, 74), (16.2, 72), (16.8, 69)):
+        music.add(tt, A.glock(M(m), 1.0, 0.22))
+    for tt in (16.7, 16.95, T_SNIFF, T_SNIFF + 0.25):
+        sfx.add(tt, sniff_snd(0.8))
+    # Crinkle: uh-oh
+    music.add(17.4, A.pad([M(53), M(57), M(60)], 2.4, 0.45))
+    sfx.add(18.45, A.uh_oh(0.9))
+    # tiptoe away (sneaky low steps), the sniff, he stops
+    for i in range(4):
+        sfx.add(20.0 + i * 0.325 + 0.3, A.marimba(M(45 + (i % 2) * 3), 0.25, 0.6))
+    music.add(19.7, A.pad([M(50), M(57), M(62)], 1.8, 0.3))
+    sfx.add(T_SNIFF + 0.35, A.boop(0.35))
+    music.add(21.8, A.pad([M(57), M(60), M(64)], 1.5, 0.4))
     # the choice: tick-tock, waiting pad
-    music.add(11.3, A.pad([M(50), M(57), M(62)], 2.6, 0.4))
-    music.add(13.7, A.pad([M(55), M(59), M(62)], 2.8, 0.4))
-    for i in range(8):
-        sfx.add(12.2 + i * 0.5, A.woodblock(i % 2 == 0, 0.5))
+    music.add(23.1, A.pad([M(50), M(57), M(62)], 1.8, 0.4))
+    music.add(24.7, A.pad([M(55), M(59), M(62)], 1.8, 0.4))
+    for i in range(5):
+        sfx.add(23.95 + i * 0.5, A.woodblock(i % 2 == 0, 0.5))
     sfx.add(T_RED, A.pop(0.7))
     sfx.add(T_GREEN, A.pop(0.7))
     sfx.add(T_Q, A.boop(0.6))
     sfx.add(T_PICK, A.chime_up(0.8))
-    # sorry: tender pad + slow glock
-    music.add(16.4, A.pad([M(48), M(55), M(64)], 2.6, 0.42))
-    music.add(18.8, A.pad([M(53), M(57), M(65)], 2.4, 0.4))
-    music.add(21.0, A.pad([M(55), M(59), M(62)], 1.2, 0.4))
+    # sorry: tender pad, soft falling melodica sigh, then warm and happy
+    music.add(26.4, A.pad([M(48), M(55), M(64)], 2.0, 0.42))
     for i in range(3):
-        sfx.add(17.4 + i * 0.37 + 0.3, A.tap(0.4))
-    for tt, m in ((19.0, 72), (19.6, 71), (20.2, 69), (20.8, 67)):
-        music.add(tt, A.glock(M(m), 1.0, 0.16))
-    # hug: warm and happy (melodica lead, marimba)
-    for t0, ch, root in ((21.6, "F", 41), (22.8, "C", 48), (24.0, "F", 41), (25.2, "G", 43)):
+        sfx.add(27.0 + i * 0.37 + 0.3, A.tap(0.4))
+    music.add(28.4, A.pad([M(53), M(57), M(65)], 1.8, 0.4))
+    for tt, m, dd in ((28.5, 72, 0.4), (28.9, 71, 0.4), (29.3, 67, 0.7)):
+        music.add(tt, MX.melodica(M(m), dd, 0.3))
+    for t0, ch, root in ((29.8, "F", 41), (31.0, "C", 48)):
         arp(t0, ch, 2, 0.32)
         music.add(t0, A.bass(M(root), 0.5, 0.55))
-    for tt, m, d in ((21.9, 72, 0.5), (22.5, 76, 0.5), (23.1, 79, 0.9), (24.0, 77, 0.5), (24.6, 76, 0.5)):
-        music.add(tt, MX.melodica(M(m), d, 0.32))
+    for tt, m, dd in ((30.1, 72, 0.5), (30.7, 76, 0.5), (31.3, 79, 0.8)):
+        music.add(tt, MX.melodica(M(m), dd, 0.32))
     sfx.add(T_HUG0 + 0.1, A.twinkle(0.6))
     for tt, _, _ in HEART_PLAN:
         sfx.add(tt, A.pop(0.35))
-    sfx.add(T_IDEA, A.chime_up(0.7, (84, 88, 91, 96)))
-    sfx.add(T_IDEA + 0.32, A.tap(0.5))
-    music.add(26.0, A.pad([M(55), M(59), M(62), M(67)], 1.2, 0.35))
-    music.add(26.4, A.glock(M(91), 0.6, 0.3))
-    # voices
-    for perf in (SN, CR):
-        for t0, line in perf.lines:
-            vox.add(t0, line.y)
+    # paw-bump (signature)
+    sfx.add(T_BUMP_PAWS - 0.55, A.snare_roll(0.5, 0.7))
+    sfx.add(T_BUMP_PAWS, A.boop(0.9))
+    A.jingle(music, T_BUMP_PAWS + 0.02, 1.0, ending=True)
+    sfx.add(T_BUMP_PAWS + 0.05, A.twinkle(0.8))
+    music.add(33.0, A.pad([M(48), M(55), M(64)], 1.0, 0.3))
 
     m = A.reverb(music.normalized(), 0.22)
     s = A.reverb(sfx.normalized(), 0.08)
-    v = A.reverb(vox.normalized(), 0.12)
     nm = lambda x: x / max(1e-9, abs(x).max())  # noqa: E731
-    y = 0.42 * nm(m) + 0.55 * nm(s) + 0.8 * nm(v)
-    A.write_wav(path, y / max(1.0, abs(y).max() / 0.95), fade_out=0.4)
+    y = 0.5 * nm(m) + 0.7 * nm(s)
+    A.write_wav(path, y / max(1.0, abs(y).max() / 0.95), fade_out=0.5)
 
 
 # ---------------------------------------------------------------- output
-KEYS = [(1.33, "1.3 dab"), (3.2, "3.2 ta-da!"), (4.6, "4.6 dance in"), (5.66, "5.7 bump"),
-        (5.9, "5.9 over Snip's head"), (6.2, "6.2 SPLAT"), (7.9, "7.9 aww (ears droop)"),
-        (8.9, "8.9 uh-oh"), (10.8, "10.8 asks the viewer"), (12.6, "12.6 hide?"), (13.8, "13.8 or sorry?"),
-        (15.4, "15.4 waits for you"), (19.4, "19.4 sorry"), (21.5, "21.5 ok"), (22.6, "22.6 hug"),
-        (25.4, "25.4 idea!")]
+KEYS = [(1.3, "1.3 Snip paints"), (4.0, "4.0 the painting"), (5.9, "5.9 proud"), (7.6, "7.6 Crinkle dances in"),
+        (8.92, "8.9 bump!"), (9.6, "9.6 wobble..."), (10.5, "10.5 tips over"), (11.4, "11.4 paint flies"),
+        (12.6, "12.6 SPLAT"), (14.15, "14.2 Snip: shock"), (16.4, "16.4 sad"), (18.8, "18.8 Crinkle: uh-oh"),
+        (20.6, "20.6 tiptoes away"), (22.6, "22.6 hears the sniff"), (24.3, "24.3 what should he do?"),
+        (28.8, "28.8 sorry"), (29.9, "29.9 hug?"), (30.8, "30.8 hug"), (32.3, "32.3 paw-bump")]
 
 
 def key_sheet(path, keys=KEYS, w=480, view="land"):
@@ -472,8 +535,6 @@ if __name__ == "__main__":
         out = os.path.join(ROOT, "build", f"pilot01_{view}_{tt:.2f}.png")
         render_frame(tt, view).convert("RGB").save(out)
         print("wrote", out)
-    elif "--audio" in sys.argv:
-        build_audio(os.path.join(ROOT, "build", "pilot01_audio.wav"))
     else:
         view = "vert" if "--vert" in sys.argv else "land"
         wav = os.path.join(ROOT, "build", "pilot01_audio.wav")

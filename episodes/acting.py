@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from characters import (CRINKLE, EYE, MOUTH_DARK, SNIP, SNIP_FACE_PIVOT, TONGUE,  # noqa: E402
                         Character, _eyes, _mouth)
-from paperlib import Cut, clamp01, ease_out_back  # noqa: E402
+from paperlib import Cut, clamp01, ease_out_back, place  # noqa: E402
 
 DPS = 15                              # drawings per second ("on twos" at 30 fps)
 FPS = 30
@@ -198,6 +198,7 @@ class Perf:
         self.blinks = self._auto_blinks(seed)
         self.no_blink = []
         self.mouth_lock = []          # spans where talking does not take over the mouth
+        self.arms_front = []          # spans where the arms are drawn over the head (paws on cheeks)
 
     # --- authoring
     def to(self, t0, t1, ease="io", **vals):
@@ -325,6 +326,10 @@ class Perf:
                     arm_l=s["arm_l"], arm_r=s["arm_r"], eyes=s["eyes"], mouth=s["mouth"], look=look,
                     alpha=s["alpha"], squash=s["sq"], head_dy=s["head_dy"], blink=False,
                     ears=(s["ear_l"], s["ear_r"]), ear_stretch=s["ear_k"], frizz=s["frizz"])
+        if any(a <= t < b for a, b in self.arms_front):
+            for side, spr, ang in (("l", self.a.arm_l, s["arm_l"]), ("r", self.a.arm_r, s["arm_r"])):
+                sx, sy = self.a.shoulder_pt(s["x"], s["y"], side, s["hop"], s["lean"], s["sq"])
+                place(base, spr, (sx - cam.ox, sy - cam.oy), angle=ang + s["lean"], alpha=s["alpha"])
         return s
 
     # helpers for props held in paws

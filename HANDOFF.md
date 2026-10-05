@@ -1,6 +1,9 @@
 # Handoff: read this first (updated 2026-10-06)
 
-**Current phase: 1 (break the template, build long-form), step: pilot part 1 done, next work package: pilot part 2.**
+**Current phase: 1 (break the template, build long-form), step: pilot part 1 v2 done (waiting for the owner's
+yes/no: "did you understand it?"), next work package: pilot part 2.**
+v1 failed the owner's viewing; see `reviews/pilot01.md` and the clarity rules there: close-ups on what matters,
+slow set-up for key actions, choices acted out, "sorry" as actions, NO speech-like voices (effects + music only).
 Part 2 = (a) vertical camera that pans per shot, (b) story part 2 (fix the painting together, 2-3 real gags),
 (c) join both parts into the ~3-minute landscape pilot, (d) a 25-40 s Short cut starting at the dance-in, with a loop.
 Then upload both as the new-style test (see "Pilot and test plan" below).
@@ -52,13 +55,14 @@ Read `docs/research-oct-2026.md` (5 Oct 2026): key points are to vary story engi
   7 days old. From about 20 Oct, upload 3 new-style Shorts + the 3-minute pilot and compare at 7 days. Draw no
   conclusion until each has a few hundred views. If the new style wins, it becomes the standard from Ep 11.
 - **New-standard toolkit** (pilot part 1, `reviews/pilot01.md`, scored 7.5):
-  - `episodes/voices.py`: instrument voices (Snip slide whistle C5, Crinkle hum-horn C4, Pip piccolo C6) + lip-sync curves.
-    Check new voice lines with a spectrogram (clean tones, no hiss), since nobody listens.
+  - `episodes/voices.py`: instrument voices + lip-sync. **Not used for characters any more** (the owner found
+    them confusing); kept only as a sound-effect generator (e.g. the slide whistle for flying things).
   - `episodes/acting.py`: `Actor` (eyebrows, glassy eyes, extra mouths), `Perf` timelines (`to` with eases
     io/out/back/antic/snap, `face`, `ears` moods, `say`, `hop`, `wiggle`), paper wobble, `Cam` (landscape/vertical
-    views of one world), `render_video` (15 drawings/s on twos, 8 cores: ~1 s of render per 1 s of 1080p video).
+    views of one world), `render_video` (15 drawings/s on twos, 8 cores: ~1 s of render per 1 s of 1080p video),
+    `arms_front` spans (paws on cheeks drawn over the head). Camera shots: list of (start, centre, zoom) cuts.
   - `episodes/props_artcorner.py`: the art-corner world (1920x1920).
-  - `episodes/pilot01_sorry_test.py`: the 27 s test scene. `tools/check_video.py --landscape --no-loop` for long-form.
+  - `episodes/pilot01_sorry_test.py`: the 27 s test scene. `tools/check_video.py --landscape --no-loop --cuts t1,t2,...` for long-form.
   - `characters.py` was not changed; Episodes 1-10 render exactly as before.
 - Strategy and the reviewed master prompt: see `docs/research-oct-2026.md`. Plan for 8,000 long-form hours
   (Feb 2027 rule); long-form is the money engine, Shorts are discovery.
