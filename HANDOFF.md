@@ -1,17 +1,15 @@
 # Handoff: read this first (updated 2026-10-06)
 
-**Current phase: 1 (break the template, build long-form), step: rig v2 test clip done (waiting for the owner's
-yes/no: "do they look alive?"), next work package: rebuild the accident (pilot step 2 of 3).**
-The owner's bar (2026-10-06): "more real, everything makes sense, and a wow factor": real-life cause and effect,
-characters that move like they're alive, and a real-cartoon-film look. Plan, agreed with the owner:
-1. DONE: rig v2 (`episodes/rig2.py`: heads turn, elbows + IK, paws hold props, planted walking) and 2x rendering
-   (`episodes/hires.py`; `props_artcorner` follows `hires.RES`). Test: `episodes/rigtest_alive.py` (14 s, PASS).
-2. NEXT: rebuild the accident with rig v2 at 2x: the paint jars sit on the EASEL TRAY; Crinkle dances, bumps the
-   easel, it wobbles, the blue jar tips and paint POURS DOWN the picture (no flying paint); Snip sees it happen;
-   sad; Crinkle starts to sneak off, hears a sniff, stops; the choice as Crinkle's THOUGHT bubble; sorry; hug.
-3. THEN: the fix and the wow: Crinkle sees a whale in the splash; together they paint eye, smile, tail, waves and a
-   boat with the two friends; the camera reveals the new painting (better than the first); they hang it up;
-   paw-bump. Join into one ~2-min landscape episode + a Short.
+**Current phase: 1 (break the template, build long-form), step: pilot episode DONE and delivered (waiting for the
+owner's verdict), next work package: a 25-40 s vertical Short cut from it + upload plan for the new-style test.**
+How to work now (owner's rule, 2026-10-06): design the whole thing first (shot list + every movement checked against
+the rig), build in one go, review internally (1-fps sheet, motion strips, full-size close-ups, numeric checks,
+check_video) for at most two rounds, and show the owner only the finished piece. No fixable weakness reaches them.
+The pilot: `episodes/pilot02_splash_of_blue.py` ("Oops! A Splash of Blue", 124 s, 1920x1080 at 2x render, ~7 min
+render on 8 cores). Plan: `reviews/pilot02_plan.md`. Final file: `output/pilot02_final.mp4` (video + rebuilt audio).
+Toolkit: `episodes/rig2.py` (turning heads with a ball projection, head-only turn `hturn`, elbows + IK, planted
+walking, `face_point`), `episodes/hires.py` (2x sprites), `episodes/props_splash.py` (table, jars, block, whale
+splash and its painted layers, thought cloud), `acting.py` brows incl. "think" (do not use "focus": it reads angry).
 Pilot v1/v2 (`episodes/pilot01_sorry_test.py`, old rig, 1x) are kept for reference only.
 
 

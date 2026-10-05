@@ -42,48 +42,90 @@ def _q(v, step):
     return round(round(v / step) * step, 3)
 
 
-# ---------------------------------------------------------------- heads
+# ---------------------------------------------------------------- heads (true three-quarter turn)
+# Features sit on a ball: a feature at angle phi (degrees from the front) moves to x = R*sin(phi + THETA*turn)
+# and is foreshortened by cos(phi + THETA*turn). Turning wraps the face around the head, narrows the far eye,
+# and pushes the snout past the outline, as a real three-quarter view does.
+THETA_HEAD = 36.0
+THETA_BODY = 30.0
+EYE = (38, 32, 44)
+
+
+def _proj(cx, R, phi, turn, theta=THETA_HEAD):
+    a = math.radians(phi + theta * turn)
+    return cx + R * math.sin(a), math.cos(a)
+
+
+def _brow1(c, x, y, kind, r, look, inner_dir):
+    from acting import BROWS
+    if not kind or kind == "none":
+        return
+    rx, ry = r
+    lift, rise, arch = BROWS[kind]
+    L = rx * 2.3
+    cx, cy = x + look[0] * 0.35, y - ry * (1.75 + lift) + look[1] * 0.25
+    d = inner_dir
+    c.line([(cx - d * L / 2, cy + rise * L / 2), (cx, cy - arch * L), (cx + d * L / 2, cy - rise * L / 2)],
+           ry * 0.31, EYE)
+
+
+def _features(c, cx, R, ey, phi_e, r_eye, eyes, brows, look, turn, cheek_y, phi_c, cheek_r, cheek_col, puff):
+    for i, side in enumerate((-1, 1)):
+        x, cs = _proj(cx, R, side * phi_c, turn)
+        if cs > 0.15:
+            w = 0.3 + 0.7 * cs
+            rx = (cheek_r[0] + (5 if puff else 0)) * w
+            c.ellipse(x, cheek_y, rx, cheek_r[1] + (4 if puff else 0), cheek_col, sil=False)
+    for i, side in enumerate((-1, 1)):
+        x, cs = _proj(cx, R, side * phi_e, turn)
+        if cs < 0.12:
+            continue
+        w = 0.4 + 0.6 * cs
+        lk = (look[0] * w + 4 * turn, look[1])
+        _eyes2(c, [(x, ey)], eyes, (r_eye[0] * w, r_eye[1]), lk)
+        _brow1(c, x, ey, brows, (r_eye[0] * w, r_eye[1]), lk, 1 if side < 0 else -1)
+
+
 def snip_head(eyes, mouth, look, brows, turn, k):
-    c = RCut(300, 290, k)
-    c.ellipse(150, 150, 140, 122, SNIP["fur"])
-    sp = 1 - 0.14 * abs(turn)
-    sh = 36 * turn
-    puff = mouth == "blow"
-    for side in (-1, 1):
-        far = side * turn < -0.05
-        rx = (27 if puff else 22) * (0.72 if far else 1.0)
-        c.ellipse(150 + side * 74 * sp + sh * 0.8, 186, rx, 17 if puff else 13, SNIP["cheek"], sil=False)
-    pts = [(150 - 47 * sp + sh, 138), (150 + 47 * sp + sh, 138)]
-    lk = (look[0] + int(round(4 * turn)), look[1])
-    _eyes2(c, pts, eyes, (15, 20), lk)
-    _brows(c, pts, brows, (15, 20), lk)
-    c.ellipse(150 + 48 * turn, 170, 13, 9, SNIP["nose"], sil=False)
-    _mouth2(c, 150 + 42 * turn, 186, mouth)
-    return c.finish(pivot=(150, 260))
+    ox = 30                                            # margin for the snout poking past the outline
+    c = RCut(360, 290, k)
+    cx = 150 + ox
+    c.ellipse(cx, 150, 140, 122, SNIP["fur"])
+    if abs(turn) > 0.3:                                # cheek/snout bulge on the side the face points to
+        sd = 1 if turn > 0 else -1
+        u = (abs(turn) - 0.3) / 0.7
+        c.ellipse(cx + sd * (122 + 12 * u), 174, 24, 24, SNIP["fur"])
+    _features(c, cx, 140, 138, 19.6, (15, 20), eyes, brows, look, turn, 186, 32, (22, 13), SNIP["cheek"],
+              mouth == "blow")
+    nx, ncs = _proj(cx, 146, 0, turn)
+    c.ellipse(nx, 170, 13 * (0.6 + 0.4 * ncs), 9, SNIP["nose"], sil=False)
+    mx, mcs = _proj(cx, 138, 0, turn)
+    _mouth2(c, mx, 186, mouth, 0.8 + 0.2 * mcs)
+    return c.finish(pivot=(cx, 260))
 
 
 def crinkle_head(eyes, mouth, look, brows, turn, k):
-    c = RCut(340, 330, k)
+    ox = 40
+    c = RCut(420, 330, k)
+    cx = 170 + ox
     fur = CRINKLE["fur"]
-    for x in (70, 270):
-        c.ellipse(x + 26 * turn, 74, 56, 56, fur)
-        c.ellipse(x + 26 * turn, 78, 31, 31, CRINKLE["ear_in"], sil=False)
-    c.ellipse(170, 190, 160, 128, fur)
-    sp = 1 - 0.12 * abs(turn)
-    c.ellipse(170 + 44 * turn, 240, 74 * (1 - 0.1 * abs(turn)), 54, CRINKLE["muzzle"], sil=False)
-    puff = mouth == "blow"
     for side in (-1, 1):
-        far = side * turn < -0.05
-        rx = (30 if puff else 22) * (0.72 if far else 1.0)
-        c.ellipse(170 + side * 92 * sp + 30 * turn, 224, rx, 19 if puff else 13, CRINKLE["cheek"], sil=False)
-    pts = [(170 - 60 * sp + 38 * turn, 170), (170 + 60 * sp + 38 * turn, 170)]
-    lk = (look[0] + int(round(4 * turn)), look[1])
-    _eyes2(c, pts, eyes, (16, 21), lk)
-    _brows(c, pts, brows, (16, 21), lk)
-    c.ellipse(170 + 52 * turn, 216, 27, 18, CRINKLE["nose"], sil=False)
-    c.ellipse(161 + 52 * turn, 211, 8, 4, (140, 104, 88), sil=False)
-    _mouth2(c, 170 + 46 * turn, 250, mouth, 1.1)
-    return c.finish(pivot=(170, 312))
+        x, cs = _proj(cx, 160, side * 38.7, turn)
+        c.ellipse(x, 74, 56, 56, fur)
+        if cs > 0.2:
+            c.ellipse(x + 4 * turn, 78, 31 * (0.5 + 0.5 * cs), 31, CRINKLE["ear_in"], sil=False)
+    c.ellipse(cx, 190, 160, 128, fur)
+    mzx, mcs = _proj(cx, 150, 0, turn)
+    mrx = 74 * (0.55 + 0.45 * mcs)
+    c.ellipse(mzx, 240, mrx, 54, CRINKLE["muzzle"], sil=abs(turn) > 0.3)
+    _features(c, cx, 160, 170, 22.0, (16, 21), eyes, brows, look, turn, 224, 35, (22, 13), CRINKLE["cheek"],
+              mouth == "blow")
+    nx, ncs = _proj(cx, 165, 0, turn)
+    c.ellipse(nx, 216, 27 * (0.6 + 0.4 * ncs), 18, CRINKLE["nose"], sil=False)
+    c.ellipse(nx - 9 * ncs, 211, 8 * ncs, 4, (140, 104, 88), sil=False)
+    mx, _ = _proj(cx, 156, 0, turn)
+    _mouth2(c, mx, 250, mouth, 1.1 * (0.8 + 0.2 * mcs))
+    return c.finish(pivot=(cx, 312))
 
 
 def snip_ear(k):
@@ -104,8 +146,9 @@ def snip_body(turn, k):
     c = RCut(240, 232, k)
     c.ellipse(120, 122, 100, 106, SNIP["tee"])
     c.chord(120, 18, 42, 26, 0, 180, SNIP["fur"])
-    sx = 1 - 0.22 * abs(turn)
-    star = [(120 + 26 * turn + (x - 120) * sx, y) for x, y in star_pts(120, 130, 32, 14.4)]
+    sx_c, cs = _proj(120, 100, 0, turn, THETA_BODY)
+    sx = 0.5 + 0.5 * cs
+    star = [(sx_c + (x - 120) * sx, y) for x, y in star_pts(120, 130, 32, 14.4)]
     c.polygon(star, SNIP["star"], sil=False)
     return c.finish(pivot=(120, 20))
 
@@ -113,7 +156,8 @@ def snip_body(turn, k):
 def crinkle_body(turn, k):
     c = RCut(290, 254, k)
     c.ellipse(145, 136, 125, 114, CRINKLE["fur"])
-    c.ellipse(145 + 30 * turn, 162, 72 * (1 - 0.12 * abs(turn)), 70, CRINKLE["muzzle"], sil=False)
+    px, cs = _proj(145, 125, 0, turn, THETA_BODY)
+    c.ellipse(px, 162, 72 * (0.55 + 0.45 * cs), 70, CRINKLE["muzzle"], sil=False)
     c.polygon([(196, 44), (238, 44), (248, 130), (210, 134)], CRINKLE["scarf"])
     c.polygon([(214, 92), (243, 90), (245, 106), (216, 108)], CRINKLE["stripe"], sil=False)
     c.rrect(42, 12, 248, 60, 24, CRINKLE["scarf"])
@@ -130,38 +174,38 @@ def _foot(rx, ry, col, k):
 
 
 # ---------------------------------------------------------------- arms (upper arm + forearm with paw)
-def snip_upper(k):
-    c = RCut(48, 96, k)
-    c.rrect(5, 4, 43, 86, 19, SNIP["fur"])
+def snip_upper(k, L1):
+    c = RCut(48, 20 + L1 + 20, k)
+    c.rrect(5, 4, 43, 20 + L1 + 16, 19, SNIP["fur"])
     c.rrect(0, 0, 48, 42, 20, SNIP["tee"])
     return c.finish(pivot=(24, 20))
 
 
-def snip_fore(k):
-    c = RCut(46, 92, k)
-    c.rrect(5, 0, 41, 66, 18, SNIP["fur"])
-    c.ellipse(23, 64, 21, 20, SNIP["fur"])
+def snip_fore(k, L2):
+    c = RCut(46, 16 + L2 + 24, k)
+    c.rrect(5, 0, 41, 16 + L2 + 2, 18, SNIP["fur"])
+    c.ellipse(23, 16 + L2, 21, 20, SNIP["fur"])
     return c.finish(pivot=(23, 16))
 
 
-def crinkle_upper(k):
-    c = RCut(58, 106, k)
-    c.rrect(4, 4, 54, 96, 25, CRINKLE["fur"])
+def crinkle_upper(k, L1):
+    c = RCut(58, 24 + L1 + 26, k)
+    c.rrect(4, 4, 54, 24 + L1 + 16, 25, CRINKLE["fur"])
     return c.finish(pivot=(29, 24))
 
 
-def crinkle_fore(k):
-    c = RCut(56, 110, k)
-    c.rrect(5, 0, 51, 80, 23, CRINKLE["fur"])
-    c.ellipse(28, 78, 26, 25, CRINKLE["fur"])
-    c.ellipse(28, 86, 15, 11, CRINKLE["muzzle"], sil=False)
+def crinkle_fore(k, L2):
+    c = RCut(56, 22 + L2 + 32, k)
+    c.rrect(5, 0, 51, 22 + L2 + 2, 23, CRINKLE["fur"])
+    c.ellipse(28, 22 + L2, 26, 25, CRINKLE["fur"])
+    c.ellipse(28, 22 + L2 + 8, 15, 11, CRINKLE["muzzle"], sil=False)
     return c.finish(pivot=(28, 22))
 
 
 SPEC = {
-    "snip": dict(neck=230, head_drop=9, shoulder=(92, 52), L1=50, L2=48, foot_dx=40, foot=(44, 22), shadow_w=200,
+    "snip": dict(neck=230, head_drop=9, shoulder=(92, 44), L1=60, L2=58, foot_dx=40, foot=(44, 22), shadow_w=200,
                  default=("normal", "w")),
-    "crinkle": dict(neck=248, head_drop=8, shoulder=(112, 64), L1=56, L2=56, foot_dx=50, foot=(50, 22),
+    "crinkle": dict(neck=248, head_drop=8, shoulder=(112, 56), L1=66, L2=64, foot_dx=50, foot=(50, 22),
                     shadow_w=240, default=("normal", "smile")),
 }
 
@@ -185,12 +229,12 @@ class Puppet:
         self._default = sp["default"]
         k = self.k
         if kind == "snip":
-            self.upper, self.fore = snip_upper(k), snip_fore(k)
+            self.upper, self.fore = snip_upper(k, self.L1), snip_fore(k, self.L2)
             self.ear, self.frizz = snip_ear(k), snip_frizz(k)
             self.foot = _foot(*sp["foot"], SNIP["fur"], k)
             self._head_fn, self._body_fn = snip_head, snip_body
         else:
-            self.upper, self.fore = crinkle_upper(k), crinkle_fore(k)
+            self.upper, self.fore = crinkle_upper(k, self.L1), crinkle_fore(k, self.L2)
             self.ear = self.frizz = None
             self.foot = _foot(*sp["foot"], CRINKLE["foot"], k)
             self._head_fn, self._body_fn = crinkle_head, crinkle_body
@@ -221,8 +265,8 @@ class Puppet:
         return P
 
     def shoulder(self, st, side):
-        t = st["turn"]
-        sx = self.sh[0] * (1 - 0.25 * abs(t)) * (-1 if side == "l" else 1) + 14 * t
+        R = self.sh[0] / math.sin(math.radians(70))
+        sx, _ = _proj(0, R, -70 if side == "l" else 70, st["turn"], THETA_BODY)
         return self.anchor(st)(sx, (-self.neck + self.sh[1]) * st["sq"])
 
     def arm_points(self, st, side):
@@ -247,6 +291,16 @@ class Puppet:
         beta = math.degrees(math.acos(max(-1, min(1, (L1 * L1 + L2 * L2 - d * d) / (2 * L1 * L2)))))
         return theta + bend * alpha - st["lean"], -bend * (180 - beta)
 
+    def face_point(self, st, local):
+        """World position of a point on the face, given in head-local design units (x from the face centre,
+        y from the head pivot), following turn, tilt and lean (e.g. the nose, for a paint dot)."""
+        t = max(-1.0, min(1.0, st["turn"] + st.get("hturn", 0.0)))
+        R = 146 if self.kind == "snip" else 165
+        x = R * math.sin(math.radians(THETA_HEAD * t)) + local[0]
+        hx, hy = self.head_pivot(st)
+        dx, dy = rot(x * self.s, local[1] * self.s, st["lean"] + st["tilt"])
+        return hx + dx, hy + dy
+
     def head_pivot(self, st):
         return self.anchor(st)(0, -self.neck * st["sq"] + self.head_drop + st["head_dy"])
 
@@ -263,7 +317,8 @@ class Puppet:
               sx=max(0.6, 1 - st["hop"] / 300), shadow=False)
         for i, side in enumerate((-1, 1)):
             rel, lift = st["feet"][i]
-            fx = st["x"] + (side * self.foot_dx * (1 - 0.3 * abs(t)) + 10 * t) * s + rel
+            fdx, _ = _proj(0, self.foot_dx / 0.5, side * 30, t, THETA_BODY)
+            fx = st["x"] + fdx * s + rel
             place(base, self.foot, cam.S((fx, st["y"] - st["hop"] - lift)), alpha=A)
         far = "r" if t > 0.35 else ("l" if t < -0.35 else None)
         if far and not front:
@@ -277,12 +332,14 @@ class Puppet:
                     self._arm(base, cam, st, side)
         hx, hy = self.head_pivot(st)
         ha = st["lean"] + st["tilt"]
+        t = max(-1.0, min(1.0, st["turn"] + st.get("hturn", 0.0)))   # the head can look away from the body
         if self.ear is not None:
             if st["frizz"] > 0.01:
                 cx, cy = rot(0, -110 * s, ha)
                 place(base, self.frizz, cam.S((hx + cx, hy + cy)), angle=ha, scale=st["frizz"], alpha=A)
             for (ox, oy), tilt, extra in zip(((-50, -180), (50, -180)), (9, -9), (st["ear_l"], st["ear_r"])):
-                ex, ey = rot((ox + 22 * t) * s, oy * s, ha)
+                px, _ = _proj(0, 115, math.degrees(math.asin(ox / 115)), t)
+                ex, ey = rot(px * s, oy * s, ha)
                 place(base, self.ear, cam.S((hx + ex, hy + ey)), angle=ha + tilt + extra, sy=st["ear_k"], alpha=A)
         look = (int(round(st["look_x"] / 2) * 2), int(round(st["look_y"] / 2) * 2))
         place(base, self.head(st["eyes"], st["mouth"], look, st["brows"], t), cam.S((hx, hy)), angle=ha, alpha=A)
@@ -293,10 +350,10 @@ class Puppet:
 
 # ---------------------------------------------------------------- performance
 class Perf2(K.Perf):
-    NUM = K.NUM + ("turn", "elb_l", "elb_r")
+    NUM = K.NUM + ("turn", "hturn", "elb_l", "elb_r")
 
     def __init__(self, puppet, seed=0, **init):
-        base = dict(arm_l=-10.0, arm_r=10.0, elb_l=14.0, elb_r=-14.0, turn=0.0)
+        base = dict(arm_l=-10.0, arm_r=10.0, elb_l=14.0, elb_r=-14.0, turn=0.0, hturn=0.0)
         base.update(init)
         super().__init__(puppet, seed, **base)
         self.walks = []
