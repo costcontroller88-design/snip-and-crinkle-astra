@@ -67,6 +67,21 @@ IRIS = P.HeartIris()
 BUB_RUN = P.choice_bubble("run", (240, 110, 100))
 BUB_HOLD = P.choice_bubble("hold", (90, 190, 120))
 QMARK = icons.question()
+
+
+def wait_callout():
+    """Big round callout with the red standing figure: red means stop and wait."""
+    from paperlib import Cut
+    c = Cut(290, 290)
+    c.polygon([(40, 150), (6, 236), (98, 196)], (240, 92, 84))           # little tail pointing at the light
+    c.ellipse(150, 140, 132, 132, (240, 92, 84))
+    c.ellipse(150, 140, 112, 112, P.BOX, sil=False)
+    c.ellipse(150, 140, 96, 96, P.mix(P.LAMP_OFF, P.RED_ON, 0.3), sil=False)
+    P.draw_ped_stand(c, 150, 146, 150, P.RED_ON)
+    return c.finish(pivot=(150, 140), border=7)
+
+
+WAIT_CALLOUT = wait_callout()
 CHECK = icons.check(130)
 SPARKLE = scene.sparkle()
 NUMS = [scene.numeral(1, (244, 112, 104)), scene.numeral(2, (255, 196, 52)), scene.numeral(3, (84, 182, 222))]
@@ -90,9 +105,9 @@ GLOW_RED = soft_glow(P.RED_ON, 130)
 GLOW_GREEN = soft_glow(P.GREEN_ON, 130)
 
 SNIP_BLINKS = (1.9, 6.4, 8.0, 9.25, 11.7, 14.3, 17.4)
-CR_BLINKS = (7.1, 8.6, 9.9, 12.5, 14.4)
+CR_BLINKS = (7.65, 8.6, 9.9, 12.5, 14.4)
 T_WIND, T_DASH, T_SKID, T_BACK = 4.6, 5.0, 5.12, 5.62
-T_HAND_SN0, T_HAND_SN1 = 7.35, 7.85   # grown-up's hand comes down for Snip
+T_HAND_SN0, T_HAND_SN1 = 7.5, 8.08   # grown-up's hand comes down for Snip
 COUNTS = (8.3, 8.95, 9.6)
 T_GREEN = 10.1
 T_LOOK_L, T_LOOK_R, T_LOOK_END = 10.2, 10.55, 10.9
@@ -228,7 +243,7 @@ def snip_state(t):
         s["arm_l"] = lerp(-14, SN_HOLD, ease_in_out(seg(t, 7.45, T_HAND_SN1)))
     elif t < T_CROSS0:                # holding the grown-up's hand: WAIT, count, green, look both ways
         s.update(arm_l=SN_HOLD, eyes="normal", mouth="w", look=(-6, -8))
-        if t < 8.1:
+        if t < 8.28:
             s.update(eyes="happy", mouth="grin")
             e = spring(t, T_HAND_SN1, 10, 5.0, 3.5)
             s["ears"] = [e, -e]
@@ -348,8 +363,8 @@ def cars(t):
     if frozen(t):
         t = 2.4999
     out = []
-    if 1.2 <= t < 2.5:                # car A drives past (top lane, right -> left), well away from Snip
-        out.append((CAR_A, lerp(1500, -520, seg(t, 1.2, 2.45)), TOP_LANE_Y))
+    if 1.0 <= t < 2.5:                # car A drives past (top lane, right -> left), well away from Snip
+        out.append((CAR_A, lerp(1450, -420, seg(t, 1.0, 2.45)), TOP_LANE_Y))
     if 8.0 <= t < T_IRIS1:            # car B rolls in from the left and stops at its stop line
         x = lerp(-560, P.STOP_LEFT - 14, ease_out(seg(t, 8.0, 9.5)))
         x = lerp(x, 1700, ease_in_out(seg(t, 14.4, 16.4)) ** 1.6)
@@ -385,7 +400,7 @@ def hand_sn(t, sn):
     tp = tip(SNIP, sn, "l")
     hold = (tp[0] - 4, tp[1] + 16)
     if t < T_HAND_SN1:
-        k = ease_out(seg(t, T_HAND_SN0, T_HAND_SN1))
+        k = ease_in_out(seg(t, T_HAND_SN0, T_HAND_SN1))
         return (hold[0], lerp(-200, hold[1], k))
     if t >= T_LET_GO:
         k = ease_in_out(seg(t, T_LET_GO, T_LET_GO + 0.6))
@@ -478,6 +493,11 @@ def render_frame(t):
     if h is not None:
         place(f, HAND_SN, h)
 
+    # Crinkle shows the red standing figure: red = stop and wait
+    if 6.7 <= t < 7.75:
+        k = pop_scale(t, 6.7, 0.3) * (1 - ease_in_out(seg(t, 7.55, 7.75)))
+        place(f, WAIT_CALLOUT, C(P.LIGHT_X + 165, P.LIGHT_Y - 250), scale=k * (1 + 0.06 * math.sin(t * 12)))
+
     # desire: the ball glints
     for t0, dx, dy, sc in ((1.05, 34, -40, 0.9), (1.5, -30, 6, 0.7), (2.0, 22, 30, 0.6)):
         if t0 <= t < t0 + 0.5:
@@ -550,13 +570,12 @@ def _iris_open_at():
 
 
 CAM_KEYS = [
-    (0.0,) + CAM0, (1.0, 1.42, 480, 950), (1.6, 1.12, 540, 1060), (2.4, 1.12, 540, 1120),
-    (2.8, 1.0, 540, 960), (4.5, 1.0, 540, 960), (4.75, 1.3, 460, 1150), (5.75, 1.3, 460, 1150),
-    (6.1, 1.0, 560, 960), (6.6, 1.0, 560, 960), (6.95, 1.6, 230, 800), (7.3, 1.6, 230, 800),
-    (7.7, 1.0, 540, 960), (T_LOOK_L, 1.0, 540, 960), (T_LOOK_L + 0.25, 1.0, 380, 960),
-    (T_LOOK_R, 1.0, 380, 960), (T_LOOK_R + 0.25, 1.0, 700, 960), (T_LOOK_END, 1.0, 700, 960),
-    (T_CROSS0 + 0.2, 1.0, 560, 960), (12.9, 1.0, 560, 960), (13.2, 1.12, 580, 1150), (14.4, 1.12, 580, 1150),
-    (14.7, 1.0, 600, 960), (15.2, 1.0, 600, 960), (15.45, 1.12, 620, 1180), (16.3, 1.12, 620, 1180),
+    (0.0,) + CAM0, (1.0, 1.42, 480, 950), (2.3, 1.0, 540, 960), (4.6, 1.0, 540, 960),
+    (5.05, 1.1, 480, 1040), (5.65, 1.1, 480, 1040), (6.2, 1.0, 560, 960), (6.5, 1.0, 560, 960),
+    (7.0, 1.0, 470, 960), (7.4, 1.0, 470, 960), (8.0, 1.0, 540, 960), (T_LOOK_L, 1.0, 540, 960),
+    (T_LOOK_L + 0.3, 1.0, 440, 960), (T_LOOK_R - 0.02, 1.0, 440, 960), (T_LOOK_END - 0.02, 1.0, 640, 960),
+    (T_LOOK_END + 0.4, 1.0, 560, 960), (12.75, 1.0, 560, 960), (13.3, 1.12, 580, 1150), (14.4, 1.12, 580, 1150),
+    (14.8, 1.0, 600, 960), (15.1, 1.0, 600, 960), (15.45, 1.1, 620, 1160), (16.3, 1.1, 620, 1160),
     (T_IRIS1, 1.0, 600, 960), (T_RESET, 1.0, 600, 960), (T_RESET + 0.01,) + CAM0, (DUR,) + CAM0]
 
 IRIS_OPEN_AT = _iris_open_at()
@@ -571,8 +590,8 @@ def camera(f, t):
             break
     if T_SKID <= t < T_SKID + 0.3:    # little skid shake
         k = math.sin(math.pi * seg(t, T_SKID, T_SKID + 0.3))
-        cx += 6 * k * math.sin(t * 95)
-        cy += 5 * k * math.cos(t * 81)
+        cx += 4 * k * math.sin(t * 95)
+        cy += 3 * k * math.cos(t * 81)
     w, h = scene.W / z, scene.H / z
     left = min(max(cx + X0 - w / 2, 0), P.WORLD_W - w)
     top = min(max(cy - h / 2, 0), scene.H - h)
