@@ -9,6 +9,8 @@ A wordless YouTube Shorts series for kids worldwide (ages 2–6). Two paper-cut-
 4. **The lesson must be correct and safe** by mainstream child-safety advice. Dangerous things (hot drinks, roads, sharp objects, medicine) are handled by the **grown-up's paper hand** (`scene.grown_up_hand()`), never by Snip or Crinkle alone. Kids learn to *wait, ask or hold a grown-up's hand*.
 5. **YouTube "made for kids" quality principles:** kind, positive behaviour; nothing scary, violent, gross or product-promoting; a clear beginning, middle and end; no keyword stuffing.
 6. **Not templated.** Each episode needs a different setting or props, a different kind of mistake, and a different funny moment. Repeating the same scenes with only the lesson swapped can get the channel demonetized.
+7. **Music variety.** Keep the signature jingle (start and paw-bump) and the F → G7 loop cadence exactly as they are; they are the channel's theme. Everything else in the story section must sound different from the previous episodes: pick a different accompaniment instrument than the ukulele (`music_extra.comp(..., inst="toy_piano" | "organ" | "steel_pan" | "melodica")`) and give the story its own lead line. Episodes 1–4, 6–8 and 10 all use ukulele + glockenspiel; from Episode 11 on, no two consecutive episodes may share the same accompaniment instrument, and vary the tempo or key now and then (add new instruments to `episodes/music_extra.py`).
+8. **Vary who makes the mistake.** Snip errs in Episodes 1–10. From Episode 11 on, let Crinkle (or both) make the mistake in at least one episode out of three, so Snip doesn't become "the naughty one".
 
 ## The 18-second story template
 | Time | Beat | Notes |
@@ -30,6 +32,7 @@ A wordless YouTube Shorts series for kids worldwide (ages 2–6). Two paper-cut-
 - **Safe zones:** keep faces and key props out of the right column (x > 950, y 980–1700, the like/comment buttons) and out of the bottom band (y > 1560, the title and caption).
 - **Loop:** every periodic function needs a period that divides the duration (breathing 2.0s, ear idle 3.0s, steam phase `int(t * 16 * 13 / DUR)`). The state at t = DUR must equal t = 0.
 - **Blinking, ears, breathing and squash-and-stretch** are already in `Character.draw`. Use `hop_curve()` for hops with squash, and `spring()` for ear wiggles.
+- **The grown-up's arm:** use `episodes/props_grownup.py` (`GrownUpArm(...).draw_reaching(...)` or `.draw(...)`), a jointed paper arm with an elbow, tapered sleeve, cuff and open hand, solved from a shoulder that sits off-frame. Do not hang a long straight sleeve from the top of the frame (that "pole" arm was the weakest visual in Episodes 5 and 9 v1). For a grown-up holding two paws, put both shoulders together above the frame (one person), elbows out.
 - **Don't edit shared modules** (`paperlib.py`, `characters.py`, `scene.py`, `audio.py`, `icons.py`). Put new backgrounds, props and icons in a new file `episodes/props_<slug>.py` or inside your episode file. This avoids merge conflicts between episodes made in parallel.
 
 ## Quality gate (all must pass before you finish)

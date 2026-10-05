@@ -29,7 +29,9 @@ from PIL import Image  # noqa: E402
 
 import audio as A  # noqa: E402
 import icons  # noqa: E402
+import music_extra as MX  # noqa: E402
 import props_car as PC  # noqa: E402
+import props_grownup as G  # noqa: E402
 import props_street as PS  # noqa: E402
 import scene  # noqa: E402
 from characters import Character  # noqa: E402
@@ -83,7 +85,7 @@ DOT = PC.dot(r=12)
 DOT_Y = PC.dot((255, 214, 64), 14)
 CLICK = PC.click_star()
 BONK = PC.bonk_star()
-SLEEVE = PC.sleeve()
+ARM = G.GrownUpArm(upper=440, fore=440, bend=+1, w_shoulder=136, w_elbow=118, w_wrist=98)  # elbow up, over the seats
 H_GRIP = PC.hand_grip()
 H_POINT = PC.hand_point()
 H_THUMB = PC.hand_thumb()
@@ -492,9 +494,7 @@ def aim_hand(wrist, target):
 
 def draw_hand(f, hs):
     pose, pos, ang, sc = hs
-    sh = (SHOULDER[0], SHOULDER[1])
-    sl = math.degrees(math.atan2(-(sh[1] - pos[1]), sh[0] - pos[0]))
-    place(f, SLEEVE, pos, angle=sl)
+    ARM.draw(f, SHOULDER, pos)
     spr = {"grip": H_GRIP, "point": H_POINT, "thumb": H_THUMB}[pose]
     place(f, spr, pos, angle=ang, scale=sc)
 
@@ -763,7 +763,7 @@ def build_audio(path):
         sfx.add(tt, A.boing(0.45, 300 + 20 * (tt * 4 % 3)))
     for tt, ch, up in ((1.0, "C", False), (1.25, "C", True), (1.5, "F", False), (1.75, "F", True),
                        (2.0, "G", False), (2.25, "G", True)):
-        A.strum(music, tt, ch, 0.7, up)
+        MX.comp(music, tt, ch, 0.7, up, inst="organ")
     for tt, m in ((1.0, 48), (1.5, 41), (2.0, 43)):
         music.add(tt, A.bass(M(m), 0.5, 0.7))
     sfx.add(1.05, A.twinkle(0.8))
@@ -799,7 +799,7 @@ def build_audio(path):
     sfx.add(6.1, A.glock(M(91), 1.2, 0.7))
     sfx.add(6.15, A.glock(M(88), 1.2, 0.5))
     for tt, ch in ((6.5, "Am"), (7.0, "F"), (7.5, "C")):
-        A.strum(music, tt, ch, 0.55)
+        MX.comp(music, tt, ch, 0.55, inst="organ")
         music.add(tt, A.bass(M({"Am": 45, "F": 41, "C": 48}[ch]), 0.5, 0.6))
     sfx.add(6.6, A.twinkle(0.6, (96, 100, 103, 108)))
     for tt in (7.25, 7.5):
@@ -820,7 +820,7 @@ def build_audio(path):
     sfx.add(10.3, A.whoosh(0.35, 0.5))
     sfx.add(T_THUMB + 0.1, A.chime_up(1.0))
     sfx.add(T_THUMB + 0.15, A.twinkle(0.6))
-    A.strum(music, T_THUMB, "C", 0.7)
+    MX.comp(music, T_THUMB, "C", 0.7, inst="organ")
     sfx.add(T_WHEEL + 0.3, A.tap(0.5))
     # the drive: a soft purr and a happy tune
     sfx.add(T_GO - 0.1, PC.engine(T_STOP - T_GO + 0.5, 0.6, 1.0, 1.4))
@@ -828,14 +828,14 @@ def build_audio(path):
     for i, m in enumerate(melody):
         tt = T_GO + 0.1 + i * 0.25
         if tt < 15.3:
-            music.add(tt, A.marimba(M(m), 0.4, 0.55))
+            music.add(tt, MX.steel_pan(M(m), 0.5, 0.6))          # beach-bound: steel pan lead
     for i, ch in enumerate(("C", "F", "G", "C", "Am", "F")):
         tt = T_GO + i * 0.5
-        A.strum(music, tt, ch, 0.6)
-        A.strum(music, tt + 0.25, ch, 0.5, True)
+        MX.comp(music, tt, ch, 0.6, inst="organ")
+        MX.comp(music, tt + 0.25, ch, 0.5, True, inst="organ")
         music.add(tt, A.bass(M({"C": 48, "F": 41, "G": 43, "Am": 45}[ch]), 0.45, 0.7))
     for tt, ch, up in ((14.5, "F", False), (14.75, "G", True)):
-        A.strum(music, tt, ch, 0.7, up)
+        MX.comp(music, tt, ch, 0.7, up, inst="organ")
     for tt, _, _ in HEART_PLAN:
         sfx.add(tt, A.pop(0.45))
     sfx.add(12.4, A.twinkle(0.6))

@@ -28,6 +28,8 @@ from PIL import Image  # noqa: E402
 
 import audio as A  # noqa: E402
 import icons  # noqa: E402
+import music_extra as MX  # noqa: E402
+import props_grownup as G  # noqa: E402
 import props_street as P  # noqa: E402
 import scene  # noqa: E402
 from characters import Character  # noqa: E402
@@ -61,8 +63,12 @@ DUST = P.dust_puff()
 WHIRL = P.whirl_frames(6)
 SPEED = P.speed_lines()
 GLINT = P.glint()
-HAND_SN = P.long_hand(1600)
-HAND_CR = P.long_hand(1600, mirror=True)
+# the grown-up's arms: jointed paper arms with a soft elbow, from shoulders above the frame
+ARM_SN = G.GrownUpArm(upper=680, fore=680, bend=+1)        # elbow out to the left
+ARM_CR = G.GrownUpArm(upper=680, fore=680, bend=-1)        # elbow out to the right
+HAND_SN, HAND_LEN = G.hand_open(mirror=True)
+HAND_CR, _ = G.hand_open()
+SHOULDER_ABOVE, HALF_SHOULDERS = 1150, 170                 # one grown-up: shoulders above the frame, between the kids
 IRIS = P.HeartIris()
 BUB_RUN = P.choice_bubble("run", (240, 110, 100))
 BUB_HOLD = P.choice_bubble("hold", (90, 190, 120))
@@ -486,12 +492,17 @@ def render_frame(t):
             place(f, DUST, C(sn["x"] + dx * (1 + 0.4 * k), EDGE_Y - 10), scale=0.6 + 0.5 * k, alpha=1 - k)
 
     # the grown-up's hands (in front of everything): holding paws
-    h = hand_cr(t, cr)
-    if h is not None:
-        place(f, HAND_CR, h)
-    h = hand_sn(t, sn)
-    if h is not None:
-        place(f, HAND_SN, h)
+    hc, hs = hand_cr(t, cr), hand_sn(t, sn)
+    if hc is not None and hs is not None:
+        mid, hy = (hc[0] + hs[0]) / 2, (hc[1] + hs[1]) / 2
+    else:
+        mid = hc[0] - 230 if hc is not None else (hs[0] + 230 if hs is not None else 0)
+        hy = 850
+    SHOULDER_Y = min(-120, max(hy, 850) - SHOULDER_ABOVE)    # the grown-up walks along with them
+    if hc is not None:
+        ARM_CR.draw_reaching(f, (mid + HALF_SHOULDERS, SHOULDER_Y), hc, HAND_CR, HAND_LEN)
+    if hs is not None:
+        ARM_SN.draw_reaching(f, (mid - HALF_SHOULDERS, SHOULDER_Y), hs, HAND_SN, HAND_LEN)
 
     # Crinkle shows the red standing figure: red = stop and wait
     if 6.7 <= t < 7.75:
@@ -606,7 +617,7 @@ def build_audio(path):
     A.jingle(music, 0.02)
     for tt, ch, up in ((1.0, "C", False), (1.25, "C", True), (1.5, "G", False), (1.75, "G", True),
                        (2.0, "Am", False), (2.25, "F", True)):
-        A.strum(music, tt, ch, 0.7, up)
+        MX.comp(music, tt, ch, 0.7, up, inst="toy_piano")
     for tt, m in ((1.0, 48), (1.5, 43), (2.0, 45), (2.25, 41)):
         music.add(tt, A.bass(M(m), 0.5, 0.7))
     sfx.add(0.3, P.chirp(0.6))
@@ -640,7 +651,7 @@ def build_audio(path):
     sfx.add(6.7, A.glock(M(91), 1.2, 0.8))
     sfx.add(6.75, A.glock(M(88), 1.2, 0.55))
     for tt, ch in ((6.6, "Am"), (7.1, "F"), (7.6, "C")):
-        A.strum(music, tt, ch, 0.55)
+        MX.comp(music, tt, ch, 0.55, inst="toy_piano")
         music.add(tt, A.bass(M({"Am": 45, "F": 41, "C": 48}[ch]), 0.5, 0.6))
     for tt in (6.95, 7.25):
         sfx.add(tt, A.tap(0.5))
@@ -661,7 +672,7 @@ def build_audio(path):
         sfx.add(c + 0.02, A.tap(0.5))
     sfx.add(T_GREEN, A.chime_up(1.0))
     sfx.add(T_GREEN + 0.05, A.twinkle(0.6))
-    A.strum(music, T_GREEN, "C", 0.7)
+    MX.comp(music, T_GREEN, "C", 0.7, inst="toy_piano")
     music.add(T_GREEN, A.bass(M(48), 0.5, 0.7))
     sfx.add(T_LOOK_L, A.whoosh(0.25, 0.5))
     sfx.add(T_LOOK_L + 0.18, A.marimba(M(72), 0.4, 0.6))
@@ -671,10 +682,10 @@ def build_audio(path):
     # cross: walking plucks
     for i in range(8):
         tt = T_CROSS0 + i * (T_CROSS1 - T_CROSS0) / 8
-        music.add(tt, A.pluck(M((60, 64, 67, 72, 67, 64, 65, 67)[i]), 0.3, 0.6))
+        music.add(tt, MX.melodica(M((72, 76, 79, 84, 79, 76, 77, 79)[i]), 0.17, 0.55))   # street march on melodica
         sfx.add(tt, A.tap(0.35))
     for tt, ch in ((11.0, "C"), (11.5, "F"), (12.0, "G")):
-        A.strum(music, tt, ch, 0.5)
+        MX.comp(music, tt, ch, 0.5, inst="toy_piano")
         music.add(tt, A.bass(M({"C": 48, "F": 41, "G": 43}[ch]), 0.45, 0.6))
     sfx.add(T_LET_GO, A.pop(0.5))
     sfx.add(T_LET_GO + 0.1, A.whoosh(0.5, 0.5))
@@ -684,9 +695,11 @@ def build_audio(path):
     sfx.add(13.02, A.twinkle(0.8))
     for tt, ch, up in ((13.0, "C", False), (13.25, "C", True), (13.5, "G", False), (13.75, "G", True),
                        (14.0, "Am", False), (14.25, "F", True), (14.5, "F", False)):
-        A.strum(music, tt, ch, 0.8, up)
+        MX.comp(music, tt, ch, 0.8, up, inst="toy_piano")
     for tt, m in ((13.0, 48), (13.5, 43), (14.0, 45), (14.5, 41)):
         music.add(tt, A.bass(M(m), 0.45, 0.8))
+    for i, m in enumerate((79, 84, 83, 79, 76, 77, 79, 72)):           # melodica answers the ball
+        music.add(13.0 + i * 0.19, MX.melodica(M(m), 0.17, 0.45))
     for tt, _, _ in HEART_PLAN:
         sfx.add(tt, A.pop(0.45))
     sfx.add(13.35, A.boing(0.35, 340))
