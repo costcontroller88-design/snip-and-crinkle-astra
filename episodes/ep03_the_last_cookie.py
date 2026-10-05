@@ -40,11 +40,13 @@ R = P.COOKIE_R
 SN_HOME = 320
 CR_HOME = 785                         # keeps his right arm clear of the like/comment buttons
 CR_DEMO = 640                         # where Crinkle stands to break the cookie
+HOLD_L, HOLD_R = 212, 148              # Crinkle's arms holding the halves up and out, clear of his face
 CR_REST_L = 346                       # Crinkle's left arm hanging (== -14)
 PLATE_X = 535
 PLATE_Y = TY + 8
 REST = (PLATE_X, TY - 14 - R)         # cookie centre standing on the plate
 SN_DEMO = 292                         # Snip's spot while Crinkle demonstrates
+SN_FALL = SN_HOME + 32                # where Snip lands (kept in from the left edge)
 
 BG = P.background()
 PLATE = P.plate()
@@ -177,15 +179,15 @@ def snip_state(t):
     elif t < 6.3:                     # SLIP! tumble back onto a soft bottom, rock like a roly-poly
         if t < T_LAND:
             p = ease_out(seg(t, T_SLIP, T_LAND))
-            s.update(x=lerp(SN_HOME + 6, SN_HOME - 28, p), lean=lerp(14, 38, p), hop=46 * math.sin(math.pi * p),
+            s.update(x=lerp(SN_HOME + 6, SN_FALL, p), lean=lerp(14, 26, p), hop=46 * math.sin(math.pi * p),
                      eyes="wide", mouth="O", look=(4, -6))
             s["arm_l"], s["arm_r"] = lerp(-40, -150, p), lerp(70, 150, p)
             s["ears"] = [lerp(18, -14, p), lerp(12, 22, p)]
             s["ear_stretch"] = lerp(1.0, 1.2, p)
         else:
             dt = t - T_LAND
-            s["x"] = SN_HOME - 28
-            s["lean"] = 38 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
+            s["x"] = SN_FALL
+            s["lean"] = 26 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
             s["sq"] = 1 - 0.14 * math.exp(-12 * dt)
             down = ease_in_out(seg(t, 5.5, 5.85))
             s["arm_l"], s["arm_r"] = lerp(-150, -14, down), lerp(150, 14, down)
@@ -202,7 +204,7 @@ def snip_state(t):
                 s["ears"] = [e + droop, -e - droop]
     elif t < T_CRACK:                 # Crinkle's idea: Snip watches, curious
         p = ease_in_out(seg(t, 6.3, 6.7))
-        s["x"] = lerp(SN_HOME - 28, SN_DEMO, p)
+        s["x"] = lerp(SN_FALL, SN_DEMO, p)
         droop = 18 * (1 - ease_in_out(seg(t, 6.4, 6.8)))
         s["ears"] = [droop, -droop]
         if t < 6.45:
@@ -323,13 +325,13 @@ def crinkle_state(t):
     elif t < 6.3:                     # SLIP! plop onto his soft bottom, rock back up
         if t < T_LAND:
             p = ease_out(seg(t, T_SLIP, T_LAND))
-            s.update(x=lerp(CR_HOME, CR_HOME + 12, p), lean=lerp(-14, -22, p), hop=34 * math.sin(math.pi * p),
+            s.update(x=CR_HOME, lean=lerp(-14, -18, p), hop=34 * math.sin(math.pi * p),
                      eyes="wide", mouth="O", look=(-4, -6))
             s["arm_l"], s["arm_r"] = lerp(290, 200, p), lerp(40, 160, p)
         else:
             dt = t - T_LAND
-            s["x"] = CR_HOME + 12
-            s["lean"] = -22 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
+            s["x"] = CR_HOME
+            s["lean"] = -18 * math.exp(-4.2 * dt) * math.cos(2 * math.pi * 1.45 * dt)
             s["sq"] = 1 - 0.12 * math.exp(-12 * dt)
             down = ease_in_out(seg(t, 5.5, 5.85))
             s["arm_l"], s["arm_r"] = lerp(200, CR_REST_L, down), lerp(160, 2, down)
@@ -341,12 +343,12 @@ def crinkle_state(t):
                 s.update(eyes="normal", mouth="wobble", look=(-9, -2))
     elif t < 6.75:                    # IDEA! (light bulb)
         h, sq = hop_curve(t, T_IDEA, T_IDEA + 0.3, 1, 22)
-        s.update(x=CR_HOME + 12, hop=h, sq=sq, eyes="sparkle" if t >= T_IDEA else "normal",
+        s.update(x=CR_HOME, hop=h, sq=sq, eyes="sparkle" if t >= T_IDEA else "normal",
                  mouth="grin" if t >= T_IDEA else "wobble", look=(-6, -6) if t >= T_IDEA else (-9, -2))
         s["arm_r"] = lerp(2, 165, ease_out_back(seg(t, T_IDEA, T_IDEA + 0.25)))
         s["arm_r"] = lerp(s["arm_r"], 2, ease_in_out(seg(t, 6.6, 6.75)))
     elif t < T_CRACK:                 # picks up the cookie and shows it to Snip
-        s["x"] = lerp(CR_HOME + 12, CR_DEMO, ease_in_out(seg(t, 6.75, 7.05)))
+        s["x"] = lerp(CR_HOME, CR_DEMO, ease_in_out(seg(t, 6.75, 7.05)))
         bend = ease_in_out(seg(t, 6.85, 7.0)) * (1 - ease_in_out(seg(t, 7.05, 7.25)))
         s["lean"] = 14 * bend + 4 * ease_in_out(seg(t, 7.25, 7.45))
         s.update(eyes="normal", mouth="smile", look=(-6, 4) if t < 7.2 else (-8, -1))
@@ -360,13 +362,13 @@ def crinkle_state(t):
         s.update(x=CR_DEMO, eyes="wide" if t < 8.1 else "happy", mouth="o" if t < 8.1 else "grin")
         c = cookie_center_whole(T_CRACK - 0.001)
         st = dict(s, lean=4.0)
-        a_l0 = aim(CR, st, "l", (c[0] - R + 16, c[1] + 10), 195)
-        a_r0 = aim(CR, st, "r", (c[0] + R - 16, c[1] + 10), 165)
+        a_l0 = aim(CR, st, "l", (c[0] - R + 16, c[1] + 10), HOLD_L)
+        a_r0 = aim(CR, st, "r", (c[0] + R - 16, c[1] + 10), HOLD_R)
         up = ease_in_out(seg(t, 8.0, 8.35))
         s["lean"] = lerp(4, 0, up)
         bob_l, bob_r = balance_bob(t)
-        s["arm_l"] = lerp(a_l0, 195, up) + bob_l
-        s["arm_r"] = lerp(a_r0, 165, up) + bob_r
+        s["arm_l"] = lerp(a_l0, HOLD_L, up) + bob_l
+        s["arm_r"] = lerp(a_r0, HOLD_R, up) + bob_r
         if COUNTS[0] <= t < COUNTS[1]:
             s["look"] = (-6, -6)
         elif COUNTS[1] <= t < 9.55:
@@ -384,11 +386,11 @@ def crinkle_state(t):
         back = ease_in_out(seg(t, T_GIVE1, T_GIVE1 + 0.35))
         s["lean"] = 6 * give * (1 - back)
         a = aim(CR, s, "l", handoff_pt(min(t, T_GIVE1)), 270)
-        s["arm_l"] = lerp(lerp(195, a, give), CR_REST_L, back)
-        s["arm_r"] = 165
+        s["arm_l"] = lerp(lerp(HOLD_L, a, give), CR_REST_L, back)
+        s["arm_r"] = HOLD_R
     elif t < T_GONE + 0.15:           # MUNCH
         s.update(x=CR_DEMO, eyes="happy", mouth="blow", look=(-6, 4))
-        s["arm_r"] = lerp(165, 214, ease_in_out(seg(t, 11.6, 11.85)))
+        s["arm_r"] = lerp(HOLD_R, 214, ease_in_out(seg(t, 11.6, 11.85)))
         if t > T_GONE:
             s["arm_r"] = lerp(214, 2, ease_in_out(seg(t, T_GONE, T_GONE + 0.3)))
         s["mouth"] = munch_mouth(t, 0.08)
@@ -649,7 +651,7 @@ def render_frame(t):
     if T_IDEA <= t < 6.95:
         k = pop_scale(t, T_IDEA, 0.25) * (1 - ease_in_out(seg(t, 6.75, 6.95)))
         hp = CR.head_pivot(cr["x"], TY, cr["hop"], cr["lean"], cr["sq"], cr["head_dy"])
-        place(f, BULB, (hp[0], hp[1] - 385), scale=0.8 * k, angle=6 * math.sin((t - T_IDEA) * 9))
+        place(f, BULB, (hp[0] - 150, hp[1] - 400), scale=0.8 * k, angle=10 + 6 * math.sin((t - T_IDEA) * 9))  # clear of the wall picture
 
     # crumbs: the crack and every bite
     draw_crumbs(f, t, T_CRACK, (CR_DEMO, 1150), 12, 7, 1.0, 0.9)
@@ -707,8 +709,8 @@ def render_frame(t):
 CAM0 = (1.6, 548, 1185)
 CAM_KEYS = [
     (0.0,) + CAM0, (1.0, 1.63, 548, 1185), (1.45, 1.12, 540, 1060), (2.4, 1.12, 540, 1060),
-    (2.8, 1.0, 540, 960), (4.5, 1.0, 540, 960), (4.7, 1.22, 545, 1090), (5.2, 1.22, 545, 1090),
-    (5.6, 1.0, 540, 960), (7.2, 1.0, 540, 960), (7.55, 1.18, 600, 1060), (8.05, 1.18, 600, 1060),
+    (2.8, 1.0, 540, 960), (4.5, 1.0, 540, 960), (4.7, 1.22, 545, 1090), (5.08, 1.22, 545, 1090),
+    (5.3, 1.0, 540, 960),  # zoom out as they tumble so Snip stays in frame (7.2, 1.0, 540, 960), (7.55, 1.18, 600, 1060), (8.05, 1.18, 600, 1060),
     (8.4, 1.0, 540, 960), (9.6, 1.0, 540, 960), (9.9, 1.08, 590, 960), (10.4, 1.08, 590, 960),
     (10.7, 1.0, 540, 960), (11.6, 1.0, 540, 960), (11.9, 1.1, 480, 1050), (13.1, 1.1, 480, 1050),
     (13.4, 1.0, 540, 960), (15.2, 1.0, 540, 960), (15.45, 1.12, 520, 1060), (15.9, 1.12, 520, 1060),
