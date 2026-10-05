@@ -1,6 +1,7 @@
 """Objective quality checks for a rendered Short.
 
-    python3 tools/check_video.py output/ep02_xxx.mp4
+    python3 tools/check_video.py output/ep02_xxx.mp4                 (vertical Short, must loop)
+    python3 tools/check_video.py output/x.mp4 --landscape --no-loop  (1920x1080 long-form or test scene)
 
 Checks: duration, vertical size, loudness (YouTube ~ -14 LUFS), silent gaps,
 the biggest frame-to-frame jump (harsh cuts), and the loop seam (last -> first frame).
@@ -29,6 +30,8 @@ def audio_stats(path):
 
 
 def frame_stats(path, w=270, h=480):
+    if LANDSCAPE:
+        w, h = 480, 270
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf", f"scale={w}:{h}", "-f", "rawvideo",
                           "-pix_fmt", "gray", "-"], capture_output=True).stdout
     fr = np.frombuffer(raw, np.uint8).reshape(-1, h, w).astype(np.float32)
@@ -49,9 +52,10 @@ def main(path):
     print(f"silent gaps >0.25s: {silences or 'none'}")
     print(f"frame change: median {med:.2f}, biggest {mx:.2f} at {at / 30:.2f}s (keep < 20 unless it's a deliberate cut)")
     print(f"loop seam (last->first): {seam:.2f} (seamless if within ~1.5x of median {med:.2f})")
-    if (vid["width"], vid["height"]) != (1080, 1920):
-        fails.append("not 1080x1920")
-    if not 12 <= dur <= 30:
+    want = (1920, 1080) if LANDSCAPE else (1080, 1920)
+    if (vid["width"], vid["height"]) != want:
+        fails.append(f"not {want[0]}x{want[1]}")
+    if not LANDSCAPE and not 12 <= dur <= 30:
         fails.append("duration outside 12–30s")
     if lufs is None or abs(lufs + 14) > 1.0:
         fails.append("loudness not -14±1 LUFS")
@@ -59,11 +63,14 @@ def main(path):
         fails.append("silent gaps")
     if mx > 20:
         fails.append(f"harsh jump at {at / 30:.2f}s")
-    if seam > max(3.0, 1.5 * med):
+    if LOOP and seam > max(3.0, 1.5 * med):
         fails.append("loop seam visible")
     print("RESULT:", "PASS" if not fails else "FAIL — " + "; ".join(fails))
     return 0 if not fails else 1
 
+
+LANDSCAPE = "--landscape" in sys.argv
+LOOP = "--no-loop" not in sys.argv
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1]))

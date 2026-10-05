@@ -1,4 +1,10 @@
-# Handoff: read this first (written 2026-10-05)
+# Handoff: read this first (updated 2026-10-06)
+
+**Current phase: 1 (break the template, build long-form), step: pilot part 1 done, next work package: pilot part 2.**
+Part 2 = (a) vertical camera that pans per shot, (b) story part 2 (fix the painting together, 2-3 real gags),
+(c) join both parts into the ~3-minute landscape pilot, (d) a 25-40 s Short cut starting at the dance-in, with a loop.
+Then upload both as the new-style test (see "Pilot and test plan" below).
+
 
 You are continuing work for the owner of the YouTube channel **Snip & Crinkle (@SnipAndCrinkle)**, a wordless kids' Shorts channel made entirely with this code. The owner is not technical and relies on you to make decisions and do the work. They like a thorough analysis from all angles followed by a firm recommendation, and **harsh, honest ratings** (score 1–10 and say what is weak). They are in India.
 
@@ -37,5 +43,22 @@ Read `docs/research-oct-2026.md` (5 Oct 2026): key points are to vary story engi
 - Don't change YouTube account settings yourself. The owner's permission settings block it, so ask them to click.
 - No emoji fonts in videos (use `icons.py` paper icons) and only original synthesized audio. Child-safety accuracy is mandatory: dangerous things are handled by the grown-up's hand.
 
-## Next (after Episodes 1–5)
-Post one Short every weekday. From week 3, make a weekly ~10-minute compilation of the stories (16:9 for TV) to build the 4,000 watch hours. Review YouTube Studio numbers weekly (viewed vs swiped away, % viewed) and adjust. Goal: 1,000 subscribers plus 4,000 watch hours, then apply to the YouTube Partner Program.
+## Pilot and test plan (decided 2026-10-06)
+- **Owner's role is uploading only.** No listening, kid-testing or voice recording. Design every check to need none of that.
+- **Owner said yes to reading YouTube Studio** in the built-in browser, read-only, about every 2 weeks. Never change
+  anything there without a fresh "yes" in chat.
+- **Test:** the 10 current Shorts (Ep 10 live; Ep 1, 3, 4, 2, 6, 7, 8 scheduled 6-14 Oct; Ep 9 v3 and Ep 5 v2 planned
+  15-16 Oct) are the baseline. Record each one's views, viewed vs swiped away, average % viewed and subs gained at
+  7 days old. From about 20 Oct, upload 3 new-style Shorts + the 3-minute pilot and compare at 7 days. Draw no
+  conclusion until each has a few hundred views. If the new style wins, it becomes the standard from Ep 11.
+- **New-standard toolkit** (pilot part 1, `reviews/pilot01.md`, scored 7.5):
+  - `episodes/voices.py`: instrument voices (Snip slide whistle C5, Crinkle hum-horn C4, Pip piccolo C6) + lip-sync curves.
+    Check new voice lines with a spectrogram (clean tones, no hiss), since nobody listens.
+  - `episodes/acting.py`: `Actor` (eyebrows, glassy eyes, extra mouths), `Perf` timelines (`to` with eases
+    io/out/back/antic/snap, `face`, `ears` moods, `say`, `hop`, `wiggle`), paper wobble, `Cam` (landscape/vertical
+    views of one world), `render_video` (15 drawings/s on twos, 8 cores: ~1 s of render per 1 s of 1080p video).
+  - `episodes/props_artcorner.py`: the art-corner world (1920x1920).
+  - `episodes/pilot01_sorry_test.py`: the 27 s test scene. `tools/check_video.py --landscape --no-loop` for long-form.
+  - `characters.py` was not changed; Episodes 1-10 render exactly as before.
+- Strategy and the reviewed master prompt: see `docs/research-oct-2026.md`. Plan for 8,000 long-form hours
+  (Feb 2027 rule); long-form is the money engine, Shorts are discovery.
