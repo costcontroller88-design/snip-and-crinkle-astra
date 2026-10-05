@@ -229,7 +229,7 @@ def snip_state(t):
             s.update(eyes="worried", mouth="wobble", look=(7, -3), ears=[droop, -droop], tilt=6 * down)
     elif t < 7.9:                     # Crinkle shows the soap; Snip watches, then nods
         s.update(eyes="worried" if t < 6.75 else "normal", mouth="wobble" if t < 6.75 else "w", look=(8, -4))
-        s["arm_r"] = lerp(112, 100, ease_in_out(seg(t, 6.0, 6.4)))
+        s["arm_r"] = lerp(112, 88, ease_in_out(seg(t, 6.0, 6.5)))   # germy paw held out, away from apples and soap
         droop = 24 * (1 - ease_in_out(seg(t, 6.75, 7.2)))
         s["ears"] = [droop, -droop]
         s["tilt"] = 6 * (1 - ease_in_out(seg(t, 6.0, 6.5)))
@@ -238,7 +238,7 @@ def snip_state(t):
         s.update(look=(0, 6), eyes="normal", mouth="w")
         into = ease_in_out(seg(t, 7.9, 8.1))
         s["arm_l"] = lerp(-14, WASH_L, into)
-        s["arm_r"] = lerp(100, WASH_R, into)
+        s["arm_r"] = lerp(88, WASH_R, into)
         for t0 in (TAP_ON1, TAP_OFF1, TAP_ON2, TAP_OFF2):
             k = tap_k(t, t0)
             if k > 0:
@@ -364,13 +364,13 @@ def crinkle_state(t):
     if t < 6.9:                       # slides in, holds the soap up high
         s["x"] = lerp(1450, CR_HOME, ease_out_back(seg(t, 6.0, 6.5), 1.2))
         s["lean"] = 12 * (1 - ease_out(seg(t, 6.0, 6.9)))
-        s["arm_l"] = lerp(CR_REST_L, 194, ease_out_back(seg(t, 6.3, 6.55)))
+        s["arm_l"] = lerp(CR_REST_L, 184, ease_out_back(seg(t, 6.3, 6.55)))
         s.update(eyes="worried" if t < 6.5 else "normal", mouth="o" if t < 6.5 else "smile", look=(-7, 2))
         s["soap"] = "paw"
     elif t < 7.85:                    # mimes a scrub: paws together, bubbles!
         k = ease_in_out(seg(t, 6.9, 7.1))
         rub = 8 * math.sin(2 * math.pi * 6 * (t - 7.1)) if t > 7.1 else 0.0
-        s["arm_l"] = lerp(194, 414, k) + rub          # 414 == 54 (inward), swung round through 270
+        s["arm_l"] = lerp(184, 414, k) + rub          # 414 == 54 (inward), swung round through 270
         s["arm_r"] = lerp(2, -54, k) + rub
         s.update(eyes="happy" if t > 7.15 else "normal", mouth="grin" if t > 7.15 else "smile", look=(-7, 4))
         s["soap"] = "paw"
