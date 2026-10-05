@@ -12,13 +12,13 @@ You are continuing work for the owner of the YouTube channel **Snip & Crinkle (@
   - Ep 3 `episodes/ep03_the_last_cookie.py` (evening kitchen, tug-of-war tumble, break in half and share)
   - Ep 4 `episodes/ep04_whose_toy_is_this.py` (park, teddy ears pop up, give the toy back to the duckling)
   - Ep 5 `episodes/ep05_hold_paws_to_cross.py` (street, wind-up legs skid, wait for green, look both ways, hold a grown-up's hand)
-- **Delivered:** the MP4s for Episodes 1–5 are attached to GitHub Releases `ep01` … `ep05` (each release note has the upload title, description and scorecard).
+- **Delivered:** the MP4s for Episodes 1–5 were sent to the owner directly in the Claude chat (2026-10-05). GitHub Releases could not be created: cloud sessions get "Creating, editing, or deleting releases is not permitted for this session type" (HTTP 403). MP4s are git-ignored; re-render any episode with `python3 episodes/<file>.py` (~5 min each).
 - **Tips learned:** zooms or fast pans over fine stripes (zebra crossing, gingham cloth) trip the "harsh jump" check; keep zooms slow (≤ ~0.35 zoom/s) or pan sideways instead. Review single frames with `render_frame(t)` to review before a full render (~5 min per episode).
 
 ## How to work
 1. `./setup_cloud.sh` (ffmpeg, Pillow, numpy, Fredoka font).
 2. For each episode: continue its branch, render stills, **look at key frames at full size** (props hidden behind characters is the most common bug), render the MP4, run `python3 tools/check_video.py output/<file>.mp4` until it PASSes, and score with the rubric (overall ≥ 8, no item < 7).
-3. **Deliver MP4s to the owner as GitHub Release assets** (`gh release` uses GraphQL, which is blocked in cloud sessions: create the release with `gh api repos/<owner>/<repo>/releases -f tag_name=epNN ...` and upload the MP4 to `https://uploads.github.com/.../releases/<id>/assets?name=...`), so they can download and upload to YouTube. Also merge finished episode branches into `main`.
+3. **Deliver MP4s to the owner** by sending the files in the chat (GitHub Releases are blocked in cloud sessions). Also merge finished episode branches into `main`.
 4. Report to the owner in plain language: what is done, the scorecards, and exactly what they need to do next.
 
 ## Limits
