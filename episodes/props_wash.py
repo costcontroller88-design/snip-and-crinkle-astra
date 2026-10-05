@@ -240,7 +240,7 @@ def water_frames(length, n=8):
     return frames
 
 
-def splash():
+def splash_sprite():
     c = Cut(170, 80)
     for (x, y, r) in ((30, 50, 9), (52, 28, 7), (85, 18, 8), (118, 28, 7), (140, 50, 9), (70, 56, 6), (102, 58, 6)):
         c.ellipse(x, y, r, r * 1.2, WATER)
