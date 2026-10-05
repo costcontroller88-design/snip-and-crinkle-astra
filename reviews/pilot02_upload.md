@@ -4,7 +4,7 @@ Both videos: Made for Kids = **Yes**. Category: Education. Language: Not applica
 (and later "Kindness & Sharing"). No AI label needed (animation). Do not upload until the owner says go.
 
 ## Long video (landscape, 2:04) — file `Videos/pilot02_splash_of_blue.mp4`
-**Title:** Say Sorry and Fix It Together! 🐳🎨 Kids Cartoon | Snip & Crinkle
+**Title:** Oops! Blue Paint Spills! Say Sorry and Fix It Together 🎨🐳 | Snip & Crinkle | Kids Cartoon
 
 **Description:**
 Snip the bunny and Crinkle the bear are painting when — oops! — blue paint splashes all over the picture.
@@ -14,12 +14,12 @@ A gentle, wordless story for little ones everywhere, with original art and music
 #kidscartoon #kindness #sayingsorry #preschool
 
 ## Short (vertical, 0:43) — file `Videos/pilot02_short.mp4`
-**Title:** Oops! Say Sorry! 🎨💙 Kids Cartoon | Snip & Crinkle
+**Title:** Crinkle Trips and Spills the Paint! Then a Sorry Hug 🎨💙 | Snip & Crinkle | Kids Cartoon
 
 **Description:**
 Snip the bunny and Crinkle the bear: an oops, a sorry, and a big surprise in the painting!
 When we make a mistake, we say sorry and fix it together.
-Watch the full story on our channel: "Say Sorry and Fix It Together!"
+Watch the full story on our channel: "Oops! Blue Paint Spills! Say Sorry and Fix It Together"
 
 #shorts #kidscartoon #kindness
 
