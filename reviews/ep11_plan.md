@@ -137,6 +137,25 @@ about x 710–1210, y 660–1060; soft edges, warm yellow-orange, brightest in t
 Faces are never in the beam: characters standing in front of the wall stay outside x ≈ 880–1040 near the pumpkin,
 except Crinkle's body (chest down) in shots 33–36 and the paws/wing in shots 40–41.
 
+**Lead review of the stage-1 stills (`reviews/ep11_proto_wow.png`, 7 Oct; overrides the numbers above).** The pumpkin
+glow (99 s) and the giant face (133 s) work; the beats that teach the rule do not. Must fix before the full render:
+- **L1 hearts plant (shots 1–3):** no light hearts are visible on the wall in the 2 s and 8 s wides. The low sun
+  comes under the eave through the railing hearts onto the wall, which is in the roof's shade (a cooler peach, not
+  sunlit cream), so the hearts read bright. Each heart ≥ 70 units wide; railing hearts at x 1040/1130/1220.
+- **L2 smile on Crinkle (shots 34–36):** reads as a glow blob; the stem cuts the smile. Pattern 0.8x, raised so the
+  whole smile clears the stem, landing on the cream tummy patch, not the scarf; brightest core near-white warm.
+- **L3 smile on Pip's wing (40b):** invisible, and Pip's wing is yellow, so golden light on it has no contrast.
+  Wing held flat toward camera, Pip at x 812, pattern 0.5x, drawn as warm near-white (≈255,248,220) with a soft
+  bloom while the rest of the wing sits in evening shade; camera 2.8x on the wing instead of 1.9.
+- **L4 evening look:** the evening grade washes characters lavender (lilac Snip on a lilac wall). Grade the set
+  more than the characters (characters keep most of their colour); wall one step darker, so the giant face glows
+  like light (brighter core, soft bloom), not flat paint.
+- **L5 positions (overlapping heads, Pip hidden):** Crinkle steps aside to x 1400 (shot 37); Snip/Pip step back to
+  x 520/700 (shot 33); opening Snip 560, Crinkle 780 re-spaced so heads don't overlap; bench Snip 640, Crinkle 500,
+  Pip 560 re-spaced so Pip is in clear view.
+- Accepted: in 40a/40c the wing blocks the whole smile (the wall keeps eyes and heart) — reads as "Pip caught the
+  smile"; keep it. The pumpkin's back keeps only a faint glow, below the projected patterns.
+
 | # | Time (s) | Shot | What happens | Movements needed | Rig check |
 |---|---|---|---|---|---|
 | 1 | 0.0–4.0 | Wide 1.0, centre (980,1100) | Golden sunset. Pip, mid-hop on frame 1, hops into a heart's beam: the heart lands on her tummy; she flaps. Snip sketches; Crinkle polishes the pumpkin with a cloth, eyes closed, humming. Jingle. | Pip hop, flap; Snip sketch strokes, book in the other paw; Crinkle circular rub (IK circle) | OK; N1 Pip, N2 world, N3 heart light clipped to Pip, N6 sketchbook, cloth |
@@ -172,11 +191,11 @@ except Crinkle's body (chest down) in shots 33–36 and the paws/wing in shots 4
 | 30 | 105.0–110.0 | Medium-close 1.7, centre (860,1270) | Snip bends beside the pumpkin and copies its face: wide round eyes, huge smile. Pip copies too: three smiles in a row. A laugh from Crinkle (heard). | lean; faces | OK |
 | 31 | 110.0–113.5 | Medium 1.4, centre (900,1000) | Pip glances back and up at the dark wall under the roof: still dark. A small shiver (tuft dips); she edges toward Snip. | hturn back, look up; shiver wiggle | OK; N1 |
 | 32 | 113.5–117.0 | Medium Crinkle 1.6, centre (1130,1100) | Crinkle saw her look. He looks at the dark wall, at the glowing pumpkin: tilt... tilt... idea (sparkle), a nod. | tilts; sparkle | OK |
-| 33 | 117.0–123.0 | Medium-wide 1.15, centre (960,1180) | Snip and Pip step back left (Snip 600, Pip 720). Crinkle walks behind the pumpkin (x 960), paws on both its sides. Push 1: it won't budge, cheeks puff (118.3–119.0). Pushes 2 and 3 (119.5–120.6, 120.9–122.0) turn it round in two careful quarter-turns (soft rumble). The glowing face slides round and away; we see its back (ribs, stem, glow at the lid line). A small glowing smile appears on Crinkle's chest (121.8); he's looking down at the pumpkin and doesn't notice. | walk; paws on the pumpkin's sides, drawn over it; lean; strain (sq, mouth `blow`); pumpkin turns 0 → 180° | N4 rotation, N8 arms over prop, N3 body projection |
+| 33 | 117.0–123.0 | Medium-wide 1.15, centre (960,1180) | Snip and Pip step back left (Snip 520, Pip 700; L5). Crinkle walks behind the pumpkin (x 960), paws on both its sides. Push 1: it won't budge, cheeks puff (118.3–119.0). Pushes 2 and 3 (119.5–120.6, 120.9–122.0) turn it round in two careful quarter-turns (soft rumble). The glowing face slides round and away; we see its back (ribs, stem, glow at the lid line). A small glowing smile appears on Crinkle's chest (121.8); he's looking down at the pumpkin and doesn't notice. | walk; paws on the pumpkin's sides, drawn over it; lean; strain (sq, mouth `blow`); pumpkin turns 0 → 180° | N4 rotation, N8 arms over prop, N3 body projection |
 | 34 | 123.0–125.0 | Close chest 1.9, centre (960,1290) | A little glowing face on his tummy: two eyes, a heart, a smile. Hold. | — | N3 |
 | 35 | 125.0–127.0 | Medium 1.5, centre (760,1200) | Snip and Pip see it: point, giggle (Snip's paw over mouth, Pip flapping). | points; giggles | OK |
 | 36 | 127.0–130.0 | Medium Crinkle 1.6, centre (960,1130) | Crinkle looks up at them (?), then down: his tummy is smiling! He laughs and wiggles; the light smile stays still in space and slides over his fur. | look down; wiggle (x ±10, lean); projection fixed in space, clipped to his body | N3 |
-| 37 | 130.0–136.0 | Wide, 1.15 → 1.0, centre (960,1080) | THE WOW: Crinkle steps aside to the right (130.5–132.0, to x 1340, clear of the giant face; his lower body may be partly behind the railing). The smile slides off him and lands on the wall above them as a GIANT glowing friendly face, as big as the door, where it was darkest; warm light spreads round it. Everyone looks up. Pip's face goes from surprised to a smile within 1.0 s of the face appearing (by about 133 s); she never puffs up, backs away or hides. The reveal is the soft 1.5 s wipe; the music swell starts at least 1.0 s before the face lands and rises over at least 1.5 s (no hit). | walk; look up; the wall pattern revealed by a soft wipe that follows his body | N3 wall projection |
+| 37 | 130.0–136.0 | Wide, 1.15 → 1.0, centre (960,1080) | THE WOW: Crinkle steps aside to the right (130.5–132.0, to x 1400 (L5), clear of the giant face; his lower body may be partly behind the railing). The smile slides off him and lands on the wall above them as a GIANT glowing friendly face, as big as the door, where it was darkest; warm light spreads round it. Everyone looks up. Pip's face goes from surprised to a smile within 1.0 s of the face appearing (by about 133 s); she never puffs up, backs away or hides. The reveal is the soft 1.5 s wipe; the music swell starts at least 1.0 s before the face lands and rises over at least 1.5 s (no hit). | walk; look up; the wall pattern revealed by a soft wipe that follows his body | N3 wall projection |
 | 38 | 136.0–138.5 | Close Pip 1.9, centre (720,1210) | Pip, lit warm: wide eyes → sparkle → open-beak grin; tuft springs up; wings flap. | faces; flaps | N1 |
 | 39 | 138.5–141.0 | Medium-wide 1.2, centre (960,1150) | Snip hops, ears wiggling; Crinkle's surprised O becomes a laugh and a tiny wiggle; all look up at the face. | hops; dance | OK |
 | 40a | 141.0–143.5 | Medium 1.4, centre (900,1150) | Pip walks to x ≈ 820 and reaches her wing up into the light just above the pumpkin: part of the big face on the wall goes dark (a wing-shaped gap). | walk; wing reach up | N3 gap mask |
