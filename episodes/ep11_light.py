@@ -376,7 +376,7 @@ def grade_layer(lay, t, glow=0.0, glow_at=None, cam=None, glow_r=300.0, glow_gai
 HEART_XS = (1040, 1130, 1220)
 HEART_W = 76                         # Lead L1: each heart on the wall at least 70 units wide
 HEART_W_BODY = 50                    # the same beam caught nearer the railing (on Pip): a little smaller
-HEART_DY_BODY = 80                   # ... and lower on screen: she stands in front of the wall, nearer the camera
+HEART_DY_BODY = 88                   # ... and lower on screen: she stands in front of the wall, nearer the camera
                                      # (rule: >= 30 units from her head; see the episode's checks)
 HEART_LIGHT = np.array((255, 246, 214), np.float32)       # sunlight through the cut-outs: warm near-white ...
 HEART_LIGHT_PINK = np.array((255, 226, 230), np.float32)  # ... turning pink as the sun goes down
@@ -451,8 +451,8 @@ def sun_light(f, t, cam, albedo, occluders=()):
             if lay is None:
                 continue
             cx = ((lay.box[0] + lay.box[2]) / 2) / cam.res + cam.ox      # a body catches the beam it stands in
-            mine = tuple(i for i, hx in enumerate(HEART_XS) if abs(hx - cx) < 45)
-            on_body = (_hearts_map(cam, box, y + HEART_DY_BODY, size=HEART_W_BODY, blur=1.0, which=mine)
+            mine = tuple(i for i, hx in enumerate(HEART_XS) if abs(hx - cx) < 32)
+            on_body = (_hearts_map(cam, box, HEART_Y0 + HEART_DY_BODY, size=HEART_W_BODY, blur=1.0, which=mine)
                        if mine else np.zeros(I.shape, np.float32))
             sol = np.zeros(I.shape, np.float32)
             ox0, oy0 = max(box[0], lay.box[0]), max(box[1], lay.box[1])

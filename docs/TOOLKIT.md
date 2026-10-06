@@ -14,6 +14,8 @@ here and an API docstring at its top.
 | `episodes/props_porch.py` | Episode 11 world: `Porch(cam)`, `background(t)` (golden → sunset → evening), `front(f, t)` (railing drawn after characters), `albedo` |
 | `episodes/ep11_light.py` | Dusk grade, railing hearts, pumpkin glow, floor pool, projected smile on wall/body/wing, `luma`, `clearance` checks |
 | `episodes/props_pumpkin.py` | `Pumpkin().paper(rot, strokes, holes, lid)` and `.emissive(...)`; `stroke_tip` for marker tracks; stages plain → drawn → cut → lit → turned |
+| `episodes/props_glow.py` | Episode 11 small props: sketchbook (back / plan page), tucked book, crayon, polishing cloth, battery tea light (off/on), wind chime, autumn leaves |
+| `episodes/props_hand2.py` | The grown-up's arm and hands at 2x: `Arm(upper, fore)`, `draw`, `wrist_for`, `draw_hand`; hands rest / pinch / press (click) / thumb / palm; `sleeve_end()`; never a tool |
 | `episodes/props_splash.py`, `props_artcorner.py` | The pilot's art corner, jars, brushes, thought cloud, sparkle, heart (reusable) |
 | `episodes/props_grownup.py` | The grown-up's jointed arm (old 1x pipeline; port to `hires.Cut` before using at 2x) |
 | `episodes/music_extra.py`, `audio.py` | Synth instruments (toy piano, melodica, organ, steel pan, marimba, glock, pads, bass), sound effects, `jingle`, `Mix`, `reverb`, `write_wav` |
