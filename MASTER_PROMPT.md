@@ -337,6 +337,9 @@ The key sheet; `--still` at every close-up; every-drawing strips of the key acti
 - Audio: arrays of equal length; pad and fade 0.25 s around gaps; normalise loudness last.
 - In a re-cut, check every borrowed moment for something crossing the subject (a head, an ear) before using it.
 - Episode scripts treat any unknown flag as "render everything": check the flags first.
+- Waiting on a render: never `until ! pgrep -f "<pattern>"` (it matches its own shell and never ends), and only
+  watch the log the render really writes to. Run the render in the foreground (with a long timeout) or wait for its
+  "wrote" line; one watcher at most.
 - Large pushes: `git -c http.postBuffer=524288000 push`.
 
 ## Return (≤150 words)
