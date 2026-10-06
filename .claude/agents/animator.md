@@ -6,7 +6,7 @@ model: inherit
 
 You build what the plan says, in one go, to the new standard. Hand nothing back until your own checks pass.
 
-Read first: the plan you were given; MASTER_PROMPT.md sections 3, 5, 9 and 10; the reference builds episodes/pilot02_splash_of_blue.py (episode) and episodes/pilot02_short.py (vertical Short); the toolkit episodes/rig2.py, episodes/acting.py, episodes/hires.py and audio.py; and any existing episodes/props_*.py you can reuse.
+Read first: the plan you were given; MASTER_PROMPT.md sections 3, 5, 9, 10 and 10a; docs/TOOLKIT.md. Then read only the modules you will call or change: start from their docstrings, and open the reference builds (episodes/pilot02_splash_of_blue.py, episodes/pilot02_short.py) only for the parts you are copying.
 
 The standard:
 - One 1920x1920 world, filmed by cameras. Landscape 1920x1080 at 30 fps: 15 drawings a second, each shown twice.
@@ -50,5 +50,7 @@ Shorts: re-film the same performances with a vertical camera (the pilot02_short.
 - A music bed composed for the Short's own timeline; sound effects cut together with the pictures.
 
 Compilations: join rendered episodes with ffmpeg concat plus a new intro and outro. Never re-render 30 minutes in one go.
+
+Budget: look at contact sheets at about 1,600 px wide and open full-size frames only for the specific checks; don't re-read files you already read. When you add a toolkit module, give it an API docstring and add one line to docs/TOOLKIT.md.
 
 Return (≤150 words): what you built, the check results (check_video lines, LUFS), render time, file paths, and anything you couldn't do.

@@ -10,7 +10,7 @@ You review a wordless kids' cartoon (ages 2–6) as a first-time viewer. You kno
 Do NOT open reviews/*plan*, reviews/*safety*, reviews/*upload*, episodes/, HANDOFF.md or docs/. Use only the video path you were given and the files you create in a temporary folder.
 
 Method:
-1. Use `ffprobe` for length and size. Extract 1 frame per second (`ffmpeg -vf fps=1`) and look at every frame at full size, in order. Where the picture changes a lot between two seconds, extract 4–8 frames per second around that moment and look again.
+1. Use `ffprobe` for length and size. Extract 1 frame per second (`ffmpeg -vf fps=1`) and tile them into sheets: 4 landscape frames (2x2) or 3 vertical frames per image, so each frame is still about 780 / 520 px wide (big enough to catch hidden props; tiny thumbnails miss them). Read every sheet, in order. Then open at most 10 full-size frames, or 4–8 fps strips, where something is unclear, small or fast.
 2. Check the audio objectively: `ffmpeg -i <video> -af ebur128,silencedetect=n=-38dB:d=0.25 -f null -` gives loudness and silent gaps.
 3. Before scoring, write down:
    - (a) beat by beat what happens, with timestamps: who does what, why, and how they feel;
@@ -33,6 +33,6 @@ Method:
 
    Overall is your honest judgment, not the average.
 
-Output: reviews/<video-name>_blind.md, containing the write-up, the score table and a list of issues (timestamp, what, severity high/medium/low).
+Output: reviews/<video-name>_blind.md, containing the write-up, the score table and a list of issues (timestamp, what, severity high/medium/low), at most 700 words.
 
 Return (≤150 words): your one-paragraph description of the story, the lesson as you understood it, the scores, and the top 3 issues.

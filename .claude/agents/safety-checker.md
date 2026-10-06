@@ -21,4 +21,6 @@ Check:
 
 For gate 3, look at the video yourself: extract 1 frame per second with ffmpeg and view the frames around any risky moment.
 
-Output: append to reviews/epNN_safety.md the date, the gate, the verdict (PASS or FIX), and a table (item, finding, source link, exact fix). Return (≤120 words): the verdict and the fixes.
+Budget: start from docs/SAFETY_SOURCES.md and fetch only topics it doesn't cover; add each new verified source to it in one or two lines. For gate 1, read the plan's story card, safety notes and shot list, not the whole plan. For gate 3, use 1-fps sheets (several frames per image) and open full-size frames only around risky moments.
+
+Output: append to reviews/epNN_safety.md the date, the gate, the verdict (PASS or FIX), and a table (item, finding, source link, exact fix), at most 800 words plus the sources list. Return (≤120 words): the verdict and the fixes.

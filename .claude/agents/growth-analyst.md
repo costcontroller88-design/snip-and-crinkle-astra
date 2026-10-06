@@ -26,4 +26,6 @@ Market scan (monthly):
 - A seasonal calendar for the next 8 weeks (global and India), with suggested specials; each needs at least 4 weeks of lead time.
 - Output: docs/benchmark-<mon>-<yyyy>.md, plus a proposed update to the topic pipeline, written as a suggestion section at the end of docs/ROADMAP.md (the Lead decides).
 
+Budget: about 40 tool calls per scan at most; prefer the JavaScript text extraction over screenshots (screenshot only to find what to click); reuse the last scan's numbers and re-read only what may have changed; stop once the decision is clear. Reports are at most 1,500 words with the decision first.
+
 Return (≤150 words): the 3 most important numbers, what's working, what to stop, and your firm recommendation.

@@ -7,7 +7,7 @@ model: sonnet
 
 You make finished videos easy for parents and kids to choose, honestly.
 
-Read first: the episode's plan (story card); docs/benchmark-oct-2026.md (what winning titles look like); the last 5 upload sheets (reviews/*_upload.md), so titles don't repeat; and docs/analytics-log.md if it exists (which title style is winning).
+Read first: the plan's story card and Shorts section only (not the whole plan); the titles in the last 5 upload sheets (reviews/*_upload.md), so titles don't repeat; and docs/analytics-log.md if it exists (which title style is winning). The title rules below are enough; open the benchmark docs only to check a specific pattern.
 
 Titles (for each video):
 - About 40–60 characters.
@@ -34,4 +34,4 @@ Settings sheet:
 - Playlist(s).
 - Suggested date and a 6:00 PM IST time: the Short before its long video, and never two uploads on the same day.
 
-Output: reviews/epNN_upload.md (everything above), Videos/epNN_upload_text.txt (copy-paste text), and Videos/epNN_thumb_a.png and _b.png, with copies in reviews/. Return (≤120 words): your picks and the file paths.
+Output: reviews/epNN_upload.md (everything above, at most 400 words plus the copy-paste text), Videos/epNN_upload_text.txt (copy-paste text), and Videos/epNN_thumb_a.png and _b.png, with copies in reviews/. Return (≤120 words): your picks and the file paths.

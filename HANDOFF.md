@@ -3,11 +3,18 @@
 **How we work (rules, the agent team, the pipeline): `MASTER_PROMPT.md`, which wins over any older section below.
 Plan, dates and topic pipeline: `docs/ROADMAP.md`. This file holds the current state.**
 
-**Current phase: 0 (foundations, to 19 Oct); Phase 1 starts 20 Oct. Step: work package "Episode 11" (the first full
-test of the agent team), resumed 2026-10-06. Next: story-designer writes `docs/CHARACTER_BIBLE.md` and
-`reviews/ep11_plan.md` ("friendly glow" Halloween; Lead brief in `docs/ROADMAP.md` Phase 1, evidence in
-`docs/benchmark-oct-2026-halloween.md`); then safety gate 1, animator, blind review, packaging, gate 3. Shorts due
-18-19 Oct, episode 24 Oct.**
+**Current phase: 0 (foundations, to 19 Oct); Phase 1 starts 20 Oct. Step: work package "Episode 11", build in
+progress. Done: plan + character bible, gate 1 (safety) with fixes applied, stage 1 (porch world, light, pumpkin,
+six "wow" prototype stills: `reviews/ep11_proto_wow.png`, NOT yet reviewed by the Lead), stage 2 (Pip in rig v2,
+reviewed and approved). Next, in a NEW session (token budget, MASTER_PROMPT 10a):**
+1. Lead reviews `reviews/ep11_proto_wow.png` (at about 1,600 px) and stage 1's three known gaps: the stem cuts the
+   tummy smile; the wing smile is tiny; the pumpkin's back glows faintly.
+2. Lead applies stage 1's position changes to `reviews/ep11_plan.md`: chest pattern 0.8x (not 1.0x); wing pattern
+   0.5x with the wing held flat and Pip at x 812; Crinkle steps aside to x 1400 (not 1340); Snip/Pip step back to
+   x 520/700; railing hearts at x 1040/1130/1220; the opening positions (560/780) and the bench positions
+   (640/500/560) overlap heads and hide Pip, so re-space them.
+3. Animator stage 3: grown-up arm at 2x + small props + the full episode (acts 1-4), render, check_video; then the
+   blind review, stage 4 (the two Shorts), packaging, gate 3. Shorts due 18-19 Oct, episode 24 Oct.
 - Whale Short (`episodes/pilot02_whale_short.py`): DROPPED by the owner (6 Oct) after failing two blind reviews
   (7, then 6/10). Draft files stay in `Videos/` named "DRAFT-failed-review_…"; do not upload.
 - Pilot upload text was retitled moment-first by packaging and accepted (`reviews/pilot02_upload.md`).
