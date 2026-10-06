@@ -339,7 +339,9 @@ The key sheet; `--still` at every close-up; every-drawing strips of the key acti
 - Episode scripts treat any unknown flag as "render everything": check the flags first.
 - Waiting on a render: never `until ! pgrep -f "<pattern>"` (it matches its own shell and never ends), and only
   watch the log the render really writes to. Run the render in the foreground (with a long timeout) or wait for its
-  "wrote" line; one watcher at most.
+  "wrote" line; one watcher at most. Every check-in re-sends your whole context (a 25-min render polled every few
+  minutes cost ~7% of the 5-hour limit on 7 Oct), so wait in as few turns as possible. Ask the Lead before any
+  second full render.
 - Large pushes: `git -c http.postBuffer=524288000 push`.
 
 ## Return (≤150 words)
