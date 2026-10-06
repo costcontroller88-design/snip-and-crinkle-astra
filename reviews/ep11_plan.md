@@ -13,8 +13,8 @@ the friends stand back while the grown-up's hand cuts the shapes out and puts in
 flame). The pumpkin glows. Pip still glances at the dark wall behind them, so Crinkle turns the pumpkin round to
 face it: the little glowing smile lands first on his tummy, and when he steps aside it lands on the wall as a
 GIANT friendly face, right where it was darkest. Pip laughs and catches the smile on her wing.
-**Lesson in one line:** little ones draw the pumpkin's face, a grown-up does the cutting and adds a battery light;
-and when a friend feels unsure in the dark, you help them feel brave.
+**Lesson in one line:** little ones draw the pumpkin's face and a grown-up does the cutting and adds a battery
+light; and when a friend feels unsure in the dark, you comfort them with light, company and a part in the plan.
 **Engine:** E (looking after the little one), first use. **Who errs:** nobody; the problem is Pip's feeling.
 **Setting:** NEW: a cosy front porch with a garden path, golden sunset turning to early evening (warm oranges,
 pinks and purples; never black). **Outcome:** the dark spot that worried Pip becomes a giant smile of light that
@@ -27,6 +27,14 @@ hand does all cutting with the tool out of view, the friends stand back; a batte
 click, no candle, no flame, no matches; nobody climbs or goes down the steps in the dark; the light never shines
 in anyone's face (only on a tummy, a wing, paws and the wall); no monsters, ghosts, skulls, bats, fangs or
 pointy-eyed faces; the face is round eyes, a heart and a smile, and Pip greets the giant face with joy at once.
+**Gate 1 additions (safety-checker, 6 Oct; applied by the Lead):** No blade, knife, saw, tool outline, glint or
+sawing/stabbing motion is ever drawn, in any shot or Short. The cutting hand stays fully hidden behind the pumpkin;
+only the steadying hand and the second sleeve show, and the sleeve makes small quiet taps, not strokes. The "tok"
+sounds are soft woody taps no louder than the footstep taps. Snip's flinch stays ears-only. The friends stay at the
+bench (Snip x 640, Crinkle x 500, Pip x 560) from 85.0 until the hand has left (98.4); nobody looks at or walks to the
+pumpkin before then. The tea light is touched only by the grown-up's hand. It is never shown open, with a battery or
+with a compartment; no friend ever holds the tea light or the lid. It goes in, the lid goes on, and it stays out of
+reach on the bottom. Its glow is steady (no flicker, no flame shape, no smoke), so it cannot read as a candle.
 Source for the safety-checker to verify: AAP HealthyChildren.org "Halloween Safety Tips"
 (https://www.healthychildren.org/English/safety-prevention/all-around/Pages/Halloween-Safety-Tips.aspx: small
 children draw on pumpkins with markers and parents do the cutting; use a flashlight or battery light instead of a
@@ -136,7 +144,7 @@ except Crinkle's body (chest down) in shots 33–36 and the paws/wing in shots 4
 | 3 | 6.0–10.0 | Wide 1.0 | The sun sinks behind the hill; the hearts rise a little, turn pink, fade (gone 9.4). Pip hops for the last one; it fades under her wing. The porch dims. | 2 hops, reach up | N2 sun and sky states, N3 grade |
 | 4 | 10.0–12.5 | Close Pip 1.9 | Empty wing. Tuft droops, sad beak; she looks round the dim porch; a first star twinkles. | head turns, tuft droop | N1 |
 | 5 | 12.5–15.0 | Medium 1.4, centre (1000,1180) | A breeze: the chime tinkles, three leaves skitter past. Pip PUFFS up, un-puffs, waddle-runs left and hides behind Crinkle (eyes still closed, humming). | puff-up; fast waddle; leaves drift; chime sway | N1 puff, N6 chime, leaf sprites |
-| 6 | 15.0–22.0 | Medium-wide 1.2, centre (760,1150) | "Behind you!": Snip sees, ears swivel, points. Crinkle opens his eyes, looks over his left shoulder; Pip peeks out on his right; he looks right; she ducks and peeks left. Snip giggles behind a paw. Crinkle steps aside: Pip revealed mid-shuffle, freezes, looks up shyly. | Crinkle hturn ±1.1, step; Pip drawn behind him, lean-peek, shuffle; Snip point, paw over mouth | OK; N1 |
+| 6 | 15.0–22.0 | Medium-wide 1.2, centre (760,1150) | "Behind you!": Snip sees, ears swivel, points. Crinkle opens his eyes, looks over his left shoulder; Pip peeks out on his right; he looks right; she ducks and peeks left. Snip giggles behind a paw at Crinkle's wrong-way turns (eyes on Crinkle; the giggle ends by 20.5). Crinkle steps aside: Pip revealed mid-shuffle (about 21.5), freezes, looks up shyly; nobody laughs: Snip's face is kind, ears forward. | Crinkle hturn ±1.1, step; Pip drawn behind him, lean-peek, shuffle; Snip point, paw over mouth | OK; N1 |
 | 7 | 22.0–26.0 | Close two-shot 1.6, centre (800,1200) | Crinkle crouches to her level. Pip points her wing at the dark wall under the roof, then hugs herself small. Crinkle looks there, back at her: worry → soft smile; pats her tuft (it springs back up). | crouch (sq 0.85, lean, head_dy); Pip point, self-hug (arms in front); paw to her head | OK; N1 |
 | 8 | 26.0–30.0 | Medium Snip 1.6, centre (560,1100) | Snip's ears droop in sympathy; Snip looks from Pip to the shiny pumpkin: ears snap up, sparkle, idea (sparkle above). Fast scribble in the sketchbook. | ear moods; scribble strokes | OK; N6 |
 | 9 | 30.0–32.0 | Close sketchbook 2.0 | Snip turns the book round: a pumpkin with round eyes, a big smile and yellow glow lines, and a tiny smiling Pip beside it. Hold. | flip (squash x 1→0→1, swap page) | N6 |
@@ -144,7 +152,7 @@ except Crinkle's body (chest down) in shots 33–36 and the paws/wing in shots 4
 | 11 | 39.0–43.0 | Medium 1.5, centre (600,1200) | Snip takes three markers from the box on the bench (two black, one red), gives a black one to Crinkle and the red one to Pip. | reach to box; give paw to paw / wing; props follow paws | OK; N6 markers |
 | 12 | 43.0–45.0 | Medium-wide 1.2, centre (900,1180) | Snip walks to the pumpkin's left (x 760, facing right), Crinkle round to its right (x 1160, facing left); Pip waits by Snip (x 640). | walks | OK |
 | 13 | 45.0–49.0 | Close pumpkin 1.9, centre (960,1380) | Snip draws the left eye (45.2–46.0), pauses, then the right eye (47.0–47.8). Hold. | marker tip on a circle path; the line grows behind it | N4 stroke reveal |
-| 14 | 49.0–53.0 | Medium Snip 1.4, centre (680,1050) | Snip steps back under the chime, admires, joy-hops (50.0): the ear tips bonk the chime, DING-a-ling, it swings. Snip rubs an ear, sheepish grin. Pip puffs up at the jingle (50.4), sees it's only the chime, giggles. | 2 steps back, hop; ear wiggle on the bonk; paw to ear; chime pendulum; Pip puff | OK; N6, N1 |
+| 14 | 49.0–53.0 | Medium Snip 1.4, centre (680,1050) | Snip steps back under the chime, admires, joy-hops (50.0): the ear tips bonk the chime, a soft ding-a-ling (small light bells), it swings. Snip wiggles the ears and grins. Pip puffs up at the jingle (50.4), sees it's only the chime, giggles with relief, and Snip laughs with her. | 2 steps back, hop; ear wiggle on the bonk; chime pendulum; Pip puff | OK; N6, N1 |
 | 15 | 53.0–55.0 | Medium 1.3, centre (1080,1250) | Crinkle crouches carefully, marker ready; tongue pokes out of the side of his mouth. | crouch; mouth `yum` | OK |
 | 16 | 55.0–60.0 | Close 1.8, centre (1010,1240): his face + the pumpkin's lower half | He draws the big smile slowly (56.5–59.5); his tongue slides left and right with the marker. | IK along the curve; `yum` ↔ left-side tongue | N4; N7 |
 | 17 | 60.0–62.0 | Close pumpkin 1.9 | Two round eyes and a big smile. Hold. | — | — |
@@ -154,10 +162,10 @@ except Crinkle's body (chest down) in shots 33–36 and the paws/wing in shots 4
 | 21 | 74.0–78.0 | Medium-wide 1.2, centre (860,1150) | Snip holds the plan beside the pumpkin: the plan glows, the real one doesn't. Snip tilts left; Pip copies; Crinkle copies; all three tilt right together (boop, boop, boop). | hold book out; tilts | OK |
 | 22 | 78.0–82.0 | Wide 1.0 | Snip turns to the left edge (the grown-up's side), holds up the plan, points at the pumpkin. The grown-up's hand comes in from the top-left: thumbs-up (80.3), then an open palm: wait there. | turn; hold up; point; hand from off-frame | N5 |
 | 23 | 82.0–85.0 | Medium 1.3, centre (620,1180) | The friends step back to the bench (Snip 640, Crinkle 500, Pip 560 half behind Crinkle); Crinkle guides Pip with a paw behind her back. | walks; paw behind Pip | OK |
-| 24a | 85.0–86.2 | Close pumpkin 1.8, centre (960,1360) | The hand rests on top of the pumpkin; the second sleeve shows behind its right shoulder. Tok: the left eye becomes a hole (85.6). | steadying hand pose | N5, N4 holes |
+| 24a | 85.0–86.2 | Close pumpkin 1.8, centre (960,1360) | The hand rests on top of the pumpkin; the second sleeve shows behind its right shoulder (no blade, glint or sawing motion; the cutting hand stays hidden). Tok: the left eye becomes a hole (85.6). | steadying hand pose | N5, N4 holes |
 | 25 | 86.2–87.6 | Medium friends 1.6, centre (560,1150) | Tok (86.4), tok (87.2): Snip's ears flinch with each one, left then right; Pip peeks out from behind Crinkle's leg. | ear wiggles; Pip peek | OK |
-| 24b | 87.6–92.0 | Close pumpkin 1.8 | Eyes and heart are holes; tok-tok: the smile (88.0–88.4). Hold. A lid line round the stem (tok, 89.4); the hand lifts the lid by the stem and sets it beside the pumpkin (90.4–91.4). Dark hollow inside. | hand lift, place | N4, N5 |
-| 26 | 92.0–95.0 | Close 2.0, centre (960,1250) | Just above the opening, the hand holds a small white battery tea light; the thumb clicks its switch (93.0): the little LED dome glows warm yellow. Steady, no flame, no smoke. Hold. | hand holding pose; thumb click | N5, N6 tea light |
+| 24b | 87.6–92.0 | Close pumpkin 1.8 | Eyes and heart are holes; tok-tok: the smile (88.0–88.4). Hold. A lid line round the stem (tok, 89.4); the hand lifts the lid by the stem and sets it beside the pumpkin (90.4–91.4). The unlit hollows are warm dark orange-brown (the flesh in shade), never black; enough porch light stays on the cut face that the eyes, heart and smile read at once. | hand lift, place | N4, N5 |
+| 26 | 92.0–95.0 | Close 2.0, centre (960,1250) | Just above the opening, the hand holds a small white battery tea light; the thumb clicks its switch (93.0): the little LED dome glows warm yellow. Steady (no flicker), no flame, no smoke; white body, side switch, LED dome; never shown open. Hold. | hand holding pose; thumb click | N5, N6 tea light |
 | 27 | 95.0–98.5 | Close pumpkin 1.8 | The hand lowers the light in (95.6–96.8): the face glows from the top down, eyes, heart, smile. Lid back on (97.4); the hand leaves (97.6–98.4). | hand lower; lid place | N4 lit stage, N3 glow |
 | 28 | 98.5–102.5 | Close → medium, 1.9 → 1.3, centre (960,1300) | THE GLOW: the friendly face shines warm in the purple dusk; a warm pool spreads over the porch floor and onto the friends by the bench. Hold, then pull back (≤0.35x per second). | camera | N3 pool + light on characters |
 | 29 | 102.5–105.0 | Medium 1.4, centre (880,1200) | Pip's eyes sparkle in the glow; she waddles close (x 850), lit warm, smiles. Snip's ears perk; Crinkle's O becomes a smile; they come closer (Snip 720, Crinkle 1130). | walks; faces | OK; N3 |
@@ -168,7 +176,7 @@ except Crinkle's body (chest down) in shots 33–36 and the paws/wing in shots 4
 | 34 | 123.0–125.0 | Close chest 1.9, centre (960,1290) | A little glowing face on his tummy: two eyes, a heart, a smile. Hold. | — | N3 |
 | 35 | 125.0–127.0 | Medium 1.5, centre (760,1200) | Snip and Pip see it: point, giggle (Snip's paw over mouth, Pip flapping). | points; giggles | OK |
 | 36 | 127.0–130.0 | Medium Crinkle 1.6, centre (960,1130) | Crinkle looks up at them (?), then down: his tummy is smiling! He laughs and wiggles; the light smile stays still in space and slides over his fur. | look down; wiggle (x ±10, lean); projection fixed in space, clipped to his body | N3 |
-| 37 | 130.0–136.0 | Wide, 1.15 → 1.0, centre (960,1080) | THE WOW: Crinkle steps aside to the right (130.5–132.0, to x 1340, clear of the giant face; his lower body may be partly behind the railing). The smile slides off him and lands on the wall above them as a GIANT glowing friendly face, as big as the door, where it was darkest; warm light spreads round it. Everyone looks up: O mouths, then smiles. | walk; look up; the wall pattern revealed by a soft wipe that follows his body | N3 wall projection |
+| 37 | 130.0–136.0 | Wide, 1.15 → 1.0, centre (960,1080) | THE WOW: Crinkle steps aside to the right (130.5–132.0, to x 1340, clear of the giant face; his lower body may be partly behind the railing). The smile slides off him and lands on the wall above them as a GIANT glowing friendly face, as big as the door, where it was darkest; warm light spreads round it. Everyone looks up. Pip's face goes from surprised to a smile within 1.0 s of the face appearing (by about 133 s); she never puffs up, backs away or hides. The reveal is the soft 1.5 s wipe; the music swell starts at least 1.0 s before the face lands and rises over at least 1.5 s (no hit). | walk; look up; the wall pattern revealed by a soft wipe that follows his body | N3 wall projection |
 | 38 | 136.0–138.5 | Close Pip 1.9, centre (720,1210) | Pip, lit warm: wide eyes → sparkle → open-beak grin; tuft springs up; wings flap. | faces; flaps | N1 |
 | 39 | 138.5–141.0 | Medium-wide 1.2, centre (960,1150) | Snip hops, ears wiggling; Crinkle's surprised O becomes a laugh and a tiny wiggle; all look up at the face. | hops; dance | OK |
 | 40a | 141.0–143.5 | Medium 1.4, centre (900,1150) | Pip walks to x ≈ 820 and reaches her wing up into the light just above the pumpkin: part of the big face on the wall goes dark (a wing-shaped gap). | walk; wing reach up | N3 gap mask |
@@ -277,7 +285,8 @@ pattern), with their own music beds (jingle at the start; the ending jingle at t
 episode's sound effects cut with the pictures. Safe zones: nothing important in the bottom 19% or in the right 12%
 between 50% and 90% of the height; faces at about 40% of the height; zoom ≤2.0.
 
-**(a) Story Short, 58.5 s** (hook in 2 s: the heart of light is already on Pip's tummy in frame 1)
+**(a) Story Short, 58.5 s** (hook in 2 s: the heart of light is already on Pip's tummy in frame 1). Output times
+after row 9 shift with the gate-1 trims and the inserted row 14b; the build computes them from the source times.
 | # | Out (s) | Source (s) | Framing | Beat |
 |---|---|---|---|---|
 | 1 | 0.0–2.0 | 4.0–6.0 | close Pip | heart on her tummy, then on her wing |
@@ -288,12 +297,13 @@ between 50% and 90% of the height; faces at about 40% of the height; zoom ≤2.0
 | 6 | 13.8–16.6 | 22.6–25.4 | close two-shot | she points at the dark wall, hugs herself; tuft pat |
 | 7 | 16.6–18.4 | 27.6–29.4 | Snip | idea, scribble |
 | 8 | 18.4–20.2 | 30.1–31.9 | sketchbook | the plan |
-| 9 | 20.2–22.2 | 34.2–36.2 | Crinkle + Pip | dance and copy |
+| 9 | 20.2–21.5 | 34.4–35.7 | Crinkle + Pip | dance and copy (trimmed for F2) |
 | 10 | 22.2–25.1 | 45.1–48.0 | pumpkin | the eyes |
-| 11 | 25.1–26.9 | 49.8–51.6 | Snip + chime | ear bonk |
+| 11 | 24.4–25.5 | 49.9–51.0 | Snip + chime | ear bonk (trimmed for F2) |
 | 12 | 26.9–29.7 | 56.6–59.4 | Crinkle + pumpkin | the smile, tongue |
 | 13 | 29.7–32.3 | 66.8–69.4 | Pip + pumpkin | the heart nose |
 | 14 | 32.3–34.5 | 79.6–81.8 | Snip + hand | ask; thumbs-up; wait there |
+| 14b | (+1.4 s) | 83.0–84.4 | friends | they step back to the bench, Crinkle's paw behind Pip (gate 1, F2) |
 | 15 | 34.5–37.9 | 85.4–88.8 | pumpkin | tok, tok, tok, tok-tok: the holes |
 | 16 | 37.9–39.5 | 92.7–94.3 | tea light | click: on |
 | 17 | 39.5–42.5 | 95.4–98.4 | pumpkin | lowered in, glows top-down, lid on |
@@ -318,7 +328,7 @@ already touching it and the first bit of the eye line drawn: something is clearl
 | 3.65–6.65 | 56.5–59.5 | Crinkle's paw draws the big smile in one slow stroke |
 | 6.65–7.85 | 59.5–60.7 | hold |
 | 7.85–10.05 | 66.9–69.1 | Pip's wing draws the red heart nose, two halves |
-| 10.05–11.45 | 69.1–70.5 | hold: the finished drawn face |
+| 10.05–11.45 | 69.1–70.5 | hold: the finished drawn face, with no paw, wing or marker in shot (gate 1, F1: Pip's wing is back by 69.1) |
 | 11.45–14.85 | 85.3–88.7 | the hand steadies the pumpkin; tok, tok, tok, tok-tok: eyes, heart and smile become holes |
 | 14.85–16.05 | 88.7–89.9 | hold the cut face; the lid line (tok) |
 | 16.05–17.25 | 90.3–91.5 | the hand lifts the lid off |
