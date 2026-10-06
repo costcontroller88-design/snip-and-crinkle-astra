@@ -155,6 +155,11 @@ glow (99 s) and the giant face (133 s) work; the beats that teach the rule do no
   Pip 560 re-spaced so Pip is in clear view.
 - Accepted: in 40a/40c the wing blocks the whole smile (the wall keeps eyes and heart) — reads as "Pip caught the
   smile"; keep it. The pumpkin's back keeps only a faint glow, below the projected patterns.
+- **Check sheet `reviews/ep11_check_L.png` approved (7 Oct, 8/10).** Accepted the animator's departures: tummy face
+  0.8x wide x 0.62x tall and a stem 10 units shorter; the flat wing catches the whole face, so the wall goes fully
+  dark in 40a/40c (Pip catches the whole face); opening Pip at x 1240; Snip steps back to x 490; bench Snip 260,
+  Crinkle 450, Pip 640 (still standing back from the pumpkin). Shot 40b: if the render scale can be raised for that
+  one shot without touching shared code, render it sharper; otherwise keep the slightly soft 2.8x.
 
 | # | Time (s) | Shot | What happens | Movements needed | Rig check |
 |---|---|---|---|---|---|

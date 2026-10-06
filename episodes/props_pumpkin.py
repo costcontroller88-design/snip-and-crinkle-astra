@@ -209,7 +209,7 @@ def _lobes(c, o, rot):
 
 def _stem(c, o, rot, lid_off=False, lid_dy=0.0):
     k = math.cos(math.radians(rot))                       # curl direction flips as it turns
-    pts = [(0, -154), (2 * k, -172), (8 * k, -186), (17 * k, -192)]
+    pts = [(0, -154), (2 * k, -166), (7 * k, -176), (14 * k, -182)]       # short: the chest smile clears it
     pts = [(o[0] + x, o[1] + y + lid_dy) for x, y in pts]
     c.line(pts, 15, STEM_DARK, sil=True)
     c.line(pts[:-1], 11, STEM, sil=False)

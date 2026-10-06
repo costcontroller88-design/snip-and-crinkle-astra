@@ -519,11 +519,15 @@ def _field(state, H, W, ppu=None):
         f[deck] = np.array((0.60, 0.55, 0.78), np.float32)
         f[garden] = np.array((0.52, 0.52, 0.76), np.float32)
         f[garden & (y >= 1592)] = np.array((0.54, 0.54, 0.76), np.float32)
-    img = Image.fromarray((f * 100).clip(0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(2))
+        f[wall] *= 0.86                                   # Lead L4: the wall one step darker (the face glows)
+    if state in WALL_SHADE:                               # Lead L1: the wall is in the roof's shade (cool peach),
+        f[wall] = np.array(WALL_SHADE[state], np.float32) * (1 - 0.06 * under)[wall][..., None]  # hearts read bright
+    img =Image.fromarray((f * 100).clip(0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(2))
     return np.asarray(img.resize((W, H), Image.BILINEAR)).astype(np.float32) / 100
 
 
 LIFT = {"golden": (0, 0, 0), "sunset": (4, 2, 6), "evening": (10, 9, 20)}
+WALL_SHADE = {"golden": (0.86, 0.73, 0.74), "sunset": (0.80, 0.64, 0.70)}   # light multiplier on the house wall
 
 
 def relight(albedo, state):

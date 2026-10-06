@@ -2,17 +2,20 @@
 
 Per frame, in camera pixels (the frame is RGBA, cam.res pixels per design unit):
 
-    bg = world.background(t)                           # props_porch
-    layers = [L.Layer.of(f.size, lambda im: perf.draw(im, t, cam, st=st), head=L.head_mask(perf.a, st, cam, f.size))]
-    L.sun_light(bg, t, cam, world.albedo, occluders=[pip_layer])  # railing shadow band, golden hearts (+ gaps)
-    L.floor_pool(bg, t, cam, world.albedo, glow)       # warm pool on the deck round the pumpkin
-    L.wall_light(bg, t, cam, world.albedo, k, occ)     # the giant face (with the soft wipe / wing-shaped gap)
+    bg = world.background(t)                           # props_porch (wall in the roof's shade at golden hour)
+    lay = L.Layer.of(bg.size, lambda im: perf.draw(im, t, cam, st=st), head=L.head_mask(perf.a, st, cam, bg.size))
+    caught = L.sun_light(bg, t, cam, world.albedo, occluders=[wing, pip])   # FRONT FIRST: who catches a heart
+    L.floor_pool(bg, cam, world.albedo, glow, facing)  # warm pool on the deck round the pumpkin
+    L.wall_light(bg, cam, world.albedo, k, occ)        # the giant face: near-white core, soft bloom, gaps
     for lay in layers:
-        L.light_layer(lay, t, cam, glow=glow, beams=[(plane, k)], hearts=...)   # grade + warm light + pattern
+        L.grade_layer(lay, t, glow, L.GLOW_AT, cam)    # dusk grade (characters keep their colour; prop=True: set)
+        L.rail_shade(lay, t, cam)                      # a body in the railing's shadow
+        L.heart_on_layer(lay, caught, t, cam)          # a caught heart, near-white, never on the face
+        L.beam_on_layer(lay, plane, cam, k)            # the projected face on a body / wing (golden edge, white core)
         lay.paste(bg)
-    ... pumpkin (graded layer + its emissive light) ...
+    ... pumpkin (graded layer + its emissive light); L.shade_layer(lay, mul, k) darkens one surface ...
     L.halo(bg, cam, glow)                              # soft bloom round the lit pumpkin
-    world.front(bg, t)
+    world.front(bg, t); L.rail_glow(bg, t, cam)        # railing, then its sunlit cut-outs
 
 Rules built in (Ep 11 safety, carry-forward 1 and 2):
   * never black: the grade multiplies and then lifts (a cool floor), so faces always stay readable;
@@ -47,23 +50,29 @@ HEART_PINK = np.array((1.14, 0.80, 0.88), np.float32)
 
 
 # ---------------------------------------------------------------- the grade for characters and props
-CHAR_GRADE = {   # multiply, then lift (0..255): faces stay readable in every state
+CHAR_GRADE = {   # multiply, then lift (0..255): characters keep most of their colour (Lead L4)
+    "golden": ((1.03, 0.96, 0.86), (6, 3, 0)),
+    "sunset": ((0.98, 0.88, 0.91), (5, 2, 6)),
+    "evening": ((0.88, 0.85, 0.94), (8, 7, 16)),
+}
+PROP_GRADE = {   # props sit in the set's light: graded more than the characters
     "golden": ((1.03, 0.96, 0.86), (6, 3, 0)),
     "sunset": ((0.97, 0.84, 0.88), (6, 2, 8)),
-    "evening": ((0.72, 0.69, 0.88), (14, 12, 26)),
+    "evening": ((0.74, 0.71, 0.88), (14, 12, 26)),
 }
 
 
-def grade(t):
-    """(mul rgb, add rgb) for characters and props at time t (follows the porch's light states)."""
+def grade(t, prop=False):
+    """(mul rgb, add rgb) for characters (or props) at time t (follows the porch's light states)."""
     w = P.state_weights(t)
+    table = PROP_GRADE if prop else CHAR_GRADE
     mul = np.zeros(3, np.float32)
     add = np.zeros(3, np.float32)
     for s, wt in w.items():
-        m, a = CHAR_GRADE[s]
+        m, a = table[s]
         mul += wt * np.array(m, np.float32)
         add += wt * np.array(a, np.float32)
-    d = 1.0 - (1.0 - P.deepen(t)) * 0.6            # characters dim a little less than the porch
+    d = 1.0 - (1.0 - P.deepen(t)) * (0.6 if prop else 0.35)     # characters dim less than the porch
     return mul * d, add
 
 
@@ -162,17 +171,36 @@ def _add_light(rgb, albedo, col, I):
 
 
 LIGHT_OWN = np.array((255, 222, 120), np.float32)         # the colour of the light itself
+NEAR_WHITE = np.array((255, 248, 220), np.float32)        # the bright core of a projected shape (Lead L2, L3)
+BLOOM_COL = np.array((1.0, 0.86, 0.58), np.float32)       # soft bloom round projected light
 
 
-def _lit(rgb, albedo, tint, I, own=0.0):
+def _lit(rgb, albedo, tint, I, own=0.0, own_col=LIGHT_OWN):
     """Move each pixel towards its warm-lit colour (albedo x tint, mixed with `own` of the light's own colour) by I.
-    Projected light keeps its colour: a cream tummy turns warm yellow, not white; `own` keeps shapes readable on
-    surfaces close to the light's colour (caramel fur, grey feathers)."""
+    `own` may be a number or a map (e.g. more near-white in the bright core of a shape)."""
     target = np.minimum(albedo * tint[None, None, :], 255.0)
-    if own:
-        target = target * (1 - own) + LIGHT_OWN[None, None, :] * own
+    if np.any(np.asarray(own) > 0):
+        o = np.asarray(own, np.float32)
+        o = o[..., None] if o.ndim == 2 else o
+        target = target * (1 - o) + own_col[None, None, :] * o
     k = np.clip(I, 0, 1)[..., None]
     rgb += (target - rgb) * k
+
+
+def _blur(I, sigma_px):
+    """Gaussian blur of a 0..1 map (for bloom)."""
+    if sigma_px <= 0.3:
+        return I
+    img = Image.fromarray((np.clip(I, 0, 1) * 255).astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(sigma_px))
+    return np.asarray(img).astype(np.float32) / 255
+
+
+def _bloom(rgb, I, sigma_px, gain, clip=None, col=BLOOM_COL):
+    """A soft warm bloom round lit shapes (added, easing off near white); `clip` keeps it on one surface."""
+    B = _blur(I, sigma_px) * gain
+    if clip is not None:
+        B = B * clip
+    _soft_add(rgb, 255.0 * col[None, None, :] * B[..., None])
 
 
 # ---------------------------------------------------------------- planes and the face pattern
@@ -198,8 +226,10 @@ class Plane:
 
 
 WALL = Plane((960, 866), 3.6, 3.6 * 1.1, blur=7.0, wash=0.15, name="wall")
-CHEST = Plane((960, 1270), 0.8, blur=2.0, name="chest")
-WING = Plane((916, 1318), 0.5, blur=1.2, name="wing")
+CHEST = Plane((960, 1275), 0.8, 0.62, blur=1.2, name="chest")  # Lead L2: 0.8x, raised: the smile on the
+                                                                # cream tummy, clear of the stem; his round
+                                                                # tummy leans back, so it lands a little flatter
+WING = Plane((946, 1318), 0.5, blur=1.0, name="wing")        # Lead L3 (set from the episode's wing pose)
 
 _PAT = {}
 
@@ -280,9 +310,14 @@ def wall_light(f, cam, albedo, k, occluders=(), plane=WALL, col=WARM_PATTERN, ga
         I = I * (1 - g)
     sub = _arr(f.crop(box))
     alb = _arr(albedo.crop(box))[..., :3]
-    _lit(sub[..., :3], alb, col, I * gain)
+    core = np.clip((I / max(k, 1e-3) - 0.66) / 0.34, 0, 1)          # Lead L4: a brighter core ...
+    _lit(sub[..., :3], alb, col, I * gain, own=0.15 + 0.55 * core, own_col=NEAR_WHITE)
+    _bloom(sub[..., :3], I, WALL_BLOOM * cam.res, 0.42)               # ... and a soft bloom: light, not paint
     _put(f, sub, box)
     return I, box
+
+
+WALL_BLOOM = 16.0                                                    # design units
 
 
 def _pbox(plane, cam):
@@ -292,9 +327,9 @@ def _pbox(plane, cam):
     return a[0], a[1], b[0], b[1]
 
 
-def beam_on_layer(lay, plane, cam, k, part=None, col=WARM_PATTERN, gain=0.92):
-    """The pattern landing on a layer (a body, or `part` of it such as a wing), never on its face.
-    Returns the intensity map (crop-sized) for checks."""
+def beam_on_layer(lay, plane, cam, k, part=None, col=WARM_PATTERN, gain=0.97, bloom=3.0, own=(0.2, 0.7)):
+    """The pattern landing on a layer (a body, or `part` of it such as a wing), never on its face: near-white warm
+    in its bright core, with a soft bloom kept on that surface. Returns the intensity map (crop-sized) for checks."""
     if lay is None or k <= 0.003:
         return None
     box = lay.box
@@ -311,19 +346,22 @@ def beam_on_layer(lay, plane, cam, k, part=None, col=WARM_PATTERN, gain=0.92):
         I = I * (1 - lay.head)
     a = _arr(lay.img)
     alb = lay.albedo if getattr(lay, "albedo", None) is not None else a[..., :3].copy()
-    _lit(a[..., :3], alb, col * BODY_BOOST, I * gain, own=0.45)
+    core = np.clip((I / max(k, 1e-3) - 0.6) / 0.4, 0, 1)
+    _lit(a[..., :3], alb, col * BODY_BOOST, I * gain, own=own[0] + own[1] * core, own_col=NEAR_WHITE)  # golden edge,
+    surf = clip if lay.head is None else clip * (1 - lay.head)                                     # white core
+    _bloom(a[..., :3], I, bloom * cam.res, 0.22, clip=surf)
     lay.img = Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
     return I
 
 
 # ---------------------------------------------------------------- grade and warm light on a layer
-def grade_layer(lay, t, glow=0.0, glow_at=None, cam=None, glow_r=300.0, glow_gain=0.40):
+def grade_layer(lay, t, glow=0.0, glow_at=None, cam=None, glow_r=300.0, glow_gain=0.40, prop=False):
     """Dusk grade, then the pumpkin's warm light by distance (additive, on top of the grade)."""
     if lay is None:
         return
     a = _arr(lay.img)
     lay.albedo = a[..., :3].copy()
-    mul, add = grade(t)
+    mul, add = grade(t, prop)
     a[..., :3] = a[..., :3] * mul[None, None, :] + add[None, None, :]
     if glow > 0.003 and glow_at is not None:
         xx, yy = _grid(lay.box)
@@ -336,20 +374,31 @@ def grade_layer(lay, t, glow=0.0, glow_at=None, cam=None, glow_r=300.0, glow_gai
 
 # ---------------------------------------------------------------- golden hour: the railing hearts
 HEART_XS = (1040, 1130, 1220)
-HEART_W = 46
-HEART_DX = 0                         # where a body in front of the wall catches a heart (relative)
+HEART_W = 76                         # Lead L1: each heart on the wall at least 70 units wide
+HEART_W_BODY = 50                    # the same beam caught nearer the railing (on Pip): a little smaller
+HEART_DY_BODY = 80                   # ... and lower on screen: she stands in front of the wall, nearer the camera
+                                     # (rule: >= 30 units from her head; see the episode's checks)
+HEART_LIGHT = np.array((255, 246, 214), np.float32)       # sunlight through the cut-outs: warm near-white ...
+HEART_LIGHT_PINK = np.array((255, 226, 230), np.float32)  # ... turning pink as the sun goes down
+HEART_Y0, HEART_Y1 = P.FLOOR_Y - 155, P.FLOOR_Y - 185   # whole hearts on the wall, above the pumpkin's top
+RAIL_SHADE_K = 0.14                  # how much the railing's shadow darkens a body standing in it
 
 
 def heart_state(t):
     """(y, colour 0..1, strength) of the hearts on the wall: rise a little, turn pink, fade (gone 9.4)."""
     u = ease_in_out(seg(t, P.T_SUN0, 9.4))
-    y = (P.FLOOR_Y - 110) + ((P.FLOOR_Y - 150) - (P.FLOOR_Y - 110)) * u
+    y = HEART_Y0 + (HEART_Y1 - HEART_Y0) * u
     col = HEART_GOLD * (1 - u) + HEART_PINK * u
     k = 1.0 - ease_in_out(seg(t, 7.6, 9.4))
     return y, col, k
 
 
-def _hearts_map(cam, box, y, dx=0.0, size=HEART_W, which=(0, 1, 2)):
+def heart_light(t):
+    u = ease_in_out(seg(t, P.T_SUN0, 9.4))
+    return HEART_LIGHT * (1 - u) + HEART_LIGHT_PINK * u
+
+
+def _hearts_map(cam, box, y, dx=0.0, size=HEART_W, which=(0, 1, 2), blur=1.6):
     x0, y0, x1, y1 = box
     W, H = x1 - x0, y1 - y0
     m = Image.new("L", (W * 2, H * 2), 0)
@@ -357,35 +406,54 @@ def _hearts_map(cam, box, y, dx=0.0, size=HEART_W, which=(0, 1, 2)):
     for i in which:
         pts = heart_pts(HEART_XS[i] + dx, y, size)
         d.polygon([((cam.S(p)[0] - x0) * 2, (cam.S(p)[1] - y0) * 2) for p in pts], fill=255)
-    m = m.resize((W, H), Image.LANCZOS).filter(ImageFilter.GaussianBlur(1.6 * cam.res))
+    m = m.resize((W, H), Image.LANCZOS).filter(ImageFilter.GaussianBlur(blur * cam.res))
     return np.asarray(m).astype(np.float32) / 255
 
 
+def _sun_box(f, cam):
+    a, b = cam.S((960, 1250)), cam.S((1500, 1520))
+    return _clip_box((a[0], a[1], b[0], b[1]), f.size)
+
+
+def _into(arr_box, lay):
+    """Copy of a map over arr_box, cut to a layer's box (zeros where they don't overlap)."""
+    arr, box = arr_box
+    full = np.zeros((lay.box[3] - lay.box[1], lay.box[2] - lay.box[0]), np.float32)
+    ox0, oy0 = max(box[0], lay.box[0]), max(box[1], lay.box[1])
+    ox1, oy1 = min(box[2], lay.box[2]), min(box[3], lay.box[3])
+    if ox1 > ox0 and oy1 > oy0:
+        full[oy0 - lay.box[1]:oy1 - lay.box[1], ox0 - lay.box[0]:ox1 - lay.box[0]] = \
+            arr[oy0 - box[1]:oy1 - box[1], ox0 - box[0]:ox1 - box[0]]
+    return full
+
+
 def sun_light(f, t, cam, albedo, occluders=()):
-    """Golden hour: the railing's soft shadow band on the lower wall and deck, the three hearts of light inside it,
-    and a body standing in a beam catches its heart (its shadow leaves a gap on the wall).
-    occluders: [Layer]. Returns {layer: heart intensity map} for the hearts that land on bodies."""
+    """Golden hour: the wall sits in the roof's shade (props_porch); the railing adds a soft shadow band, and the low
+    sun shines through its three heart cut-outs: bright warm near-white hearts on the wall (Lead L1).
+    occluders: Layers standing in the beams, FRONT FIRST (e.g. [Pip's wing, Pip]): each catches the part of a heart
+    that nothing in front of it took. Returns {id(layer): (heart map, box)}."""
     sk = P.sun_k(t)
     y, col, hk = heart_state(t)
     caught = {}
     if sk <= 0.003 and hk <= 0.003:
         return caught
-    box = _clip_box((cam.S((960, 1250))[0], cam.S((960, 1250))[1], cam.S((1500, 1520))[0],
-                     cam.S((1500, 1520))[1]), f.size)
+    box = _sun_box(f, cam)
     sub = _arr(f.crop(box))
     xx, yy = _grid(box)
     wx, wy = _world(cam, xx, yy)
-    # railing shadow band: on the wall (x 1060..1262, y 1300..1390) and across the deck towards the railing
-    wall_band = (_soft(wx, 1000, 1262, 36) * _soft(wy, 1302, P.WALL_BASE + 6, 30) * (wx < P.HOUSE_X1))
-    deck_band = _soft(wy, P.WALL_BASE, 1478, 8) * _soft(wx - (wy - P.WALL_BASE) * 1.9, 1000, 1262, 40)
-    band = np.maximum(wall_band, deck_band) * 0.30 * sk
+    band = _rail_band(wx, wy) * 0.42 * sk
     sub[..., :3] *= (1 - band)[..., None]
     if hk > 0.003:
         alb = _arr(albedo.crop(box))[..., :3]
-        I = _hearts_map(cam, box, y) * hk
-        for lay in occluders:                         # bodies in front: catch the heart, cast a gap
+        I = _hearts_map(cam, box, y, blur=1.0) * hk
+        covered = np.zeros(I.shape, np.float32)
+        for lay in occluders:
             if lay is None:
                 continue
+            cx = ((lay.box[0] + lay.box[2]) / 2) / cam.res + cam.ox      # a body catches the beam it stands in
+            mine = tuple(i for i, hx in enumerate(HEART_XS) if abs(hx - cx) < 45)
+            on_body = (_hearts_map(cam, box, y + HEART_DY_BODY, size=HEART_W_BODY, blur=1.0, which=mine)
+                       if mine else np.zeros(I.shape, np.float32))
             sol = np.zeros(I.shape, np.float32)
             ox0, oy0 = max(box[0], lay.box[0]), max(box[1], lay.box[1])
             ox1, oy1 = min(box[2], lay.box[2]), min(box[3], lay.box[3])
@@ -394,34 +462,61 @@ def sun_light(f, t, cam, albedo, occluders=()):
             s = lay.solid()
             sol[oy0 - box[1]:oy1 - box[1], ox0 - box[0]:ox1 - box[0]] = \
                 s[oy0 - lay.box[1]:oy1 - lay.box[1], ox0 - lay.box[0]:ox1 - lay.box[0]]
-            shift = int(round(HEART_DX * cam.res))
-            shadow = np.zeros_like(sol)                       # her shadow on the wall, offset to the left
-            if shift < sol.shape[1]:
-                shadow[:, :sol.shape[1] - shift] = sol[:, shift:]
-            on_her = _hearts_map(cam, box, y + 4, dx=HEART_DX) * sol
-            blocked = np.clip(on_her.max() * 4, 0, 1) if on_her.size else 0
-            I = I * (1 - shadow * blocked)
-            caught[id(lay)] = (on_her * hk, box)
-        _lit(sub[..., :3], alb, col, I * 0.92)
+            caught[id(lay)] = (on_body * sol * (1 - covered) * hk, box)
+            covered = np.maximum(covered, sol)
+        I = I * (1 - covered)                          # the bodies take the light; the wall behind them gets none
+        _lit(sub[..., :3], alb, col, I * 0.97, own=0.72, own_col=heart_light(t))
+        _bloom(sub[..., :3], I, 4.0 * cam.res, 0.15)
     _put(f, sub, box)
     return caught
 
 
-def heart_on_layer(lay, caught):
-    """Put the heart a body caught (from sun_light) onto that body's layer, never on its face."""
+def _rail_band(wx, wy):
+    """Where the railing's shadow falls (wall and deck), 0..1."""
+    wall_band = (_soft(wx, 1000, 1262, 36) * _soft(wy, 1262, P.WALL_BASE + 6, 30) * (wx < P.HOUSE_X1))
+    deck_band = _soft(wy, P.WALL_BASE, 1478, 8) * _soft(wx - (wy - P.WALL_BASE) * 1.9, 1000, 1262, 40)
+    return np.maximum(wall_band, deck_band)
+
+
+def rail_shade(lay, t, cam):
+    """A body standing between the railing and the wall is in the railing's shadow below its top (so a caught heart
+    reads bright): darken it there, softly."""
+    sk = P.sun_k(t)
+    if lay is None or sk <= 0.003:
+        return
+    xx, yy = _grid(lay.box)
+    wx, wy = _world(cam, xx, yy)
+    sh = _soft(wx, 1000, 1290, 40) * np.clip((wy - (P.RAIL[2] + 10)) / 30.0, 0, 1) * RAIL_SHADE_K * sk
+    if lay.head is not None:
+        sh = sh * (1 - lay.head)
+    a = _arr(lay.img)
+    a[..., :3] *= (1 - sh)[..., None]
+    lay.img = Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
+
+
+def shade_layer(lay, mul, k=1.0):
+    """Darken a layer (e.g. a surface turned away from the dusk light): rgb *= mix(1, mul, k)."""
+    if lay is None or k <= 0.003:
+        return
+    a = _arr(lay.img)
+    m = 1 + (np.array(mul, np.float32) - 1) * k
+    a[..., :3] *= m[None, None, :]
+    lay.img = Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
+
+
+def heart_on_layer(lay, caught, t, cam):
+    """Put the heart a body caught (from sun_light) onto that body's layer, never on its face: near-white warm with
+    a soft bloom kept on that surface."""
     if lay is None or id(lay) not in caught:
         return None
-    I, box = caught[id(lay)]
-    full = np.zeros((lay.box[3] - lay.box[1], lay.box[2] - lay.box[0]), np.float32)
-    ox0, oy0 = max(box[0], lay.box[0]), max(box[1], lay.box[1])
-    ox1, oy1 = min(box[2], lay.box[2]), min(box[3], lay.box[3])
-    full[oy0 - lay.box[1]:oy1 - lay.box[1], ox0 - lay.box[0]:ox1 - lay.box[0]] = \
-        I[oy0 - box[1]:oy1 - box[1], ox0 - box[0]:ox1 - box[0]]
+    full = _into(caught[id(lay)], lay)
     if lay.head is not None:
         full = full * (1 - lay.head)
     a = _arr(lay.img)
     alb = lay.albedo if getattr(lay, "albedo", None) is not None else a[..., :3].copy()
-    _lit(a[..., :3], alb, HEART_GOLD * BODY_BOOST, full * 0.92, own=0.4)
+    _lit(a[..., :3], alb, HEART_GOLD * BODY_BOOST, full * 0.97, own=0.75, own_col=heart_light(t))
+    surf = lay.solid() if lay.head is None else lay.solid() * (1 - lay.head)
+    _bloom(a[..., :3], full, 3.5 * cam.res, 0.4, clip=surf)
     lay.img = Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
     return full
 
@@ -439,8 +534,9 @@ def rail_glow(f, t, cam):
         if box[2] <= box[0]:
             continue
         sub = _arr(f.crop(box))
-        I = _hearts_map_at(cam, box, hx, hy, P.RAIL_HEART_W + 2) * 0.55 * sk
-        _add_light(sub[..., :3], np.full_like(sub[..., :3], 255), np.minimum(col, 1) * 0.9, I)
+        I = _hearts_map_at(cam, box, hx, hy, P.RAIL_HEART_W + 2) * sk           # the low sun right behind the cut-outs
+        _lit(sub[..., :3], np.full_like(sub[..., :3], 255), np.ones(3, np.float32), I, own=1.0,
+             own_col=np.minimum(heart_light(t) * np.array((1.0, 0.97, 0.86), np.float32), 255))
         _put(f, sub, box)
 
 
@@ -450,7 +546,7 @@ def _hearts_map_at(cam, box, x, y, size):
     m = Image.new("L", (W * 2, H * 2), 0)
     pts = heart_pts(x, y, size)
     ImageDraw.Draw(m).polygon([((cam.S(p)[0] - x0) * 2, (cam.S(p)[1] - y0) * 2) for p in pts], fill=255)
-    m = m.resize((W, H), Image.LANCZOS).filter(ImageFilter.GaussianBlur(2.2 * cam.res))
+    m = m.resize((W, H), Image.LANCZOS).filter(ImageFilter.GaussianBlur(1.2 * cam.res))
     return np.asarray(m).astype(np.float32) / 255
 
 
