@@ -18,12 +18,12 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 - [growth-analyst] Free name check for "Snip & Crinkle" (India trademark registry search, YouTube, app stores).
 - [story-designer] `docs/CHARACTER_BIBLE.md` for Snip, Crinkle and Pip.
 - [animator, toolkit] Pip in rig v2.
-- [owner: YES, 6 Oct] The whale transformation Short cut from the pilot, for 22 Oct: it tests the benchmark's strongest
-  Shorts pattern against our story Short. Built 6 Oct (`episodes/pilot02_whale_short.py`).
+- [owner: DROPPED, 6 Oct] The whale transformation Short cut from the pilot failed two blind reviews (7, then 6/10);
+  the owner said no to a rebuild. The transformation-Short test moves to Episode 11's own transformation Short.
 
 ## Phase 1: Test the new style (20 Oct – 15 Nov)
 - Uploads at 6:00 PM IST, one a day: Sun 18 and Mon 19 Oct the two Episode 11 Shorts; Tue 20 Oct pilot Short;
-  Wed 21 Oct pilot episode; Thu 22 Oct whale Short; Sat 24 Oct the Episode 11 episode.
+  Wed 21 Oct pilot episode; Sat 24 Oct the Episode 11 episode.
 - Episode 11: a gentle "friendly glow" Halloween (accepted from the growth-analyst's scan, 6 Oct): Pip is a little
   unsure as evening falls; Snip and Crinkle give a pumpkin a friendly face, the grown-up's hand does any cutting and
   places a battery light, and the glow comforts Pip. Shorts first (the 2025 hits went up 11-16 days before Halloween);

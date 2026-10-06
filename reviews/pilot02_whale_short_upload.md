@@ -140,6 +140,6 @@ line 3 of the whale Short's description must be changed to match it:
 `Watch the full story: "Say Sorry and Fix It Together!"`.
 
 ## Status (Lead, 6 Oct 2026)
-NOT READY TO UPLOAD. The Short failed gate 2 twice (blind reviews: 7/10, then 6/10; pass is 8). Per MASTER_PROMPT.md
+DROPPED by the owner (6 Oct, no rebuild). NOT FOR UPLOAD. The Short failed gate 2 twice (blind reviews: 7/10, then 6/10; pass is 8). Per MASTER_PROMPT.md
 section 9 the Lead stopped after two rounds and reported to the owner with a recommendation. The draft video and
 text in `Videos/` are renamed "DRAFT-failed-review_…" so they can't be uploaded by mistake.
