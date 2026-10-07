@@ -21,11 +21,11 @@ The owner approved round 3 (final). **Done 7 Oct evening:** fixes_r2 applied in 
 further fixes in `reviews/ep11_fixes_sb2.md` (opening: the sun sinks in the same shot as the fading hearts; 133 s
 wonder faces + light cone; Safety R1 carry = 7 slow steps; carry restage 32-43 s, closest 170 units). Safety
 re-check PASS with R1 (`reviews/ep11_safety.md`).
-**Next (after the 23:20 IST limit reset):** resume or brief the animator: build the "Carry restage" section of
-fixes_sb2 (shot-11 camera (1100, 1200); Snip and Pip drawn in front of the pumpkin 41.7-43.5 s); give Snip's
-marker a coloured body at 133 s (a white one read as a knife); then the 3x hires pass (`EP11_RES=3 ... --hires`),
-one full render, check_video, key sheet. Then the Lead checks the key sheet, makes `build/rv3/review_video.mp4`,
-and a NEW fresh-eyes-reviewer does round 3 (final).
+**Done 21:01:** final code built and rendered (`output/ep11_friendly_glow.mp4`, check_video PASS -14.2 LUFS), but
+the Lead's key-sheet look found 4 build misses; 2 fixed by the Lead (uncommitted code is committed).
+**Next (after the 23:20 IST reset):** a NEW animator with `reviews/ep11_fixes_r3pre.md` (code + stills only, returns
+the commands); the Lead runs the render chain in one background command (zero polling), looks at the key sheet,
+makes `build/rv3/review_video.mp4`, then a NEW fresh-eyes-reviewer, round 3 (final). Then the retro (below).
 
 **Owner request (7 Oct):** once Episode 11's final blind round is done, treat the build as a test case: a retro
 from `reviews/ep11_retro_notes.md` (token ledger + findings, kept as we go), then sharpen the agent files (Appendix A,

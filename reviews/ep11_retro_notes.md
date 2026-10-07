@@ -13,6 +13,10 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
 | Storyboard sb3, attempt 1 | animator (new) | 272k | 46 | 29 min | 36 -> ? | No sheet: 3 fixes infeasible (beams behind Pip's head, 144 s wing reach, 830-unit carry vs "3 steps"); built the 130-133 s fixes |
 | Storyboard sb3, resumed with Lead decisions | animator (resumed) | 208k | 13 | 10 min | 57 -> 64% | Sheet done; 2 issues left (144 s wing overlap, carry path crossing at 36.8 s) |
 | Blind storyboard check sb3 | fresh-eyes-reviewer | 17k | 7 | 1 min | ~0 | MATCH on problem, cause, lesson; side risk: Snip's white marker reads as a knife (133 s) |
+| Fix mode: carry path 32-43 s | story-designer | 78k | 15 | 9 min | 64 -> 71% | Restage, closest 170 units; computed from the real code positions |
+| Final code (carry, marker colour), no render | animator (resumed) | 236k | 17 | 4 min | 71 -> ? | Code done; returned exact commands; render run by the Lead in one background job |
+| Render chain (hires + render + check + keys) | Lead (Bash, background) | ~0 | 1 | 42 min | 0 | check_video PASS -14.2 LUFS; the key sheet showed 4 build misses |
+| Lead diagnosis + 3 small code fixes + 2 stills | Lead | ~10 steps | | 20 min | 79 -> 81% | camera and reuse fixed; 2 misses left for a fresh animator |
 
 ## Findings so far (candidate agent changes)
 1. **Gate 1b cost estimate was wrong:** MASTER_PROMPT says ~3% of a 5-hour limit; the first sheet cost ~27%,
@@ -36,3 +40,14 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
    re-sent each time). Fine for a short finish; for a long job, a fresh agent with a short fix file.
 9. **Prop colours carry safety meaning:** a plain white marker near a cutting scene reads as a knife. Markers keep
    a coloured cap/body in every shot after the hand cuts.
+10. **Split "code" from "render" (owner's question, 7 Oct):** the render costs no tokens, but the agent around it
+    does. The Lead nearly waited 3 h for a reset by pricing "build + render" as one agent job. Better: the animator
+    codes and checks stills, returns the exact commands, and the Lead runs the render as one background command
+    (notified on exit, zero polling). Candidate rule for the animator file and section 10.
+11. **The Lead's key-sheet look paid for itself:** it caught 4 build misses (Snip in the opening camera, gold
+    cut-outs after sunset, stale reused 40b frames, a white "knife" marker) before the final blind round.
+12. **Never reuse rendered frames across rounds** after any staging change; the animator's "nothing there changed"
+    was wrong. Reuse only with a check that the shot's code is unchanged (e.g. a hash of the shot's inputs).
+13. **"Applied" needs a still at every time the change touches**, not one: the marker went blue at 133 s only.
+14. **The Lead fixing code is a false economy past ~3 steps:** each Lead step re-sends ~170k; diagnosis is the
+    Lead's job, the fix belongs to a fresh animator with a short fix file.
