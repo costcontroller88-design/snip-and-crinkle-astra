@@ -71,6 +71,12 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 
 ## Topic pipeline (by demand)
 1. Halloween "friendly glow" (Episode 11): episode parked (8 Oct); the transformation Short is queued for Sun 18 Oct
+2. **Episode 12: "Tidy up together" (every toy has a home) + colour sorting** (Lead go, 8 Oct; evidence
+   `docs/benchmark-topic-ep12.md`). Engine A (Snip errs: his mess buries Pip's ball by accident; the three put toys
+   in picture baskets, 1-2-3, and the ball appears). One new thing: the playroom. Misread to rule out: "Snip took
+   Pip's ball". Transformation Short: mess → tidy sort.
+3. **Episode 13: "Potty in time"** (the owner's request, 8 Oct): notice the feeling, go in time, potty before bed;
+   accidents met kindly (NHS: never punish bedwetting). Clothes on, nothing gross; safety gate first.
 2. Washing hands, brushing teeth or bath time (routine, with a dirty → clean Short)
 3. Diwali rangoli Short (blank floor → colourful; LED lamps, no fire): 3-5 Nov
 4. Colour mixing in the art corner (blank → colourful Short)
