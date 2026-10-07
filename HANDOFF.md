@@ -23,8 +23,7 @@ the ledger lives in `reviews/epNN_ledger.md`.
 Channel data: 2 Shorts live (5 and 6 Oct); Studio on 7 Oct showed only the owner's own views. Checkpoint Wed 14 Oct:
 Shorts feed reach, logged in `docs/analytics-log.md`.
 
-Waiting on the owner: turn on 2-Step Verification and phone verification (custom
-thumbnails); upload Ep 9 v3 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode
+Phone verification: done (owner, 8 Oct). Waiting on the owner: 2-Step Verification; upload Ep 9 v3 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode
 (Wed 21 Oct), text in `reviews/pilot02_upload.md`.
 
 Notes: `Videos/` holds drafts named "DRAFT-in-review_…" (Episode 11, old render) and "DRAFT-failed-review_…" (the
