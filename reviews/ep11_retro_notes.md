@@ -20,7 +20,9 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
 | r3pre feasibility pass (new 5-h window, 7 Oct 23:20 IST) | animator (new) | 133k | 22 | 10 min | 1 -> ?% | Stopped as briefed: real causes found (Pip's body through the cut-outs; the white 'knife' is the tucked book edge-on; 40b not in HI_T); item 4 infeasible (crossing; Crinkle's face >50% hidden 0.87 s). Lead accepted item 4 as a walk-past, with the measurement |
 | r3pre items 1-3, resumed, stills only | animator (resumed) | 145k | 9 | 3 min | -> 17% (both sessions) | 1-3 PASS on 10 stills; the Lead checked them on one 1,560 px contact sheet |
 | Last build fixes (fixes_r3pre 1-4), stills only (other Lead session) | animator (new) | 136k | 25 | 10 min | 5 -> ?% | All 4 done with still evidence (item 4: face hidden 0.27 s); edited the same file in parallel with the row above |
-| Render chain (hires + render + check + keys), commit d6b2959 | Lead (Bash, background) | ~0 | 1 | ~42 min | 0 | running |
+| Render chain (hires + render + check + keys), commit d6b2959 | Lead (Bash, background) | ~0 | 1 | ~42 min | 0 | check_video PASS -14.2 LUFS |
+| Lead key sheet + 3 frames from the MP4 (42.1, 133, 144 s) | Lead | 2 images | 3 | 3 min | 17 -> 20% | No build misses; 42.1 s both faces show |
+| Blind review round 3 (final) | fresh-eyes-reviewer | 119k | 55 | 4.5 min | 20 -> ?% | Overall 6 (comedy 5, hook/clarity/lesson 6, payoff 8, look 8); 'Bear won't share' gone; blocking: no visible light source for the hearts 0-14 s; the carving invisible under the hand 88-90 s. 55 tool calls, 119k: far above the 17-19k storyboard checks |
 
 ## Findings so far (candidate agent changes)
 1. **Gate 1b cost estimate was wrong:** MASTER_PROMPT says ~3% of a 5-hour limit; the first sheet cost ~27%,
