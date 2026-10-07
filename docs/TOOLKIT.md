@@ -14,6 +14,8 @@ here and an API docstring at its top.
 | `episodes/props_porch.py` | Episode 11 world: `Porch(cam)`, `background(t)` (golden → sunset → evening), `front(f, t)` (railing drawn after characters), `albedo` |
 | `episodes/ep11_light.py` | Dusk grade, railing hearts, pumpkin glow, floor pool, projected smile on wall/body/wing, `luma`, `clearance` checks |
 | `episodes/props_pumpkin.py` | `Pumpkin().paper(rot, strokes, holes, lid)` and `.emissive(...)`; `stroke_tip` for marker tracks; stages plain → drawn → cut → lit → turned |
+| `episodes/props_lantern.py` | Ep 11 Short: the paper-lantern pumpkin (PK size); `Lantern().paper(strokes)` / `.lit(strokes, level)` (whole paper glows, ink stays dark), eye strokes that read as a "C" (`C_STOP`), `tip_world`, `inside_clip` (hide what goes into the ring) |
+| `episodes/ep11_short_transform.py` | Ep 11 transformation Short: own timeline; a one-marker holder schedule (`marker_pose`), paws/wings behind the back (`BACK`), the hand straight down with the tea light, `--check` (measured gaps), `--hires` for the 2.4x take |
 | `episodes/props_glow.py` | Episode 11 small props: sketchbook (back / plan page), tucked book, crayon, polishing cloth, battery tea light (off/on), wind chime, autumn leaves |
 | `episodes/props_hand2.py` | The grown-up's arm and hands at 2x: `Arm(upper, fore)`, `draw`, `wrist_for`, `draw_hand`; hands rest / pinch / press (click) / thumb / palm; `sleeve_end()`; never a tool |
 | `episodes/props_splash.py`, `props_artcorner.py` | The pilot's art corner, jars, brushes, thought cloud, sparkle, heart (reusable) |

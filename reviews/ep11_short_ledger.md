@@ -11,3 +11,4 @@
 | 8 Oct | Gate 1b round 1: MATCH (problem, cause, lesson); 2 staging risks → designer fix mode | fresh-eyes-reviewer (23k tok, 8 calls) | 77+ | 62 | |
 | 8 Oct | Fix mode S1/S2 (new close camera T for the take; clean let-go) | story-designer (41k tok, 12 calls) | — | — | heart → black ink (Lead) |
 | 8 Oct | Animator build hit the 5-hour cap (429); resumed after the reset (SendMessage) | animator | 0 (reset) | 65 | |
+| 8 Oct | Build (T1-T3 + Short + sound), key sheet; stopped before render | animator (308k tok, 27 calls; hit the cap once) | 10 | 66 | Lead key check: takes OK; light-in too small (K1) → fresh animator, fix file keys1 |

@@ -9,7 +9,7 @@ Run:  python3 episodes/ep11_short_transform.py --still T     (one frame through 
       python3 episodes/ep11_short_transform.py --keys        (risky-shot check sheet -> reviews/ep11_short_transform_keys.png)
       python3 episodes/ep11_short_transform.py --cuts        (cut times for check_video)
       python3 episodes/ep11_short_transform.py --check       (measured clearances and gaps, printed)
-      EP11S_RES=3 python3 episodes/ep11_short_transform.py --hires   (camera T, 2.6x, at 3x -> build/ep11s_hi/;
+      EP11S_RES=3 python3 episodes/ep11_short_transform.py --hires   (camera T, 2.4x, at 3x -> build/ep11s_hi/;
                                                                     run it before --render)
       python3 episodes/ep11_short_transform.py --audio       (sound only -> build/ep11s_audio.wav)
       python3 episodes/ep11_short_transform.py --render      (audio + video -> output/ep11_short_transform.mp4)
@@ -96,10 +96,10 @@ MK_S = 1.1
 MK = RP.marker_sprite(body=(96, 170, 236), ink=PK.INK, scale=MK_S)
 TIP_L = RP.MARKER_TIP * MK_S            # grip point -> tip
 CAP = 40.0                              # a pinch near the top end: the paw this far behind the grip point
-U_SN, U_PIP, U_CR = _unit(0.39, 0.92), _unit(0.5, 0.87), _unit(-0.3, 0.95)
+U_SN, U_PIP, U_CR = _unit(0.39, 0.92), _unit(-0.22, 0.98), _unit(-0.3, 0.95)
 U_GIVE = _unit(0.97, -0.24)             # Pip holds it up to Crinkle, pointing at his paw (tip away from every face)
 ANG = {k: RP.marker_angle(u) for k, u in (("sn", U_SN), ("pip", U_PIP), ("cr", U_CR), ("give", U_GIVE))}
-A_HANG, A_HOLD, A_FLAT = 4.0, -12.0, 90.0    # A_FLAT: lying flat, tip pointing right (away)
+A_HANG, A_HOLD, A_FLAT, A_REST = 40.0, -12.0, 90.0, 80.0    # A_FLAT: lying flat, tip pointing right (away)
 C = PL.C_STOP
 
 STROKE_KEYS = {"eye_l": [(0.0, 0.30), (0.6, 0.50), (0.8, C), (8.6, C), (9.1, 1.0)],
@@ -151,10 +151,10 @@ W_SN = SN.paw(0.8, "r")[0]                                          # her paw st
 for _t in np.arange(0.8, 5.39, 0.2):                                # (re-aimed every 0.2 s: breathing never moves it)
     SN.reach(float(_t), float(min(5.4, _t + 0.2)), "r", W_SN, "lin")
 CAP_P = (W_SN[0] - CAP * U_SN[0], W_SN[1] - CAP * U_SN[1])          # the marker's top end (where he pinches)
-LIFT = (1006, 1298)
+LIFT = (1010, 1262)                                                 # tip stays above the paper
 CR.hop(0.0, 0.3, 1, 6)
 CR.to(0.3, 0.6, "io", lean=-10, sq=0.92)
-CR.reach(0.3, 0.8, "l", (CAP_P[0] + 34, CAP_P[1] - 30))
+CR.reach(0.3, 0.8, "l", (CAP_P[0] + 40, CAP_P[1] - 24))
 CR.reach(0.8, 1.0, "l", CAP_P, "io")                                # slow pinch (no tug)
 CR.reach(1.1, 1.6, "l", LIFT, "io")                                 # tip leaves the paper at 1.1: the "C"
 SN.face(1.15, mouth="o", brows="up").to(1.6, 1.8, "io", look_x=8, look_y=9)   # eyes: the C, then her empty paw
@@ -171,9 +171,10 @@ CR.face(3.2, mouth="o", brows="sorry").to(3.2, 3.5, "io", sq=0.97, head_dy=5, le
 CR.reach(3.5, 4.0, "l", CAP_P, "io")                                # fits it into her open fingers, tip on the line
 CR.face(3.9, eyes="normal", mouth="smile", brows="sorry")
 CR_HP = CR.a.head_pivot(CR.state(3.95))
-CHEST = (CR_HP[0] - 22, CR_HP[1] + 108)
-CR.reach(4.0, 4.4, "l", CHEST, "out")                               # lets go; open paw straight back to his chest
-CR.to(4.4, 4.75, "io", lean=-14, head_dy=10).to(4.75, 5.1, "io", lean=-6, head_dy=4)   # a small bow
+CHEST = (CR_HP[0] + 4, CR_HP[1] + 110)
+CR.to(4.0, 4.15, "out", lean=-12)                                   # lets go and rocks back: well clear of it
+CR.reach(4.0, 4.3, "l", CHEST, "out")                               # open paw straight back to his chest
+CR.to(4.4, 4.75, "io", lean=-9, head_dy=14).to(4.75, 5.1, "io", lean=-11, head_dy=4)   # a small bow (head)
 SN.ears(4.8, 5.0, "happy", "back").face(4.8, eyes="happy", mouth="smile", brows="calm")
 SN.to(4.95, 5.1, "io", head_dy=10).to(5.1, 5.3, "io", head_dy=0)                        # nod
 # ---- shot 3 (5.4-7.2, A): he straightens, half step back, copies Pip's waiting pose; they sway together
@@ -203,21 +204,22 @@ SN.face(9.15, eyes="happy", mouth="smile", brows="calm")
 SN.reach(9.2, 9.5, "r", (SN.paw(9.1, "r")[0][0] - 4, SN.paw(9.1, "r")[0][1] - 14))
 SN.face(10.0, eyes="normal", brows="think")
 follow(SN, "r", "eye_r", 10.2, 10.8, 0.0, 1.0, U_SN, lead=0.35, n=10)
-SN.face(10.85, eyes="sparkle", mouth="smile_open", brows="up").reach(10.9, 11.3, "r", (885, 1290))
+SN.face(10.85, eyes="sparkle", mouth="smile_open", brows="up").reach(10.9, 11.3, "r", (860, 1305))
 # ---- shot 6 (11.8-13.6, A): Snip gives the marker to Pip, steps back, sweeps a paw; Pip waddles in
-M_GIVE = (742, 1330)
+M_GIVE = (755, 1390)
 SN.to(11.8, 12.05, "io", turn=-0.3, look_x=-8, look_y=6).face(11.8, eyes="happy", mouth="smile_open", brows="up")
 SN.reach(11.85, 12.15, "r", M_GIVE)
 PIP.to(11.75, 11.9, "io", arm_l=-12, elb_l=16, arm_r=12, elb_r=-16).face(11.9, eyes="sparkle", mouth="smile_open")
-PIP_TAKE = (M_GIVE[0] + 18 * U_SN[0], M_GIVE[1] + 18 * U_SN[1])
+PIP_TAKE = (M_GIVE[0] + 18, M_GIVE[1])           # the marker is held flat for the give
 PIP.reach(11.95, 12.2, "r", PIP_TAKE)
 SN.reach(12.25, 12.45, "r", (770, 1360)).walk(12.3, 12.8, SN_X1, steps=2)
 SN.to(12.4, 12.7, "io", turn=0.35, look_x=8, look_y=6)
 SN.reach(12.55, 12.85, "r", (820, 1300), "back").reach(13.2, 13.5, "r", (760, 1395))
-PIP.walk(12.45, 13.5, 845, steps=4).to(13.5, 13.65, "io", turn=0.3, look_x=10, look_y=10)
+PIP.walk(12.45, 13.5, 830, steps=4).to(13.5, 13.65, "io", turn=0.3, look_x=10, look_y=10)
 PIP.reach(12.3, 12.6, "r", (742, 1384))                             # carried flat in front of her tummy
 H_WAIT, H_PIP = (968, 1332), (975, 1322)
 # ---- shot 7 (13.6-16.6, B): Pip draws the heart nose (black), tongue tip out, copying Crinkle
+PIP.to(13.45, 13.75, "io", tilt=7).to(15.45, 15.8, "io", tilt=0)          # head tipped away from the marker
 follow(PIP, "r", "heart_l", 13.8, 14.5, 0.0, 1.0, U_PIP, lead=0.3, n=12)
 PIP.reach(14.5, 14.7, "r", (PL.tip_world("heart_r", 0)[0] - TIP_L * U_PIP[0],
                             PL.tip_world("heart_r", 0)[1] - TIP_L * U_PIP[1]))
@@ -236,7 +238,7 @@ CR.to(16.75, 16.9, "io", arm_l=-10, elb_l=14, arm_r=10, elb_r=-14).to(16.8, 17.1
 CR.face(16.8, eyes="sparkle", mouth="smile_open", brows="up").to(16.8, 17.0, "io", look_x=-8, look_y=6)
 CR.reach(16.95, 17.3, "l", P_TAKE)
 PIP.rest_wings(17.4, 17.7).walk(17.6, 18.1, PIP_X1, steps=2).to(17.9, 18.2, "io", turn=0.35, look_x=10, look_y=8)
-CR.reach(17.4, 17.8, "l", (1055, 1290)).wiggle(17.5, "lean", 4, 5, 3).to(17.8, 18.1, "io", sq=0.96, lean=-4)
+CR.reach(17.4, 17.8, "l", (1058, 1322)).wiggle(17.5, "lean", 4, 5, 3).to(17.8, 18.1, "io", sq=0.96, lean=-4)
 # ---- shot 9 (18.2-22.0, B): the big smile, slowly; his tongue slides with the marker; paw out; he holds it flat on his tummy
 CR.to(18.2, 18.4, "io", sq=0.88, lean=-12).face(18.3, eyes="normal", mouth="yum_l", brows="think")
 CR.to(18.3, 18.5, "io", look_x=-8, look_y=10)
@@ -283,14 +285,14 @@ def marker_pose(t):
                         (4.0, ANG["sn"])])
         return "cr", "l", CAP, ang
     if t < 12.2:
-        return "sn", "r", 0.0, ANG["sn"]
+        return "sn", "r", 0.0, _ease(t, [(10.9, ANG["sn"]), (11.3, A_REST), (11.85, A_REST), (12.15, A_FLAT)])
     if t < 17.3:
         off = _ease(t, [(12.2, -18.0), (12.6, 0.0), (15.45, 0.0), (15.9, CAP)])
-        ang = _ease(t, [(12.2, ANG["sn"]), (12.6, A_FLAT), (13.5, A_FLAT), (13.75, ANG["pip"]), (15.45, ANG["pip"]),
+        ang = _ease(t, [(12.2, A_FLAT), (12.6, A_FLAT), (13.5, A_FLAT), (13.75, ANG["pip"]), (15.45, ANG["pip"]),
                         (15.9, ANG["give"])])
         return "pip", "r", off, ang
     if t < 20.95:
-        ang = _ease(t, [(17.3, ANG["give"]), (17.8, A_HOLD), (18.2, A_HOLD), (18.4, ANG["cr"]), (20.6, ANG["cr"]),
+        ang = _ease(t, [(17.3, ANG["give"]), (17.8, A_FLAT), (18.2, A_FLAT), (18.4, ANG["cr"]), (20.6, ANG["cr"]),
                         (20.95, A_FLAT)])
         return "cr", "l", -5.0, ang
     return "cr", "l", -5.0, A_FLAT
@@ -493,7 +495,7 @@ def render_world(t, d=None, cam=None, bg=None):
 
 
 # ---------------------------------------------------------------- cameras (plan b4; vertical)
-CAMS = {"A": ((880, 1250), 1.7), "T": ((950, 1300), 2.6), "B2": ((920, 1270), 1.8), "K": ((1060, 1180), 1.9),
+CAMS = {"A": ((880, 1250), 1.7), "T": ((962, 1300), 2.4), "B2": ((920, 1270), 1.8), "K": ((1060, 1180), 1.9),
         "B": ((950, 1320), 2.0), "B3": ((990, 1290), 1.6)}   # B3: the light goes in (room for the hand, Crinkle in)
 END_C, END_Z = (975, 1215), 1.4
 T_PULL = (26.0, 28.0)
