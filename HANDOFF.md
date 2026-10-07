@@ -21,7 +21,8 @@ Pip's opening; Snip points at the dark wall; stronger gold hearts; shorter 16-31
 sit-down reads, the stray marker removed, one gag near 44 s), then one final round 3, after the 09:00 limit reset.
 
 The owner approved round 3 (final). Next steps, after the ~09:00 IST limit reset: brief a NEW animator with
-`reviews/ep11_fixes_r2.md` (check sheet first, the Lead's go, then one render), then a NEW fresh-eyes-reviewer, round 3
+`reviews/ep11_fixes_r2.md` (storyboard sheet first, checked blind by a NEW fresh-eyes-reviewer in storyboard mode = new gate 1b; render
+only if its retelling matches the story card), then a NEW fresh-eyes-reviewer, round 3
 (`build/rv3/review_video.mp4`).
 
 Waiting on the owner: turn on 2-Step Verification and phone verification (custom thumbnails); upload Ep 9 v3
