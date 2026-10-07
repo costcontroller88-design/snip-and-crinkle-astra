@@ -20,7 +20,9 @@ stopped and asked the owner. Lead's recommendation: one structural fix of 0-31 s
 Pip's opening; Snip points at the dark wall; stronger gold hearts; shorter 16-31 s) and the comedy beats (62 s
 sit-down reads, the stray marker removed, one gag near 44 s), then one final round 3, after the 09:00 limit reset.
 
-Next steps: wait for the owner's answer on round 3, then brief a NEW animator with a short fix file.
+The owner approved round 3 (final). Next steps, after the ~09:00 IST limit reset: brief a NEW animator with
+`reviews/ep11_fixes_r2.md` (check sheet first, the Lead's go, then one render), then a NEW fresh-eyes-reviewer, round 3
+(`build/rv3/review_video.mp4`).
 
 Waiting on the owner: turn on 2-Step Verification and phone verification (custom thumbnails); upload Ep 9 v3
 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode (Wed 21 Oct), text in
