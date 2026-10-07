@@ -340,27 +340,151 @@ after row 9 shift with the gate-1 trims and the inserted row 14b; the build comp
 | 24 | 54.9–56.3 | 136.3–137.7 | close Pip | joy |
 | 25 | 56.3–58.5 | 148.6–150.8 | paws over the pumpkin | paw-bump, ending jingle |
 
-**(b) Transformation Short, 27.4 s: "plain pumpkin → drawn face → glowing smile."** Its own locked vertical
-close-up on the pumpkin: camera centre (960, ≈1415), 1.9x (the pumpkin is about 42% of the width, at about half
-the height; the bottom 19% is the garden path; the paws and marker reach in from the sides; the hand from above).
-No cutaways to wide shots. Every change holds 1.1–1.5 s before the next one starts (the episode's drawing pauses
-are timed for this). **First frame (src 45.25):** the plain round orange pumpkin in purple dusk with Snip's marker
-already touching it and the first bit of the eye line drawn: something is clearly about to happen.
-| Out (s) | Source (s) | Change |
+**(b) Transformation Short, r2 (8 Oct; replaces the carving version): "Plain Pumpkin Becomes a Glowing Friend!"
+29.4 s, vertical 1080x1920, `episodes/ep11_short_transform.py`.** A standalone mini-story with its own performances
+and timeline in the Episode 11 porch world (early-evening light state all through: no railing hearts, no sunset, no
+wall projection). Reused: `props_porch`, `ep11_light` (grade, `halo`, `floor_pool`), rig2 Snip and Crinkle, `rig2_pip`,
+`props_hand2`, `G.tea_light`, the marker and its `draw_held`, `PK.FEATURES`/`stroke_tip` (same face, same draw spots).
+The one new thing: a paper-lantern pumpkin that glows through its paper. No cutting, no tool, no holes. This
+supersedes the section 8 note "shots 13-28 are all the transformation Short needs".
+
+**b0. Feasibility**
+| Can we? | Answer |
+|---|---|
+| Rig and reach | Yes. Draw spots as built: Snip x 790 (eyes), Pip x 845 (nose), Crinkle x 1080 (smile). Crinkle's reach is 156 (rig2 SPEC 66+64 at 1.2); his left shoulder, standing at 1080 and turned left, is at about (985, 1250) (estimate); Snip's marker grip at mid-eye is about (890, 1385): about 165 standing, so he leans (-10 deg) and crouches (sq 0.92) to take it; the animator measures; if still over 150, Crinkle takes one small step to x 1050 at 0.4 s. |
+| Props | One new prop (the lantern, M). Everything else exists. |
+| Light | A paper lantern diffuses: the whole paper glows, no pattern is thrown, so no projection planes are needed. |
+| Time | Estimate 2-3 min render (29.4 s at about 3.5 s per second); build by 15 Oct for Sun 18 Oct. |
+| Source | AAP HealthyChildren.org Halloween tips (in the story card): little ones decorate with markers; battery light, not a candle. |
+
+**b1. Mini story card.** **Lesson: when it's a friend's turn, wait until they finish; then it's your turn.** Wrong →
+right: Crinkle, bouncing with excitement and eyes only on the pumpkin, takes the marker out of Snip's paw while Snip is
+halfway round the first eye → he sees the half-drawn eye and Snip's empty paw, puts the marker back with its tip where
+the line stopped, then waits (paws behind his back, copying Pip) and gets his turn from Pip. The marker carries the
+lesson: Snip → Crinkle (wrong) → Snip → Pip → Crinkle. **Angle (ROADMAP, quoted):** "A plain pumpkin gets a
+paper/paint face and glows (battery light placed by the grown-up's paper hand)"; Short: "a 20-30 s 'Plain Pumpkin
+Becomes a Glowing Friend!' transformation Short". **Engine:** B (Crinkle errs); the brief's "Pip or Crinkle" goes to
+Crinkle because the bible says Pip "never snatches or pushes in" and is not a third mistake-maker; his trait 3 (busy
+with the job in front of him, forgets when bouncy-happy) carries it. **Setting:** the Ep 11 porch, early evening.
+**Outcome:** a face drawn in three turns glows as one friendly face. **Wow:** the whole paper pumpkin lights up from
+inside; the black lines stay dark, the red heart glows deep red. **Music:** glockenspiel lead (music-box tone), pluck
+bass, organ pad only under the glow; F major, 104 bpm, straight. Each turn has its own phrase (Snip glock, Pip the
+same an octave up and shorter, Crinkle low organ); the grab cuts Snip's phrase off mid-bar; it resolves when the eye
+closes. **Safety:** markers without caps, tips only on the lantern; the take is a slow pinch, never a tug; the tea light
+is touched only by the grown-up's hand (white body, side switch, LED dome, never opened, steady glow, no flame,
+flicker or smoke), goes in through the top ring and stays inside; no candle, no cutting, no tool; nobody climbs; the
+glow is a warm wash, never a beam on a face; nobody laughs at Crinkle. **Misread to rule out:** "Crinkle is mean" or
+"Snip won't share" (b9). From 22.0 s to the end, nobody touches the lantern: no paw, wing or foot on the paper or over the top ring; Crinkle's wiggle-dance arms stay on the side away from the lantern; Pip dances in place (gate 1, F3).
+
+**b2. Variety** (the Ep 11 episode is parked; it is still the previous story)
+| | Ep 9 | Ep 10 | Ep 11 episode (previous) | **This Short** |
+|---|---|---|---|---|
+| Engine | A | A | E | **B (Crinkle errs)** |
+| Setting | car + street | beach | porch at dusk | porch at dusk (**repeat: the Lead's reuse decision**) |
+| Mistake-maker | Snip | Snip | nobody | **Crinkle** |
+| Outcome | drive to the beach | castle finished | dark spot → giant smile | **a face made in turns glows** |
+| Wow | car drives off | ears spring back | projected smile on the wall | **glow through paper** |
+| Lead instrument | organ comp + steel pan | ukulele + glock | organ, F, 116 swung | **glock (music box), F, 104 straight** |
+Engine order holds: E → B → Ep 12's A.
+
+**b3. Cause and effect**
+Set-ups in frame 0: the plain orange paper-lantern pumpkin on the deck (BASE 960, 1505; same outline as `PK`: 240 x 170)
+with a wire ring opening on top (about 84 wide) and a green paper stem curl beside it; the one black marker in Snip's
+paw, its tip on the lantern; Pip waiting at x 640, wings behind her back; Crinkle at x 1080, bouncing.
+1. Crinkle wants to draw (bounce, sparkle eyes, eyes only on the lantern) and takes the marker gently out of Snip's
+   paw. The tip leaves the paper, so the eye stops as a "C".
+2. Snip's paw stays in the air, empty; Snip looks at the half eye; the ears droop (cause and feeling in one shot).
+3. Crinkle crouches to draw the smile, tongue out; the tip stops short of the paper (no stray mark). From down
+   there the half eye is right in front of him: he looks at it, at Snip's empty paw, up at the drooping ears.
+4. He understands (O mouth, shoulders sag), puts the marker back in Snip's paw with the tip on the end of the line,
+   paw on chest, a small bow. Snip's ears spring up; a nod.
+5. Crinkle straightens, sees Pip waiting, copies her pose; they sway together, smiling.
+6. Snip closes the "C" into an "O" (the cut-off phrase resolves), draws the second eye, gives the marker to Pip (she
+   was waiting first), steps back to x 700 and sweeps a paw: go on. Pip waddles in to x 845.
+7. Pip draws the red heart nose with a tiny tongue tip (copying Crinkle's tongue from step 3), then holds the
+   marker up to Crinkle over the lantern's top: his turn, given by her. Happy wiggle.
+8. Crinkle draws the big smile slowly, tongue sliding with the marker.
+9. The grown-up's hand comes straight down from above with a battery tea light, clicks it on above the ring (we see
+   the LED dome light: no flame), lowers it in. Light inside thin paper: the paper itself glows; the ink blocks
+   light, so the black lines stay dark; red ink passes red light, so the heart glows red. Brightest low and in the
+   middle (the light sits on the bottom), the edges a deeper orange (more paper on the slant), the ribs as soft
+   darker lines (the wire frame). A warm halo and floor pool; the friends lit warm.
+10. All three helped, in turn: Crinkle's wiggle-dance in the glow; Pip copies, small and late.
+
+**b4. Shot list** (cameras, vertical: A group 1.7x centre (880, 1250), view x 562-1198, y 685-1815; B lantern close
+2.0x centre (950, 1320), view x 680-1220, y 840-1800, lantern 44% of the width, heads in the top third; K Crinkle
+close 1.9x centre (1060, 1180). Bottom 19% is below y 1600 (A) / 1617 (B): only deck and path.)
+| # | Time (s) | Cam | What happens | Movements | Rig check |
+|---|---|---|---|---|---|
+| 1 | 0.0-1.6 | A | Frame 0: Snip (790, turn +0.5) has the marker on the lantern, eye 20% drawn; Pip (640) waits, wings behind back, small sway; Crinkle (1080, turn -0.5) bounces on his toes, paws up at chest, sparkle eyes locked on the lantern. Eye 20→50% (0.0-0.6). One bounce (0.0-0.3); Crinkle leans in (0.3-0.6), slowly pinches the marker's top (0.6-0.9), lifts it slowly to his chest (0.9-1.6). The marker's whole path stays in frame; Snip's paw stays put and opens (gate 1, F2). | stroke reveal; bounce (hop 6, x1); lean -10, sq 0.92; pinch + lift (marker hands over) | OK; wings/paws-behind-back pose (T2) |
+| 2 | 1.6-5.4 | B | The half eye. Snip's empty paw hangs beside it 0.6 s, then opens; ears droop (2.0), then glassy eyes, sad brows (never angry); Snip looks at the eye, not at Crinkle. Crinkle crouches toward the smile spot, tongue out (`yum_l`), tip stops 20 short (2.0-2.6); looks at the half eye (2.7), at Snip's paw (3.0), up at the ears (3.3); O mouth, shoulders sag (3.5-3.8); puts the marker back, tip on the line's end (3.8-4.5); paw on chest, bow (4.5-5.2). Snip's ears spring up (4.8), nod (5.0). | look_x/y; sq 0.94; give paw to paw; paw to chest, head_dy | OK |
+| 3 | 5.4-7.2 | A | Crinkle straightens, half step back to 1100, sees Pip waiting; tucks paws behind his back (5.9), sways with her a beat late and bigger (6.2-7.2, two sways, lean ±5). Pip notices and smiles at him (a shared smile, not a laugh); Snip watches them, then turns back to the eye (7.0). | lean sways; arms back | T2 |
+| 4 | 7.2-8.4 | K | Crinkle's face while waiting: calm smile, eyes on Snip's drawing, sway. | look; sway | OK |
+| 5 | 8.4-11.8 | B | Snip closes the C into an O (8.6-9.1); hold (9.1-10.2); the second eye (10.2-10.8); hold (10.8-11.8). | stroke reveal from 0.5 | OK |
+| 6 | 11.8-13.6 | A | Snip turns and gives the marker to Pip (11.9-12.3), steps back to 700, sweeps a paw (12.3-12.8); Pip waddles in front of Snip to 845 (12.4-13.5). | give; walk; sweep; Pip walk | OK (as ep 64.9-66.2) |
+| 7 | 13.6-16.6 | B | Pip draws the heart nose: left half (13.8-14.5), right half (14.7-15.4), tiny tongue tip; wing back by 15.6; hold (15.4-16.6). | wing IK + `draw_held` | OK (as ep 67-69) |
+| 8 | 16.6-18.2 | A | Pip turns and holds the marker up toward Crinkle (16.7-17.1); he crouches and takes it over the lantern's top at about (915, 1320) (17.1-17.5; his shoulder to it about 105 of 156, her wing about 63 of 76, estimates); sparkle eyes, one small wiggle (17.5-18.1). | crouch; reach; wiggle | OK |
+| 9 | 18.2-22.0 | B | Crinkle draws the big smile in one slow stroke (18.4-20.6), tongue `yum_l` ↔ `yum` with the marker; paw out (20.6-20.9); hold the finished face, no paw, wing or marker in shot (20.9-22.0). | IK along the curve | OK (as ep 56.5-59.5) |
+| 10 | 22.0-26.0 | B | The hand comes straight down from above, pinching the tea light (22.0-22.5); thumb press: click, the LED dome glows (22.7); hold (to 23.7); lowered through the ring (23.7-24.5): the paper lights from the top down, then all of it; the hand leaves upward (24.5-24.9); hold the glowing face (24.9-26.0). | `H.Arm.draw_to`, pinch → press → pinch | T1 lit stage; T3 |
+| 11 | 26.0-29.4 | B → 1.5x, centre → (880, 1220) | Pull back (26.0-27.5, 0.33x per second): Snip 700, Pip 845, Crinkle 1100 lit warm. Snip hops (27.0); Crinkle's wiggle-dance (26.8-28.0); Pip copies, small and late (27.2-28.4). End chord 28.6; hold. | camera; dance | OK |
+Cut times: 1.6, 5.4, 7.2, 8.4, 11.8, 13.6, 16.6, 18.2, 22.0, 26.0.
+
+**b5. Hook, gags, close-ups.** **Hook:** frame 0 is mid-action (the marker on the pumpkin, Crinkle bouncing); the take
+happens 1.0-1.6 s, so the problem is on screen by 1.6 s. **Gags** (none at the take): 5.9-7.2 Crinkle copies Pip's
+waiting sway (the copycat running joke flipped) → K close of his face; 14.0 Pip's tongue tip copying Crinkle (copycat;
+her face is in B); 18.4-20.6 Crinkle's tongue slides with the marker (trait 2; face in B); 26.8-28.4 wiggle-dance,
+Pip copies (end; faces at 1.5x). Longest gap 6.8 s. **Close-ups:** the half eye and empty paw (B, 3.8 s); every
+change in B with holds 1.0-1.5 s (half eye, O, second eye, heart, smile, light on, glow). No 6 s without a change.
+
+**b6. Sound** (no voices; effects from the episode's banks)
+| Action | Sound |
+|---|---|
+| Crinkle's bounce | two soft boings |
+| Marker stroke | short soft squeaks along the line (Snip mid, Pip higher, Crinkle lower, slower) |
+| The take | the squeak stops; a soft "plip"; Snip's glock phrase breaks off mid-bar, a beat of near-silence |
+| Ears droop | two falling glock notes |
+| Crinkle understands | a low organ note bending down (not a voice) |
+| Marker given (each hand-over) | small tap |
+| Sorry bow | warm pad swell, two soft chords (instruments only; no vocal, choir, crowd or "aww" sample) (gate 1, F1) |
+| Waiting sways | woodblock tick-tock per sway |
+| Pip's waddle | light pitter-pats |
+| Tongue slides | tiny two-note trill (episode) |
+| Hand arrives / leaves | soft whoosh |
+| Click | small click + rising sparkle |
+| Light goes in, paper glows | rising glock run into a warm F add9 chord, soft shimmer |
+| Dance, Pip's copy, Snip's hop | boings in rhythm, the same an octave up; a hop boing |
+| Music by section | 0-1.6 bouncy glock tune; 1.6-5.4 broken off, then a soft pad; 5.4-8.4 patient tick-tock version; 8.4-22.0 the turn phrases (Snip resolves at 9.1, Pip, Crinkle); 22.0-24.5 held careful chord; 24.5-26.0 the swell; 26.0-29.4 bouncy reprise, end chord (no paw-bump, no ending jingle) |
+
+(b7 does not apply: this is the Short.)
+
+**b8. Toolkit work**
+| # | Work | Size |
 |---|---|---|
-| 0.0–3.65 | 45.25–48.9 | left eye drawn, hold; right eye drawn, hold 1.1 s |
-| 3.65–6.65 | 56.5–59.5 | Crinkle's paw draws the big smile in one slow stroke |
-| 6.65–7.85 | 59.5–60.7 | hold |
-| 7.85–10.05 | 66.9–69.1 | Pip's wing draws the red heart nose, two halves |
-| 10.05–11.45 | 69.1–70.5 | hold: the finished drawn face, with no paw, wing or marker in shot (gate 1, F1: Pip's wing is back by 69.1) |
-| 11.45–14.85 | 85.3–88.7 | the hand steadies the pumpkin; tok, tok, tok, tok-tok: eyes, heart and smile become holes |
-| 14.85–16.05 | 88.7–89.9 | hold the cut face; the lid line (tok) |
-| 16.05–17.25 | 90.3–91.5 | the hand lifts the lid off |
-| 17.25–19.05 | 92.6–94.4 | click: the battery light glows just above the opening; hold |
-| 19.05–21.25 | 95.4–97.6 | lowered in: the face glows from the top down; lid on |
-| 21.25–24.25 | 97.6–100.6 | the hand leaves; the glowing smile holds in the dusk; slow push 1.9 → 2.0 |
-| 24.25–27.4 | 103.0–106.15 | pull back to 1.3 (≤0.35x per second): Pip's happy lit face beside it, Snip leaning in with the same smile; end chord |
-Music: its own organ bed, one rising note per change, a warm swell at the glow, no ending jingle (no paw-bump).
+| T1 | Paper-lantern pumpkin (new module, e.g. `episodes/props_lantern.py`, without touching `props_pumpkin`): `PK` outline and size, thin ribbed paper with soft wire-rib lines, top wire ring (dark warm inside, never black), paper stem curl and leaf; marker strokes on `PK.FEATURES` paths with clean partial reveal (`eye_l` 0.5 must read as a "C"); `emissive(level, sweep)`: whole-paper glow (brightest bottom-middle, deeper orange at the edges, ribs soft darker), black ink stays dark on top, red ink glows deep red, the ring glows bright; steady | M |
+| T2 | Paws/wings behind the back + sway (Crinkle and Pip): arms drawn behind the body, angled back | S (check rig2/rig2_pip draw order first) |
+| T3 | The Short script: own timeline, cameras A/B/K, the marker passing paw to paw (a held-by schedule), the hand from straight above, glow fed to `grade_layer`/`halo`/`floor_pool` at the lantern | M |
+**Riskiest, prototype first (stills, B camera, phone-size check):** the drawn unlit face at 21.0, mid-lowering at 24.1,
+full glow at 25.5, and the 1.5x end at 28.0. Pass: it reads as a lantern lit from inside (not a flat yellow blob or
+paint), the face reads at once (dark lines, red heart), the friends' faces stay readable, the glow is the brightest
+thing. Second still: 1.4 s (the take) and 2.4 s (the "C") at phone size.
+
+**b9. Misread check**
+| Moment | Likely wrong reading (age 4) | Staging that rules it out |
+|---|---|---|
+| 0-1.6 | "Snip won't share / hogs the marker" | Frame 0 shows the eye only just started and Pip calmly waiting her turn; Snip never pulls the marker away or holds it out of reach; Snip passes it on at 11.9 without being asked. |
+| 0-1.6 | "Crinkle is mean, he snatched it to tease" | His eyes are on the lantern, never on Snip; sparkle and bounce = excited; a slow pinch, no tug (Snip's paw does not jerk); he goes straight to drawing (purpose), and nobody laughs. |
+| 1.6-3.8 | "Snip is sad because Crinkle spoiled the drawing" | Crinkle's tip never touches (stops 20 short): no stray line; the only change is the unfinished "C", next to Snip's empty paw. |
+| 3.8-5.4 (lesson) | "Snip told him off" | Snip never points, frowns or reaches for the marker; ears droop (sad, not angry); Crinkle works it out alone by looking (eye → paw → ears). |
+| 5.4-8.4 (lesson) | "Crinkle is being punished, sent away" | He chooses the pose, copying Pip; both smile and sway; his calm face in K; his turn comes, from Pip's own wing. |
+| 22-26 | "It's a fire / candle" or "a scary face in the dark" | The click and the lit LED dome are seen first; steady glow, no flame; round eyes, heart, smile; everyone smiles at once. |
+
+**b10. Storyboard frames for gate 1b:** 0.0 (frame 0: marker on the plain lantern, Pip waiting, Crinkle bouncing);
+1.5 (Crinkle lifting the marker from Snip's paw); 3.0 (half eye, empty paw, Snip's ears down, Crinkle looking at the
+eye); 4.4 (marker back in Snip's paw, tip on the line); 6.6 (Pip and Crinkle swaying, paws behind backs); 17.3 (Pip
+handing the marker up to Crinkle); 19.5 (Crinkle drawing the smile, tongue out); 25.5 (the glowing face).
+
+**b11. Hidden key actions:** none. Nothing is cut. The light change is shown in full: the click on (LED dome seen)
+above the ring, the lowering, then the glow.
 
 ## 8. Toolkit work needed
 

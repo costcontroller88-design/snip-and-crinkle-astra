@@ -46,3 +46,7 @@ time a topic comes back.
 - NHS children's therapy, getting dressed: let them try first, start with undressing, no time pressure. https://cambspborochildrenshealth.nhs.uk/child-development-and-growing-up/getting-dressed/
 - YouTube Help, monetization policies (inauthentic content 15 Jul 2025; six low-quality kids principles): https://support.google.com/youtube/answer/1311392
 - YouTube Help, YPP changes (new-creator bar 8,000 h / 20M Shorts from 1 Feb 2027): https://support.google.com/youtube/answer/12843009
+
+## Taking turns (read 8 Oct 2026 for the Ep 11 transformation Short)
+- Dartmouth Health Children's, "Teaching Children How to Share" (N. Sand-Loud MD; no review date shown): sharing grows gradually with age; parents model it by taking turns. https://childrens.dartmouth-health.org/kids-health/teaching-children-how-share
+- Use with Zero to Three, sharing (above): turns first, long turns, never forced.

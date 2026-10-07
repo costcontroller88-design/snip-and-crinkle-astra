@@ -190,3 +190,45 @@ Checked: `ep11_fixes_sb2.md`, `ep11_fixes_r2.md` S1-C1, against the gate-1 notes
 - 10.5-16: dusk brightness stays at about 55 luma or more, with faces readable (carry-forward 1).
 
 **R1 revised (Lead query, 7 Oct): option (a) accepted.** The 3-step limit was a working figure, not a standard. An 830-unit carry of 6-7 slow steps is equally safe if every other condition holds. Revised line: "32-39 s: Crinkle lifts the pumpkin with both paws at belly height, close to his body, and walks it 6-7 slow, steady steps on the flat floor, then sets it down gently with a soft thud no louder than the footstep taps. No wobble, tip, drop, slip or strain. Snip and Pip stay at least 150 units away and never cross his path. His feet stay visible. Nobody sits or climbs on it." Verdict on R1 once built: PASS.
+
+## Transformation Short (8 Oct)
+
+Date: 8 Oct 2026. Gate 1, plan section 7(b) r2 only ("Plain Pumpkin Becomes a Glowing Friend!", 29.4 s).
+**Verdict: FIX (3 small text edits, no redesign).** Lead decisions accepted as given: no cutting on screen, the
+battery light goes in by the grown-up's hand, the lesson is taking turns.
+
+| Check | Result |
+|---|---|
+| 1. Teaching value | PASS. One lesson, concrete for 2-6: wrong (takes the marker mid-turn) → right (gives it back with the tip on the line, waits, gets a turn). Crinkle works it out by looking at Snip's feelings; nobody forces a "sorry"; no punishment. Matches mainstream advice: real sharing comes at 3.5-4, turn-taking comes first, turns are long and end when the child is done, never forced (Zero to Three, in the library; Dartmouth Health Children's, added). |
+| 2. Imitable danger | PASS with F3. No cutting, no candle, no tool. The tea light is only in the hand, seen lit (LED dome) before it goes in, never opened (button-battery rule, library). Markers have no caps; the tips touch only the lantern. Nobody climbs. |
+| 3. Kids quality | PASS with F2. Complete story with a clear takeaway; sad, not angry; nobody laughs at Crinkle; friendly face, early-evening light. |
+| 4. Template risk | Note only. The setting and the glow repeat the episode (the Lead's decision). The lesson repeats Ep 8 (turns, Pip waiting), 4 stories back; the angle is different (grabbing mid-turn vs hogging). Engine B, mistake-maker Crinkle, glock at 104 bpm: all new against Eps 9-11. |
+| 5. Wordless and original | PASS with F1. No text, logos or third-party material. |
+
+### FIX items (paste as written)
+
+| ID | Where | Exact text |
+|---|---|---|
+| F1 | b6, row "Sorry bow" | Replace `warm pad "aww"` with: "warm pad swell, two soft chords (instruments only; no vocal, choir, crowd or 'aww' sample)". |
+| F2 | b4 shot 1 (cut times unchanged) | "Frame 0: ... Eye 20% → 50% (0.0-0.6). Crinkle bounces once (0.0-0.3), leans in (0.3-0.6), pinches the marker's top slowly (0.6-0.9) and lifts it slowly to his chest (0.9-1.6); the marker's whole path from Snip's paw to Crinkle's chest stays in frame; Snip's paw stays where it was and opens." Reason: the plan calls it "a slow pinch" but gave the pinch and lift only 0.6 s together; the lesson's wrong action must be on screen for at least 1.0 s at ages 2-6. Check: the eye-50% point moves from 1.0 to 0.6 s. |
+| F3 | b1 Safety line, add at the end | "From 22.0 s to the end, nobody touches the lantern: no paw, wing or foot on the paper or over the top ring; Crinkle's wiggle-dance arms stay on the side away from the lantern; Pip dances in place." Reason: a lit lantern with a battery tea light inside sits at the characters' reach while they dance (Pip at 845 is at its left edge, 840; Crinkle at 1100 is 20 units from its right edge, 1080). |
+
+### Notes (optional)
+- N1. Why Pip goes before Crinkle is not visible ("she was waiting first" is only in the plan). Optional: in frame 0 Pip stands just behind Snip's shoulder like the next in line.
+- N2. "Glassy eyes": wet shine only, no falling tears; keep it short (2.0-3.8).
+- N3. The upload text should name the turn-taking moment, not safety; no "carving" or "Safety" in the title.
+
+### Carry-forward checks for gate 3 (the Short)
+1. 0.6-1.6: a slow pinch; Snip's paw does not jerk; Crinkle's eyes stay on the lantern, never on Snip (full frames 0.7, 1.2).
+2. 2.0-2.6: Crinkle's tip leaves no mark on the paper.
+3. Markers: no cap anywhere; the tip is never at or near a mouth or beak, including at the tongue gags (shots 2, 7, 9); Pip holds it in her wing, never her beak.
+4. 22.0-24.9: only the hand touches the tea light; the lit LED dome is seen above the ring before it goes in; never opened; steady glow, no flame shape, flicker or smoke; the hand leaves upward.
+5. 24.9-29.4: F3 holds in every frame; no projected beam or hard halo on any face.
+6. Sound: no voice-like sound anywhere (F1); the glow swell (24.5-26.0) rises no more than 6 LU over the previous 2 s (`ebur128`).
+7. Nobody laughs at Crinkle (the 6.2-7.2 smile is shared, not at him).
+8. Upload sheet: Made for Kids = Yes; honest, moment-first title without "Safety"; description line 1 starts "Snip the bunny and Crinkle the bear"; 3-5 hashtags.
+
+### Sources (this section)
+- Zero to Three, "Helping Young Children with Sharing" (library, 8 Oct): https://www.zerotothree.org/resource/helping-young-children-with-sharing/
+- Dartmouth Health Children's, "Teaching Children How to Share" (read 8 Oct 2026): https://childrens.dartmouth-health.org/kids-health/teaching-children-how-share
+- AAP HealthyChildren.org, button and coin batteries (library): https://www.healthychildren.org/English/safety-prevention/at-home/Pages/what-parents-need-to-know-about-button-and-lithium-coin-batteries.aspx
