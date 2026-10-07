@@ -93,6 +93,11 @@ EPISODE_GUIDE > research docs.
 9. **Tokens go to context, not quality.** Quality came from the maker/checker split, evidence and design-first. The
    waste came from one huge Lead session, agents re-reading big files, reviewers holding dozens of full-size frames,
    research with no stopping point, and building before a go/no-go check (section 10).
+10. **Waiting costs as much as working.** Every action an agent takes re-sends its whole working memory (code,
+   edits, frames it looked at), so each "is it done yet?" check during a render costs a full step while nothing
+   happens (7 Oct: three watchers on a 25-min render took the 5-hour limit from 67% to 74% in ~10 min; the render
+   itself, on the Mac's CPU, costs nothing). Wait in as few turns as possible; ask the Lead before a second full
+   render; when usage surges, the Lead checks for stray watchers.
 
 ## 6. The standard (from Episode 11)
 - **One story, three videos:** a 2-4 min landscape mini-episode (1920x1080); a story Short (≤60 s, the same
