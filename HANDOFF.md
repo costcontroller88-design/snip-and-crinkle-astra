@@ -13,15 +13,14 @@ check_video PASS (-14.2 LUFS). Animator's departure to judge: shot 1 is now a 1.
 hearts and the sun; Snip first appears at 12.5 s. A copy waiting in `Videos/` is named `DRAFT-in-review_...` (old
 render; replace it only after gate 2 passes).
 
-Paused at 05:40 on 7 Oct: the 5-hour limit was at ~85% (resets ~09:00 IST). Section 10.10 now lists every token
-saver (no polling, check sheets, ask before a second render, stop above ~85%).
+Blind review round 2 (`reviews/review_video_blind_r2.md`): overall 6 again (hook 6, clarity 6, comedy 6, lesson
+6; sense, wow, look 8). Same misread as round 1: in 0-17 s Crinkle's paw on his pumpkin in the foreground and Snip
+pointing at him read as "Bear won't share", outweighing the faint hearts. The rule allows two rounds, so the Lead
+stopped and asked the owner. Lead's recommendation: one structural fix of 0-31 s (Crinkle and the pumpkin out of
+Pip's opening; Snip points at the dark wall; stronger gold hearts; shorter 16-31 s) and the comedy beats (62 s
+sit-down reads, the stray marker removed, one gag near 44 s), then one final round 3, after the 09:00 limit reset.
 
-Next steps:
-1. Lead: `get_usage`; view `reviews/ep11_friendly_glow_keys.png` at ~1,600 px, mainly 0-16 s (hearts, sunbeams,
-   dusk, Pip hiding) and the 1.75x opening.
-2. Neutral copy to `build/rv2/review_video.mp4`; a NEW fresh-eyes-reviewer, round 2. Pass: overall ≥8, no item
-   below 7. If it fails, stop and give the owner a recommendation (no round 3).
-3. Then stage 4 (the two Shorts), packaging, gate 3. Shorts due Sun 18 and Mon 19 Oct; episode Sat 24 Oct.
+Next steps: wait for the owner's answer on round 3, then brief a NEW animator with a short fix file.
 
 Waiting on the owner: turn on 2-Step Verification and phone verification (custom thumbnails); upload Ep 9 v3
 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode (Wed 21 Oct), text in
