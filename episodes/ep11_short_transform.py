@@ -206,7 +206,7 @@ SN.face(10.0, eyes="normal", brows="think")
 follow(SN, "r", "eye_r", 10.2, 10.8, 0.0, 1.0, U_SN, lead=0.35, n=10)
 SN.face(10.85, eyes="sparkle", mouth="smile_open", brows="up").reach(10.9, 11.3, "r", (860, 1305))
 # ---- shot 6 (11.8-13.6, A): Snip gives the marker to Pip, steps back, sweeps a paw; Pip waddles in
-M_GIVE = (755, 1390)
+M_GIVE = (755, 1404)                              # keys1 K2: low, >= 30 from Pip's face
 SN.to(11.8, 12.05, "io", turn=-0.3, look_x=-8, look_y=6).face(11.8, eyes="happy", mouth="smile_open", brows="up")
 SN.reach(11.85, 12.15, "r", M_GIVE)
 PIP.to(11.75, 11.9, "io", arm_l=-12, elb_l=16, arm_r=12, elb_r=-16).face(11.9, eyes="sparkle", mouth="smile_open")
@@ -216,7 +216,7 @@ SN.reach(12.25, 12.45, "r", (770, 1360)).walk(12.3, 12.8, SN_X1, steps=2)
 SN.to(12.4, 12.7, "io", turn=0.35, look_x=8, look_y=6)
 SN.reach(12.55, 12.85, "r", (820, 1300), "back").reach(13.2, 13.5, "r", (760, 1395))
 PIP.walk(12.45, 13.5, 830, steps=4).to(13.5, 13.65, "io", turn=0.3, look_x=10, look_y=10)
-PIP.reach(12.3, 12.6, "r", (742, 1384))                             # carried flat in front of her tummy
+PIP.reach(12.3, 12.6, "r", (742, 1402))                             # carried flat, low in front of her tummy (K2)
 H_WAIT, H_PIP = (968, 1332), (975, 1322)
 # ---- shot 7 (13.6-16.6, B): Pip draws the heart nose (black), tongue tip out, copying Crinkle
 PIP.to(13.45, 13.75, "io", tilt=7).to(15.45, 15.8, "io", tilt=0)          # head tipped away from the marker
@@ -288,7 +288,7 @@ def marker_pose(t):
         return "sn", "r", 0.0, _ease(t, [(10.9, ANG["sn"]), (11.3, A_REST), (11.85, A_REST), (12.15, A_FLAT)])
     if t < 17.3:
         off = _ease(t, [(12.2, -18.0), (12.6, 0.0), (15.45, 0.0), (15.9, CAP)])
-        ang = _ease(t, [(12.2, A_FLAT), (12.6, A_FLAT), (13.5, A_FLAT), (13.75, ANG["pip"]), (15.45, ANG["pip"]),
+        ang = _ease(t, [(12.2, A_FLAT), (12.6, A_FLAT), (13.62, A_FLAT), (13.8, ANG["pip"]), (15.45, ANG["pip"]),
                         (15.9, ANG["give"])])
         return "pip", "r", off, ang
     if t < 20.95:
@@ -351,14 +351,15 @@ TEA_S = 1.15                            # 69 wide: fits the 84-wide ring
 ARM = H.Arm(upper=720, fore=760)
 T_HAND = (22.0, 24.9)
 T_CLICK = 22.7
-TEA_HOLD = (955, 1250)                  # the light's top, held above the ring
-TEA_IN = (955, 1484)                    # ... on the bottom inside
+TEA_HOLD = (961, 1250)                  # the light's top, held above the ring
+TEA_IN = (961, 1356)                    # let go just inside the ring: only the narrow fingers go in (keys1 K1);
+                                        # the light sits on the bottom inside, out of sight (the paper glows)
 TEA_GRIP = (0, -3)                      # pinched at its top rim, from straight above
 T_GLOW = (23.95, 24.75)
 
 
 def tea_top(t):
-    return _ease(t, [(22.0, (955, 640)), (22.5, TEA_HOLD), (23.7, TEA_HOLD), (24.5, TEA_IN)])
+    return _ease(t, [(22.0, (961, 640)), (22.5, TEA_HOLD), (23.7, TEA_HOLD), (24.35, TEA_IN), (24.5, TEA_IN)])
 
 
 def hand_state(t):
@@ -370,7 +371,7 @@ def hand_state(t):
         hand = "press" if T_CLICK - 0.08 <= t < T_CLICK + 0.14 else "pinch"
         return dict(grip=grip, hand=hand, top=top)
     g0 = (TEA_IN[0] + TEA_GRIP[0], TEA_IN[1] + TEA_GRIP[1])
-    return dict(grip=_ease(t, [(24.5, g0), (24.9, (955, 640))]), hand="pinch", top=None)
+    return dict(grip=_ease(t, [(24.5, g0), (24.9, (961, 640))]), hand="pinch", top=None)
 
 
 def glow_k(t):
@@ -381,10 +382,10 @@ def draw_hand(im, cam, hs, t):
     hand = H.HANDS[hs["hand"]]
     g = hs["grip"]
     sh = (g[0] - 4, g[1] - 1612)                  # the arm comes straight down (the grown-up lowers the whole arm)
-    if hs["top"] is not None:
-        place(im, TEA[t >= T_CLICK], cam.S(hs["top"]), scale=TEA_S)
     W = ARM.wrist_for(sh, g, hand, -1)
     ARM.draw_hand(im, cam, sh, W, hand, -1)
+    if hs["top"] is not None:           # keys1 K1: fingers pinch the far rim, so the light and its LED dome stay in front
+        place(im, TEA[t >= T_CLICK], cam.S(hs["top"]), scale=TEA_S)
 
 
 # ---------------------------------------------------------------- the world
@@ -496,11 +497,11 @@ def render_world(t, d=None, cam=None, bg=None):
 
 # ---------------------------------------------------------------- cameras (plan b4; vertical)
 CAMS = {"A": ((880, 1250), 1.7), "T": ((962, 1300), 2.4), "B2": ((920, 1270), 1.8), "K": ((1060, 1180), 1.9),
-        "B": ((950, 1320), 2.0), "B3": ((990, 1290), 1.6)}   # B3: the light goes in (room for the hand, Crinkle in)
+        "B": ((950, 1320), 2.0)}       # keys1 K1: shot 10 stays on B (plan b4), lantern 44% of the width
 END_C, END_Z = (975, 1215), 1.4
-T_PULL = (26.0, 28.0)
+T_PULL = (26.0, 28.2)                  # 2.0x -> 1.4x, peak 0.32x per second (K1)
 SHOTS = [(0.0, "A"), (0.6, "T"), (2.0, "B2"), (5.4, "A"), (7.2, "K"), (8.4, "B"), (11.8, "A"), (13.6, "B"),
-         (16.6, "A"), (18.2, "B"), (22.0, "B3")]
+         (16.6, "A"), (18.2, "B")]       # shots 9 + 10 on B (22.0 is not a cut)
 CUTS = [s[0] for s in SHOTS[1:]]        # 26.0 is not a cut (the pull back starts)
 
 
@@ -658,6 +659,20 @@ def checks():
             if g < hm[0]:
                 hm = (g, (round(float(tt), 2), who))
     lines.append(f"hand + tea light to nearest head 22.0-24.9: {hm[0]:.1f} at {hm[1]}")
+    lan = _mask_of(lambda im: place(im, LANTERN.paper({}), CAM.S(BASE)))
+    worst = (0, None)
+    for tt in np.arange(23.7, 24.9, 1 / 15):
+        hs = hand_state(tt)
+        lay = L.Layer.of(lan.size, lambda im: draw_hand(im, CAM, hs, tt))
+        PL.inside_clip(lay, CAM)
+        hmk = Image.new("L", lan.size, 0)
+        hmk.paste(lay.img.getchannel("A").point(lambda v: 255 if v > 40 else 0), lay.box[:2])
+        a = np.asarray(ImageChops.multiply(hmk, lan)) > 0
+        a[:int((PL.RING_WORLD[1] + PL.RING_R[1] - CAM.oy) * RES)] = False
+        n = int(a.sum())
+        if n > worst[0]:
+            worst = (n, round(float(tt), 2))
+    lines.append(f"hand pixels over the lantern paper below the ring rim 23.7-24.9: {worst[0]} (max, at {worst[1]})")
     # 5. the lantern from 22.0: nobody's paw, wing or foot on it (arms over it, or anything over the ring)
     for tt in np.arange(22.0, DUR, 0.25):
         if arms_over(tt):
@@ -665,6 +680,20 @@ def checks():
             break
     else:
         lines.append("no arm drawn over the lantern 22.0-29.4 (arms_over empty)")
+    # 6. the camera: zoom and pan speed (per drawing), and every stretch between cuts
+    ts = np.arange(0.0, DUR, 1 / 15)
+    zr, pr = [], []
+    for a, b in zip(ts[:-1], ts[1:]):
+        (na, ca, za), (nb, cb, zb) = shot_at(a), shot_at(b)
+        if na == nb:
+            zr.append((abs(zb - za) * 15, round(float(a), 2)))
+            pr.append((math.hypot(cb[0] - ca[0], cb[1] - ca[1]) * 15, round(float(a), 2)))
+    lines.append(f"camera: max zoom rate {max(zr)[0]:.3f}x/s at {max(zr)[1]}; max pan {max(pr)[0]:.1f} units/s at "
+                 f"{max(pr)[1]}")
+    edges = sorted(set([0.0] + CUTS + list(T_PULL) + [DUR]))          # cuts and camera moves
+    long = [(a, b) for a, b in zip(edges[:-1], edges[1:]) if b - a > 6.0]
+    lines.append(f"stretches > 6 s without a cut or camera move: {long or 'none'}; "
+                 f"longest {max(b - a for a, b in zip(edges[:-1], edges[1:])):.1f} s")
     return lines
 
 
@@ -840,7 +869,7 @@ def build_audio(path):
 # ---------------------------------------------------------------- key sheet
 KEYS = [0.7, 0.9, 1.0, 1.1, 1.3, 1.6, 1.9,                     # the take (camera T)
         3.6, 3.9, 4.0, 4.15, 4.25, 4.4, 4.6,                   # the give-back (B2)
-        22.3, 22.7, 23.4, 23.9, 24.1, 24.35, 24.7, 25.5]       # the light in (B)
+        ] + [round(22.0 + 0.3 * i, 1) for i in range(15)] + [27.0, 28.2]   # the light in (B, 22.0-26.2), pull back
 
 
 def sheet(frames, path, w=480, cols=8):
