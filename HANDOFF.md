@@ -8,10 +8,7 @@ After it: **Episode 12 "Tidy up together" + colour sorting** (Lead go, 8 Oct; RO
 `docs/research-synthesis-oct-2026.md`, confirmed by the 4-way research of 8 Oct); its Short dressed for Diwali, Tue 3 Nov.
 Then 13 potty, 14 bedtime, 15 dressed warm, 16 teeth (ROADMAP). Owner ruled (8 Oct): ✓/✗ icons allowed; never a wet bed on screen.
 
-**Episode 11 (Pip and the Friendly Glow): the episode is parked; the transformation Short is queued (owner, 8 Oct).** Blind round 3 (`reviews/ep11_blind_r3.md`):
-overall 6 again (comedy 5); the old misread is gone; blocking: (1) 0-14 s no visible light source for the hearts,
-(2) 88-90 s the carving hidden under the grown-up's hand. Final render `output/ep11_friendly_glow.mp4` (check_video
-PASS). The owner chose "retro first", then queued the Short (8 Oct).
+**Episode 11 (Pip and the Friendly Glow): the episode is parked; the transformation Short is queued (owner, 8 Oct).** Round 3 scored 6 (`reviews/ep11_blind_r3.md`); render `output/ep11_friendly_glow.mp4`. The owner chose "retro first", then queued the Short (8 Oct).
 
 **Retro done (8 Oct):** `reviews/ep11_retro.md` maps every mistake to a rule. Changes: the evidence rule and tool-call
 budgets on the rules card; `maxTurns` hard caps in every agent file; the safety-checker on Opus; a feasibility pass
