@@ -29,7 +29,7 @@ makes `build/rv3/review_video.mp4`, then a NEW fresh-eyes-reviewer, round 3 (fin
 
 **Owner request (7 Oct):** once Episode 11's final blind round is done, treat the build as a test case: a retro
 from `reviews/ep11_retro_notes.md` (token ledger + findings, kept as we go), then sharpen the agent files (Appendix A,
-`tools/build_agents.py`) for better results and lower token use.
+`tools/build_agents.py`) for better results and lower token use: the mistake log, token checkpoints, and the model and effort per task (requirements at the end of the retro notes).
 
 Channel data: 2 Shorts live (5 and 6 Oct); Studio on 7 Oct showed only the owner's own views. Checkpoint Wed 14 Oct:
 Shorts feed reach, logged in `docs/analytics-log.md` (the owner is signed in to Studio in the built-in browser).

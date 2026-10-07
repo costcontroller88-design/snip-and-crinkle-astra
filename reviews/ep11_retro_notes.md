@@ -51,3 +51,37 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
 13. **"Applied" needs a still at every time the change touches**, not one: the marker went blue at 133 s only.
 14. **The Lead fixing code is a false economy past ~3 steps:** each Lead step re-sends ~170k; diagnosis is the
     Lead's job, the fix belongs to a fresh animator with a short fix file.
+
+## Mistake log (owner request, 7 Oct: note every mistake by the Lead and each agent)
+| # | Who | Mistake | Cost | Rule that would have stopped it |
+|---|---|---|---|---|
+| L1 | Lead | Wrote the staging fix (fixes_r2) itself instead of routing it to the story-designer | 1 infeasible placement; an unchecked new action (the carry) | Section 8 routing, enforced by a Lead checklist |
+| L2 | Lead | Picked the storyboard times itself and left out the lesson beat | A blind sheet that couldn't test the lesson | The designer picks the frames; the lesson beat is always included |
+| L3 | Lead | Priced gate 1b at ~3% of the limit; it cost ~27% | Wrong budget calls all evening | Real numbers from the ledger |
+| L4 | Lead | Treated "build + render" as one token-costly job and nearly waited 3 h for a reset (the owner caught it) | ~3 h of idle time | The animator codes, the Lead runs the render in the background |
+| L5 | Lead | Fixed code itself for ~10 steps at ~170k context each | ~2-3% of the limit | The Lead diagnoses; a fresh animator fixes |
+| L6 | Lead | Accepted "Pip 80 units away at 32.0 s" and "Crinkle's face hidden at 42.1 s" without a still | Possible issues in the final round | A still for every exception an agent reports |
+| A1 | animator | Built shot 4 (10.5-12.5 s) at a 1.9x camera showing Snip smiling beside sad Pip, while reporting "Snip's and Crinkle's outlines stay out of every opening frame" | Nearly spent the final round on it | A still at every shot boundary of a misread-critical window |
+| A2 | animator | Reused round-2 frames for 143.5-146.1 s ("nothing there changed") after sb3 changed that shot | Stale shot with the old staging and the white marker | No frame reuse across rounds without a check that the shot's inputs are unchanged |
+| A3 | animator | "Snip's marker is now blue": only at 133 s | The "knife" read stays at 144 s | Check a still at every time a change touches |
+| A4 | animator | Railing cut-outs still gold after sunset, against fix sb2 | A known misread ("the hearts went into the gate") stays | A fix-by-fix checklist with a still per line |
+| A5 | animator | sb3 attempt 1 spent 272k tokens before reporting that 3 fixes couldn't be built | ~21% of the limit for no sheet | A feasibility pass first: "can each line be built? numbers", within ~5 tool calls |
+| A6 | animator | Reported the 144 s wing clearance as 25 units, then corrected it to -40 | One extra decision round | Numbers come from a measurement, not an estimate |
+| D1 | story-designer | fixes_sb2 asked for beams, a 40-unit reach and a short carry without reading the rig numbers | The infeasible build (A5) | The designer reads positions and sizes from the code before writing a fix |
+| D2 | story-designer | The original plan put Crinkle's paw on the pumpkin beside sad Pip | 2 failed blind rounds (rounds 1 and 2) | The misread check (now plan section 9) |
+| S1 | safety-checker | "At most 3 steps" was a working figure, not checked against the 830-unit carry | One extra round | A safety fix states its source and is checked for feasibility |
+| S2 | safety-checker | The re-check didn't spot the white marker reading as a knife; the blind reviewer did | A safety-relevant read nearly shipped | Gate 3 looks at props near any cutting scene |
+| R- | fresh-eyes-reviewer | No mistakes: cheap (17-19k) and sharp in both storyboard rounds | | Keep as is |
+Earlier mistakes (pilot 1 self-scoring, the whale Short, polling watchers, a story-hinting file name, packaging run
+too early, a wrong commit message) are already in MASTER_PROMPT sections 5 and 13.
+
+## Owner requirements for the retraining (7 Oct)
+1. **Every mistake noted** (the table above), each turned into an agent-file rule or a check.
+2. **Token checkpoints:** a ledger row per step (agent, tokens, % of the limit before and after) and fixed bands,
+   e.g. <60% anything; 60-75% small agents only (reviewer, safety, designer); 75-85% no animator, just save; >85%
+   stop. Each agent stage gets a token budget (e.g. the animator ≤150k per stage) and stops to report when it is
+   reached, instead of running on.
+3. **The right model and effort level per task:** e.g. the hardest judgement (blind review, story design, the build)
+   on the strongest model at high effort; checklists and text (safety, packaging, the Studio log) on lighter
+   models or at lower effort. To verify first: which frontmatter fields Claude Code supports for effort (ask the
+   claude-code-guide agent; don't guess). Decide per task from the ledger: tokens spent vs mistakes made.
