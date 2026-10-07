@@ -90,7 +90,7 @@ too early, a wrong commit message) are already in MASTER_PROMPT sections 5 and 1
 
 ## Coverage review (Lead, 7 Oct, at the owner's request): what the retraining must also cover
 1. **A yardstick, set now, so "sharper" can be measured.** Baseline from Episode 11: ~1.26M subagent tokens for the
-   round-3 work alone (animator ~85%); 3 video rounds + 2 storyboard rounds; 22 logged mistakes. Targets for the next
+   round-3 work alone (animator ~85%); 3 video rounds + 2 storyboard rounds; 18 logged mistakes (L1-L8, A1-A6, D1-D2, S1-S2). Targets for the next
    episode: pass gate 1b in 1 round and gate 2 in ≤2; animator ≤50% of the spend; ≤1 false check claim; total spend
    for one episode ≤1 full 5-hour window. Compare after the next episode; keep, change or roll back.
 2. **The biggest pattern: checks claimed but not done** (A1, A3, A6). One rule for every agent: each claimed check
