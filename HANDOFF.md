@@ -7,6 +7,8 @@ calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTO
 package: the Episode 11 Halloween transformation Short (owner queued it, 8 Oct), slot Sun 18 Oct.** Start with the
 go/no-go (5 lines): no cutting on screen (a drawn face that glows; the light placed by the grown-up's hand), one
 lesson with a wrong → right moment, 15-30 s from the glowing-smiley ending (scored 8). Then gate 1b, build, review.
+After it: **Episode 12 "Tidy up together" + colour sorting** (Lead go, 8 Oct; ROADMAP topic 2; evidence
+`docs/benchmark-topic-ep12.md`); Episode 13 "Potty in time" (owner's request).
 
 **Episode 11 (Pip and the Friendly Glow): the episode is parked; the transformation Short is queued (owner, 8 Oct).** Blind round 3 (`reviews/ep11_blind_r3.md`):
 overall 6 again (comedy 5); the old misread is gone; blocking: (1) 0-14 s no visible light source for the hearts,
