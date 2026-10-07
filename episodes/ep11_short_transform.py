@@ -758,6 +758,9 @@ def bass_bars(music, t0, t1, prog=("F", "Bb", "C", "F"), vel=0.45):
 
 def make_buses():
     music, sfx = A.Mix(DUR), A.Mix(DUR)
+    # a soft dusk bed under everything, so no gap falls silent (check_video, Lead)
+    for t0 in np.arange(0.8, 26.5, 2.0):
+        music.add(float(t0), A.pad([M(53), M(60)], 3.0, 0.1))
     # 0-1.1: the bouncy glock tune, broken off at the tip's lift
     tune(music, 0.0, upto=1.1, vel=0.5)
     bass_bars(music, 0.0, 1.1)
