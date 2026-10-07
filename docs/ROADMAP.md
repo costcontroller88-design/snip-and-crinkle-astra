@@ -22,8 +22,9 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
   the owner said no to a rebuild. The transformation-Short test moves to Episode 11's own transformation Short.
 
 ## Phase 1: Test the new style (20 Oct – 15 Nov)
-- Uploads at 6:00 PM IST, one a day: Sun 18 and Mon 19 Oct the two Episode 11 Shorts; Tue 20 Oct pilot Short;
-  Wed 21 Oct pilot episode; Sat 24 Oct the Episode 11 episode.
+- Uploads at 6:00 PM IST, one a day: Sun 18 Oct the Episode 11 Halloween transformation Short (queued, owner 8 Oct);
+  Tue 20 Oct pilot Short; Wed 21 Oct pilot episode. Mon 19 and Sat 24 Oct are open (the Episode 11 story Short
+  and episode are parked after 3 failed blind rounds).
 - Episode 11: a gentle "friendly glow" Halloween (accepted from the growth-analyst's scan, 6 Oct): Pip is a little
   unsure as evening falls; Snip and Crinkle give a pumpkin a friendly face, the grown-up's hand does any cutting and
   places a battery light, and the glow comforts Pip. Shorts first (the 2025 hits went up 11-16 days before Halloween);
@@ -69,7 +70,7 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 - A printables page for parents and teachers (adults only, no data from children); parent-facing social clips only.
 
 ## Topic pipeline (by demand)
-1. Halloween "friendly glow" (Episode 11): Shorts 18-19 Oct, episode 24 Oct
+1. Halloween "friendly glow" (Episode 11): episode parked (8 Oct); the transformation Short is queued for Sun 18 Oct
 2. Washing hands, brushing teeth or bath time (routine, with a dirty → clean Short)
 3. Diwali rangoli Short (blank floor → colourful; LED lamps, no fire): 3-5 Nov
 4. Colour mixing in the art corner (blank → colourful Short)

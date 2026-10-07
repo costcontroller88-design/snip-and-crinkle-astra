@@ -4,9 +4,11 @@ How we work: `MASTER_PROMPT.md` (**version 3** since 8 Oct: the Episode 11 retro
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`.
 
 **Current phase: 0 (foundations, to 19 Oct); Phase 1 starts 20 Oct. Step: the Episode 11 retro is done. Next work
-package: the owner's decision on Episode 11 (ask first, multiple choice), then that work.**
+package: the Episode 11 Halloween transformation Short (owner queued it, 8 Oct), slot Sun 18 Oct.** Start with the
+go/no-go (5 lines): no cutting on screen (a drawn face that glows; the light placed by the grown-up's hand), one
+lesson with a wrong → right moment, 15-30 s from the glowing-smiley ending (scored 8). Then gate 1b, build, review.
 
-**Episode 11 (Pip and the Friendly Glow): paused by the owner (8 Oct).** Blind round 3 (`reviews/ep11_blind_r3.md`):
+**Episode 11 (Pip and the Friendly Glow): the episode is parked; the transformation Short is queued (owner, 8 Oct).** Blind round 3 (`reviews/ep11_blind_r3.md`):
 overall 6 again (comedy 5); the old misread is gone; blocking: (1) 0-14 s no visible light source for the hearts,
 (2) 88-90 s the carving hidden under the grown-up's hand. Final render `output/ep11_friendly_glow.mp4` (check_video
 PASS). Options put to the owner: (A, the Lead's recommendation) park the episode and salvage the glowing-smiley ending
@@ -27,7 +29,7 @@ the ledger lives in `reviews/epNN_ledger.md`.
 Channel data: 2 Shorts live (5 and 6 Oct); Studio on 7 Oct showed only the owner's own views. Checkpoint Wed 14 Oct:
 Shorts feed reach, logged in `docs/analytics-log.md` (the owner is signed in to Studio in the built-in browser).
 
-Waiting on the owner: the Episode 11 decision; turn on 2-Step Verification and phone verification (custom
+Waiting on the owner: turn on 2-Step Verification and phone verification (custom
 thumbnails); upload Ep 9 v3 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode
 (Wed 21 Oct), text in `reviews/pilot02_upload.md`.
 
