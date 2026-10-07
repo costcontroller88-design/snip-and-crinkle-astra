@@ -20,10 +20,20 @@ stopped and asked the owner. Lead's recommendation: one structural fix of 0-31 s
 Pip's opening; Snip points at the dark wall; stronger gold hearts; shorter 16-31 s) and the comedy beats (62 s
 sit-down reads, the stray marker removed, one gag near 44 s), then one final round 3, after the 09:00 limit reset.
 
-The owner approved round 3 (final). Next steps, after the ~09:00 IST limit reset: brief a NEW animator with
-`reviews/ep11_fixes_r2.md` (storyboard sheet first, checked blind by a NEW fresh-eyes-reviewer in storyboard mode = new gate 1b; render
-only if its retelling matches the story card), then a NEW fresh-eyes-reviewer, round 3
-(`build/rv3/review_video.mp4`).
+The owner approved round 3 (final). **Done 7 Oct evening:** fixes_r2 applied in code; storyboard checks sb2
+(cause only guessed) and sb3 (**gate 1b MATCH**: problem, cause, lesson; `reviews/ep11_storyboard_blind_sb3.md`);
+further fixes in `reviews/ep11_fixes_sb2.md` (opening: the sun sinks in the same shot as the fading hearts; 133 s
+wonder faces + light cone; Safety R1 carry = 7 slow steps; carry restage 32-43 s, closest 170 units). Safety
+re-check PASS with R1 (`reviews/ep11_safety.md`).
+**Next (after the 23:20 IST limit reset):** resume or brief the animator: build the "Carry restage" section of
+fixes_sb2 (shot-11 camera (1100, 1200); Snip and Pip drawn in front of the pumpkin 41.7-43.5 s); give Snip's
+marker a coloured body at 133 s (a white one read as a knife); then the 3x hires pass (`EP11_RES=3 ... --hires`),
+one full render, check_video, key sheet. Then the Lead checks the key sheet, makes `build/rv3/review_video.mp4`,
+and a NEW fresh-eyes-reviewer does round 3 (final).
+
+**Owner request (7 Oct):** once Episode 11's final blind round is done, treat the build as a test case: a retro
+from `reviews/ep11_retro_notes.md` (token ledger + findings, kept as we go), then sharpen the agent files (Appendix A,
+`tools/build_agents.py`) for better results and lower token use.
 
 Channel data: 2 Shorts live (5 and 6 Oct); Studio on 7 Oct showed only the owner's own views. Checkpoint Wed 14 Oct:
 Shorts feed reach, logged in `docs/analytics-log.md` (the owner is signed in to Studio in the built-in browser).

@@ -61,6 +61,7 @@ EYES = {"eye_l": (-48, -112), "eye_r": (48, -112)}
 HEART_C, HEART_W = (0, -84), 40
 SMILE_W, SMILE_TIP_Y = 70, -64        # half width; tips
 SMILE_LO, SMILE_HI = -25, -51         # lower and upper edge at the middle
+CHEEK_C = (-86, -90)                  # Pip's extra red dot (marker only, never cut), left of the smile's tip
 PATTERN_C = (0, -80)                  # centre of the face pattern (for the projection)
 LID_C, LID_R = (0, -152), (44, 10)    # the lid line (seen slightly from above)
 ALL_HOLES = {"eye_l": 1.0, "eye_r": 1.0, "heart": 1.0, "smile": 1.0}
@@ -120,8 +121,9 @@ PATHS = {
     "smile": _smile_edge(True) + _smile_edge(False)[::-1],
     "heart_l": [_heart_xy(2 * math.pi - math.pi * i / 32) for i in range(33)],
     "heart_r": [_heart_xy(math.pi * i / 32) for i in range(33)],
+    "cheek": _circle(CHEEK_C, 3.5, -90, 12),          # Episode 11 round 3: Pip's extra dot (a little red cheek)
 }
-PATH_INK = {"eye_l": INK, "eye_r": INK, "smile": INK, "heart_l": INK_RED, "heart_r": INK_RED}
+PATH_INK = {"eye_l": INK, "eye_r": INK, "smile": INK, "heart_l": INK_RED, "heart_r": INK_RED, "cheek": INK_RED}
 
 
 def _plen(pts):

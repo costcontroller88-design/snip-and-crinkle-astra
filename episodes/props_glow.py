@@ -32,6 +32,7 @@ ORANGE_DARK = (214, 108, 30)
 INK = (40, 34, 46)
 RED = (224, 46, 66)
 GLOW_Y = (255, 206, 60)
+GLOW_BRIGHT = (255, 178, 20)          # Episode 11 round 3: the plan's glow lines, bright and saturated
 DUCK = (255, 214, 64)
 BEAK = (250, 150, 50)
 CRAYON = (72, 140, 230)
@@ -63,10 +64,11 @@ def sketchbook(view="back"):
     else:
         c.rrect(x0, y0, x1, y1, 6, PAGE)
         cx, cy = x0 + 50, y0 + 56
-        for a in (-150, -120, -90, -60, -30, 0, 180):               # glow lines round the pumpkin
-            r0, r1 = 38, 48
+        c.ellipse(cx, cy, 52, 46, mix(PAGE, GLOW_Y, 0.35), sil=False)     # a warm glow behind it (round 3)
+        for a in (-150, -120, -90, -60, -30, 0, 180, 150, 30):      # bright glow lines round the pumpkin
+            r0, r1 = 37, 53
             ca, sa = math.cos(math.radians(a)), math.sin(math.radians(a))
-            c.line([(cx + r0 * ca, cy + r0 * sa * 0.9), (cx + r1 * ca, cy + r1 * sa * 0.9)], 3.2, GLOW_Y)
+            c.line([(cx + r0 * ca, cy + r0 * sa * 0.9), (cx + r1 * ca, cy + r1 * sa * 0.9)], 4.6, GLOW_BRIGHT)
         c.ellipse(cx, cy, 32, 27, ORANGE)
         for dx in (-14, 0, 14):
             c.arc(cx + dx, cy, 8, 25, 70, 290, 1.6, ORANGE_DARK)

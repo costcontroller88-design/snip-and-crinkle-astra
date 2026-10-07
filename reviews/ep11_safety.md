@@ -169,3 +169,24 @@ Not verified: any national NHS page on fear of the dark, or a RoSPA Halloween pu
 F1-F6 were small, exact text edits, so the Lead made them in `reviews/ep11_plan.md` (rule: don't use an agent for a
 small job) instead of re-running the story-designer. The carry-forward checks 1-7 go to the animator's brief and to
 gate 3. Gate 1: PASS with fixes applied.
+
+## Re-check 7 Oct 2026 (gate 1, restaged shots only): FIX (1 item; the rest PASS)
+
+Checked: `ep11_fixes_sb2.md`, `ep11_fixes_r2.md` S1-C1, against the gate-1 notes above. No new sources needed.
+
+| ID | Item | Verdict |
+|---|---|---|
+| R1 | Pumpkin carry 32-39 s | **FIX.** Neither file describes a lift or carry (sb2 says "32 s unchanged"); gate 1 allowed only a slow turn on the spot, "no lift, tip, wobble or drop". |
+| - | Light near faces (0-10 s beams, 130-136 s cone, 141-148 s wing) | PASS with the checks below. |
+| - | Grown-up's hand, tools (88.5, 94.5) | PASS; unchanged from F1/F3. Re-check the frames. |
+
+**R1 exact text for the plan/animator brief:** "32-39 s: Crinkle lifts the pumpkin with both paws at belly height, keeps it close to his body, takes at most 3 slow steps, and sets it down gently on the bench-side floor with a soft thud (no louder than the footstep taps). No wobble, tip, drop or strain-slip. Snip and Pip stand clear, at least 150 units from his feet and not in his path. No one sits, stands or climbs on or beside the pumpkin. His feet and the floor stay visible."
+
+**Frame checks (gate 3 and the sb2 re-check frames):**
+- 1, 5, 8.5: no beam crosses Pip's face; the heart sits on the tummy only.
+- 133: the cone from the pumpkin stays outside x 880-1040 below y 1250; no pattern, bloom or hard halo on any eye, muzzle or beak.
+- 144: at least 30 units between the light's soft edge and Pip's beak (carry-forward 2).
+- 88.5: no blade, tool, glint or sawing; the cutting hand is hidden. 94.5: tea light touched only by the hand, steady, not open, no flame shape.
+- 10.5-16: dusk brightness stays at about 55 luma or more, with faces readable (carry-forward 1).
+
+**R1 revised (Lead query, 7 Oct): option (a) accepted.** The 3-step limit was a working figure, not a standard. An 830-unit carry of 6-7 slow steps is equally safe if every other condition holds. Revised line: "32-39 s: Crinkle lifts the pumpkin with both paws at belly height, close to his body, and walks it 6-7 slow, steady steps on the flat floor, then sets it down gently with a soft thud no louder than the footstep taps. No wobble, tip, drop, slip or strain. Snip and Pip stay at least 150 units away and never cross his path. His feet stay visible. Nobody sits or climbs on it." Verdict on R1 once built: PASS.

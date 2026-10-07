@@ -8,7 +8,8 @@ Run:  python3 episodes/ep11_friendly_glow.py --keys      (key sheet -> reviews/e
       python3 episodes/ep11_friendly_glow.py --cuts      (cut times for check_video)
       python3 episodes/ep11_friendly_glow.py --still T   (one frame through the shot camera -> build/)
       python3 episodes/ep11_friendly_glow.py --check     (the Lead's L-check sheet -> reviews/ep11_check_L.png)
-      EP11_RES=3 python3 episodes/ep11_friendly_glow.py --hires40b   (shot 40b at 3x -> build/ep11_40b/)
+      EP11_RES=3 python3 episodes/ep11_friendly_glow.py --hires   (every shot closer than 2x, at 3x -> build/ep11_hi_r3/;
+                                                                  run it before --render)
       python3 episodes/ep11_friendly_glow.py --render    (audio + video -> output/ep11_friendly_glow.mp4)
 Any other flag is refused (never "render everything" by accident).
 
@@ -186,28 +187,69 @@ class EpPipPerf(RP.PipPerf):
         return self.to(t0, t1, ease, arm_r=a, elb_r=b)
 
 
-# ---------------------------------------------------------------- the cast (positions: plan + Lead L5)
-SN_OPEN, CR_OPEN, PIP_OPEN = 400, 805, 1240       # opening: heads apart; Pip in the right heart's beam
+# ---------------------------------------------------------------- the cast (positions: plan + Lead L5; round 3 S1/S2)
+# Round 3 (S1): Crinkle hums at the bench with his eyes closed, Snip sketches beside him; Pip is alone in the sun's
+# light far right (the opening shots see only her, the railing, the wall and the sun). The pumpkin stands by the door
+# beside the bench, out of every shot and touched by nobody until Crinkle fetches it for the plan (32-39).
+SN_OPEN, CR_OPEN, PIP_OPEN = 850, 440, 1240
+PK_EARLY = (130, PK.BASE[1])                      # the pumpkin by the door (sprite x 0-260: bench shots start >= 290)
 SN_BENCH, PIP_BENCH, CR_BENCH = 110, 310, 500     # at the bench (85-98.4): heads apart, Pip in front between,
                                                   # everyone well back from the pumpkin
 SN_BACK, PIP_BACK = 490, 690                      # shot 33 step back
 CR_ASIDE = 1400                                   # shot 37 step aside
 PIP_WING_X = 812                                  # shots 40a-40c
 SN_EYES, CR_SMILE, PIP_NOSE = 790, 1080, 845      # where each one draws on the pumpkin
-CR_HELP = 1000                                    # after the peekaboo, Crinkle stands at the pumpkin's back right
-PIP_HIDE = 790                                    # hiding behind Crinkle (805)
+CR_HELP = 990                                     # Crinkle after setting the pumpkin down (its back right)
+PIP_HIDE = 520                                    # round 3 (S2): tucked right behind Crinkle (470)
+PIP_PEEK = 690                                    # ... her head out at his right side, toward Snip
+PIP_OUT = 735                                     # out in front of him, at his right
+CR_COMFORT = 570                                  # Crinkle crouched beside her
+PIP_DOT = 752                                     # round 3 (C1): beside the pumpkin for the extra dot
 
 # the sun's light through the railing hearts (round 2, B2): one beam per cut-out (left to right in P.RAIL_HEARTS)
-WALL_HEART = (1104, 1300, 112)        # the left beam: a big gold heart on the wall, between Crinkle and Pip
+WALL_HEART = (1118, 1300, 112)        # the left beam: a big gold heart on the wall, left of Pip
 WALL_HEART2 = (1222, 1300, 112)       # the middle beam on the wall (behind Pip, when she isn't in it)
 BODY_HEART = (1228, 1438, 60)         # the middle beam caught on Pip (her tummy, then her wing): >= 30 from her face
-FLOOR_HEART = (1182, 1516, 132, 0.42)  # the right beam: down onto the deck in front of her (seen flat)
 
-SN = R.Perf2(R.Puppet("snip", 1.15), seed=1, x=SN_OPEN, y=FLOOR, turn=0.4, eyes="happy", mouth="smile",
+
+def _t_sun_gone():
+    """Sb3: the first drawing on which props_porch no longer draws the sun (its last sliver behind the hill)."""
+    d = int(P.T_SUN0 * K.DPS)
+    while P.sun_pos(d / K.DPS)[1] < P.SUN_Y1 - 2:
+        d += 1
+    return d / K.DPS
+
+
+T_LIGHT_OUT = _t_sun_gone()           # sb3: the last sliver of sun and the last heart go out on this drawing
+
+
+class CarryPerf(R.Perf2):
+    """rig2's Perf2 plus `still_arms`: windows in which a walk does not swing the arms (Crinkle carrying)."""
+
+    def __init__(self, puppet, seed=0, **init):
+        super().__init__(puppet, seed, **init)
+        self.still_arms = []
+
+    def state(self, t, drawing=None):
+        s = super().state(t, drawing)
+        if any(a <= t <= b for a, b in self.still_arms):
+            for t0, t1, x0, x1, n in self.walks:
+                if t0 <= t <= t1:
+                    T = (t1 - t0) / n
+                    env = min(1.0, (t - t0) / (0.5 * T), (t1 - t) / (0.5 * T))
+                    ph = ((t - t0) / (2 * T)) % 1.0
+                    sw = 14 * env * math.sin(2 * math.pi * ph)
+                    s["arm_l"] -= sw
+                    s["arm_r"] -= sw
+        return s
+
+
+SN = R.Perf2(R.Puppet("snip", 1.15), seed=1, x=SN_OPEN, y=FLOOR, turn=-0.4, eyes="happy", mouth="smile",
              brows="calm")
-CR = R.Perf2(RP.crinkle(1.2), seed=2, x=CR_OPEN, y=FLOOR, turn=0.6, eyes="closed", mouth="hum")
+CR = CarryPerf(RP.crinkle(1.2), seed=2, x=CR_OPEN, y=FLOOR, turn=0.15, eyes="closed", mouth="hum")
 PIPA = EpPip(0.9)
 PIP = EpPipPerf(PIPA, seed=3, x=1150, y=FLOOR, turn=-0.15, eyes="happy", mouth="smile_open")
+
 
 
 # ---------------------------------------------------------------- tool tracks (a marker's tip; where it points)
@@ -335,124 +377,171 @@ BUMP_SPARK, BUMP_SPARK_S = (962, 1340), 0.5     # P7: a bigger sparkle, centred 
 
 
 # ================================================================ ACT 1 (0-32): the hearts go, Pip is unsure
-# ---- shot 1 (0-4): golden sunset; soft beams from the low sun through the railing hearts to the wall, the deck and
-#      Pip; frame 1: Pip mid-hop into the middle beam (the heart lands on her tummy). Crinkle polishes, eyes closed.
-SN.reach(0.0, 0.01, "l", (430, 1325)).to(0.0, 0.01, "io", look_y=6, look_x=4)
-scribble(SN, "r", (468, 1206), 0.0, 4.0)
-CR.reach(0.0, 0.01, "r", (884, 1405))
-circle_rub(CR, "r", (880, 1400), 14, 0.01, 15.6)
+# Off screen until 14.85: Snip sketches (book in his RIGHT paw, crayon in his LEFT until the plan, so the left paw is
+# free to point at Pip); Crinkle stands at the bench, paws folded on his tummy, humming with his eyes closed.
+SN.reach(-0.1, -0.05, "r", (SN_OPEN - 30, 1325)).to(-0.1, -0.05, "io", look_y=6, look_x=-4)
+scribble(SN, "l", (SN_OPEN - 68, 1206), 0.0, 15.4, step=0.16)
+CR.reach(-0.1, -0.05, "l", (CR_OPEN - 24, 1352)).reach(-0.1, -0.05, "r", (CR_OPEN + 24, 1352))
+for _i, _tt in enumerate(np.arange(0.0, 16.0, 1.2)):                     # a slow humming sway
+    CR.to(_tt, _tt + 1.2, "io", lean=2.0 if _i % 2 == 0 else -2.0)
+CR.to(16.0, 16.4, "io", lean=0.0)
+# ---- shot 1 (0-10.5, one held shot, sb3): the sun, the railing cut-outs, the wall hearts and Pip (no beams);
+#      frame 1: Pip mid-hop into the light (the heart lands on her tummy)
 PIP.hop(-0.4, 0.45, 1, 30).to(-0.4, 0.45, "io", x=PIP_OPEN, turn=0.0)
 PIP.to(0.5, 0.9, "io", look_y=12, look_x=-2, head_dy=2).flap(0.9, 1.7)
 PIP.face(0.6, eyes="sparkle", mouth="smile_open", brows="up").tuft(0.6, 1.0, "up")
 PIP.to(1.9, 2.2, "io", look_y=4, look_x=-10).to(2.8, 3.1, "io", look_y=12, look_x=-2)   # the wall heart, her own
 PIP.face(2.4, eyes="happy", mouth="smile", brows="calm")
-# ---- shot 2 (4-6): she covers it with her wing, held flat: now the heart is on her wing; giggle
+# 4-5.8: she covers it with her wing, held flat: now the heart is on her wing; giggle; by 5.8 the wing is down and
+# the heart is back on her tummy
 PIP.set(4.05, flat_r=1.0)
 PIP.to(4.0, 4.4, "io", look_y=12, look_x=-2, head_dy=2, tilt=-4)
 PIP.reach_blade(4.05, 4.55, (BODY_HEART[0] + 2, BODY_HEART[1] + 2), bend=-1)
 PIP.face(4.6, eyes="sparkle", mouth="smile_open", brows="up").tuft(4.6, 4.7, "flick")
 PIP.to(4.7, 4.9, "io", tilt=4).to(5.1, 5.3, "io", tilt=-3).to(5.5, 5.7, "io", tilt=0)
-scribble(SN, "r", (468, 1206), 4.0, 6.0, step=0.18)
-# ---- shot 3 (6-10): one camera on the sun, the beams and the hearts: the sun sinks behind the hill, the beams
-#      thin out, the heart fades under her wing (gone 9.4)
-PIP.face(6.4, eyes="happy", mouth="smile", brows="calm")
-PIP.to(7.2, 7.6, "io", look_y=-6, look_x=12, hturn=0.25, head_dy=0).face(7.3, eyes="normal", mouth="o", brows="up")
-PIP.to(8.2, 8.6, "io", look_y=12, look_x=-2, hturn=0.0, head_dy=3).face(8.2, eyes="normal", mouth="flat",
-                                                                           brows="worry")
-PIP.to(8.6, 8.9, "io", sq=1.05).to(8.9, 9.3, "io", sq=1.0)          # a little stretch after the fading light
-# ---- shot 4 (10-12.5): close on the empty wing (10.0-11.7), then she looks up at the darkened wall
-PIP.face(10.1, eyes="normal", mouth="sad", brows="sad").tuft(10.2, 10.8, "droop")
-PIP.to(10.0, 10.4, "io", look_y=14, look_x=-4, head_dy=4, tilt=-3)
+PIP.set(5.4, flat_r=0.0).rest_wings(5.4, 5.8)
+# 6-10.5 (same shot): she stands still, wings out away from her body; the sun sinks behind the hill, the hearts
+# fade together (no sparkle) and go out with the sun's last sliver; at 8.8 she looks from her tummy to the sun
+PIP.face(6.0, eyes="happy", mouth="smile", brows="calm")
+PIP.reach(6.0, 6.5, "l", (PIP_OPEN - 150, 1372), bend=1).reach(6.0, 6.5, "r", (PIP_OPEN + 150, 1372), bend=-1)
+PIP.to(6.0, 6.5, "io", look_y=12, look_x=-2, head_dy=2)
+PIP.to(7.6, 7.9, "io", look_y=14, look_x=-2).face(7.7, eyes="normal", mouth="smile", brows="up")
+PIP.to(8.8, 9.15, "io", look_y=-8, look_x=14, hturn=0.2, head_dy=0).face(8.8, eyes="normal", mouth="o", brows="up")
+PIP.face(T_LIGHT_OUT + 0.15, eyes="normal", mouth="flat", brows="worry")
+# ---- shot 4 (10.5-12.5, close 1.9): the empty tummy: a palms-up "where?" shrug (nothing touches her tummy), the
+#      tuft droops, then she looks at the hill's fading glow
+PIP.to(10.5, 10.85, "io", look_y=12, look_x=-2, hturn=0.0, head_dy=3)
+PIP.reach(10.6, 10.95, "l", (PIP_OPEN - 135, 1316), bend=1).reach(10.6, 10.95, "r", (PIP_OPEN + 135, 1316), bend=-1)
+PIP.to(10.6, 10.95, "io", sq=0.96, tilt=-6).face(10.6, eyes="normal", mouth="sad", brows="worry")
+PIP.tuft(10.95, 11.5, "droop").to(11.2, 11.5, "io", sq=1.0)
 T_LOOKUP = 11.75
-PIP.set(T_LOOKUP, flat_r=0.0).rest_wings(T_LOOKUP - 0.05, T_LOOKUP + 0.35)
-PIP.to(T_LOOKUP, T_LOOKUP + 0.5, "io", look_y=-22, look_x=-4, head_dy=0, hturn=-0.1, tilt=-10)
+PIP.rest_wings(T_LOOKUP - 0.1, T_LOOKUP + 0.35)
+PIP.to(T_LOOKUP, T_LOOKUP + 0.5, "io", look_y=-6, look_x=14, head_dy=0, hturn=0.25, tilt=0)
 PIP.face(T_LOOKUP + 0.2, eyes="normal", mouth="sad", brows="worry")
-SN.face(10.0, eyes="normal", mouth="smile", brows="calm").to(10.0, 10.4, "io", look_x=4, look_y=6)
-scribble(SN, "r", (468, 1206), 10.0, 14.9, step=0.2)
-# ================================================================ shot 5 (12.5-16.6): breeze; poof; she hides
-BREEZE = 12.6
-PIP.to(12.5, 12.75, "io", hturn=0.2, look_x=10, look_y=0, tilt=0)
-PIP.puff_up(12.8, hold=0.35, out=0.5)
-PIP.face(13.45, eyes="wide", mouth="o", brows="worry")
-T_RUN0, T_RUN1 = 13.5, 15.6                       # the waddle-run to Crinkle: >= 2 s, in view all the way
-PIP.run(T_RUN0, T_RUN1, 1012).to(13.5, 13.7, "io", turn=-0.5, hturn=0.0)     # in view all the way: she stops
-PIP.to(15.6, 15.8, "io", turn=0.3, lean=6, look_x=0, look_y=0).tuft(15.6, 16.0, "low")   # half behind him, peeking
-PIP.face(15.9, eyes="wide", mouth="flat", brows="worry")
-PIP.to(16.1, 16.4, "io", look_x=-10, look_y=-4)
-PIP.to(16.6, 16.85, "io", x=PIP_HIDE, lean=0, turn=0.0)                        # ... ducks back
-# ================================================================ shot 6 (15-22): "behind you!" peekaboo
-SN.face(15.3, eyes="wide", mouth="o", brows="up").ears(15.3, 15.6, "curious")
-SN.reach(15.6, 16.0, "r", (690, 1250), "back")                          # points at Crinkle's back
-SN.face(16.0, eyes="normal", mouth="o", brows="up").ears(16.1, 16.4, "perk")
-CR.reach(15.6, 15.9, "r", CR.a.anchor(CR.state(15.9))(70, -230))         # cloth into the scarf
-CR.to(15.9, 16.2, "io", arm_r=10, elb_r=-14)
-CR.face(16.3, eyes="normal", mouth="o", brows="up")
-CR.to(16.6, 17.0, "io", hturn=0.9, look_x=12)                          # over his left shoulder (our right)
-PIP.to(17.0, 17.4, "io", x=596, lean=-6, turn=-0.3).face(17.0, eyes="normal", mouth="smile", brows="up")
-PIP.to(17.9, 18.2, "io", x=PIP_HIDE, lean=0, turn=0.0)
-CR.to(18.0, 18.4, "io", hturn=-0.9, look_x=-12)                        # ... and the other way
-PIP.to(18.5, 18.9, "io", x=1012, lean=6, turn=0.3)
-PIP.to(19.2, 19.5, "io", x=PIP_HIDE, lean=0, turn=0.0)
-CR.to(19.3, 19.7, "io", hturn=0.9, look_x=12)
-SN.face(17.5, eyes="happy", mouth="smile_open", brows="calm")
-SN.reach(17.4, 17.7, "r", SN.a.face_point(SN.state(17.7), (12, -52)))  # giggles behind a paw
-SN.arms_front.append((17.4, 20.5))
-SN.reach(20.3, 20.6, "r", (520, 1330)).face(20.4, eyes="normal", mouth="smile", brows="calm")
-SN.ears(20.4, 20.8, "perk")
-CR.to(20.2, 20.6, "io", hturn=0.0, look_x=0)
-CR.face(20.4, eyes="normal", mouth="smile", brows="up")
-CR.walk(20.7, 21.4, CR_HELP).to(20.7, 21.0, "io", turn=-0.3)            # steps aside: there she is
-PIP.walk(21.1, 21.8, 770).face(21.5, eyes="wide", mouth="flat", brows="worry")
-PIP.to(21.8, 22.1, "io", look_y=-10, look_x=8, head_dy=4, tilt=6).face(22.0, eyes="normal", mouth="flat",
-                                                                       brows="sorry")
-CR.face(21.6, eyes="normal", mouth="smile", brows="calm").to(21.5, 21.9, "io", look_x=-10, look_y=8)
-# ================================================================ shot 7 (22-26): Crinkle crouches to her level
-CR.to(22.2, 22.8, "io", sq=0.86, lean=-6, head_dy=10)
-PIP.point(22.9, 23.3, "l", (900, 760))                                   # the dark wall under the roof
-PIP.to(22.9, 23.3, "io", look_y=-16, look_x=0, tilt=0, turn=0.0)
-PIP.unpoint(23.7, 23.9, "l").hug_self(23.9, 24.3).face(23.9, eyes="worried", mouth="wobble", brows="sad")
-CR.to(23.2, 23.6, "io", look_y=-14, look_x=-8).face(23.3, eyes="normal", mouth="flat", brows="worry")
-CR.to(23.9, 24.2, "io", look_y=8, look_x=-10).face(24.3, eyes="happy", mouth="smile", brows="calm")
-TUFT_PAT = 25.0
-_ps = PIP.state(TUFT_PAT)
-CR.reach(24.5, TUFT_PAT, "l", PIPA.tuft_root(_ps))
+# ---- shot 4b (12.5-14.85): the dark, empty wall where her hearts were (held); then the breeze: wide eyes and
+#      worried brows (sb3: no shut eyes; blinks stay <= 0.15 s, none round the puff)
+BREEZE = 13.3
+PIP.no_blink.append((12.9, 14.3))
+PIP.to(BREEZE - 0.1, BREEZE + 0.15, "io", hturn=0.2, look_x=10, look_y=0, tilt=0)
+PIP.puff_up(BREEZE + 0.2, hold=0.35, out=0.5, face=False)
+PIP.face(BREEZE, eyes="wide", mouth="o", brows="worry")
+T_RUN0, T_RUN1 = 14.25, 16.15                     # the waddle-run to the bench: out of the wall shot, into the bench shot
+PIP.run(T_RUN0, T_RUN1, PIP_HIDE).to(T_RUN0, T_RUN0 + 0.2, "io", turn=-0.5, hturn=0.0)
+PIP.to(T_RUN1, T_RUN1 + 0.25, "io", turn=0.0, lean=0).tuft(T_RUN1, T_RUN1 + 0.4, "low")
+PIP.face(T_RUN1, eyes="wide", mouth="flat", brows="worry")
+# ================================================================ shot 5 (14.85-20.4): she hides behind Crinkle
+# round 3 (S2): Snip sees her run past and points AT HER (his paw by her head, nowhere near Crinkle); Crinkle opens
+# his eyes, turns, finds her: surprise, then a gentle smile (never guilty or caught). One action at a time.
+SN.face(15.45, eyes="wide", mouth="o", brows="up").ears(15.45, 15.75, "curious")
+SN.to(15.45, 15.85, "io", look_x=-14, look_y=10, hturn=-0.2)
+PIP.to(16.45, 16.8, "io", x=PIP_PEEK, lean=7, turn=0.25, look_x=-8, look_y=-10)     # peeks out at his right side
+PIP.face(16.5, eyes="normal", mouth="flat", brows="worry")
+SN.reach(16.85, 17.2, "l", (PIP_PEEK + 28, 1150), "back")              # "there she is!": his paw just above her (her
+                                                                        # head in front of his arm, never covered)
+SN.face(17.0, eyes="normal", mouth="smile_open", brows="up").ears(17.0, 17.3, "perk")
+CR.face(17.35, eyes="normal", mouth="o", brows="up")                    # Crinkle opens his eyes ...
+CR.to(17.45, 17.85, "io", hturn=0.8, look_x=12, look_y=12)              # ... turns to his right and looks down
+CR.face(17.55, eyes="wide", mouth="o", brows="up")                      # surprise ...
+CR.face(17.95, eyes="happy", mouth="smile", brows="calm")               # ... a gentle smile
+PIP.face(18.55, eyes="normal", mouth="smile", brows="sorry").to(18.5, 18.8, "io", look_x=-6, look_y=-14)
+SN.reach(18.7, 19.0, "l", (SN_OPEN - 60, 1330)).face(18.8, eyes="normal", mouth="smile", brows="calm")
+PIP.walk(18.9, 19.4, PIP_OUT).to(18.9, 19.4, "io", lean=0, turn=0.0)     # she comes out in front of him
+CR.reach(18.9, 19.3, "l", (CR_OPEN - 70, 1380)).reach(18.9, 19.3, "r", (CR_OPEN + 70, 1380))   # paws unfold
+CR.walk(19.45, 19.85, CR_COMFORT, steps=2).to(19.45, 19.85, "io", turn=0.35, hturn=0.2)
+CR.to(19.85, 20.3, "io", sq=0.86, lean=-6, head_dy=10, look_x=10, look_y=10)         # crouches to her level
+# ---- 20.0-21.8: she points at the dark wall where her hearts were (cut to it: 20.4-21.8, empty)
+PIP.point(19.95, 20.3, "l", (1100, 1000))
+PIP.to(19.95, 20.3, "io", look_y=-16, look_x=10, tilt=0, turn=0.1).face(20.0, eyes="normal", mouth="flat",
+                                                                          brows="worry")
+CR.to(20.1, 20.4, "io", hturn=0.5, look_x=12, look_y=-12)
+# ---- shot 7 (21.8-25.2): she hugs herself; Crinkle comforts her (a pat on her tuft)
+PIP.unpoint(21.7, 21.85, "l").hug_self(21.85, 22.25).face(21.85, eyes="worried", mouth="wobble", brows="sad")
+PIP.to(21.85, 22.2, "io", look_y=4, look_x=-6, turn=0.0)
+CR.to(21.8, 22.1, "io", hturn=0.2, look_x=10, look_y=10).face(21.9, eyes="normal", mouth="flat", brows="worry")
+CR.face(22.75, eyes="happy", mouth="smile", brows="calm")
+TUFT_PAT = 23.85
+CR.reach(23.3, TUFT_PAT, "r", (PIPA.tuft_root(PIP.state(TUFT_PAT))[0], PIPA.tuft_root(PIP.state(TUFT_PAT))[1] - 34))
 PIP.tuft(TUFT_PAT, TUFT_PAT + 0.1, "low").tuft(TUFT_PAT + 0.25, TUFT_PAT + 0.55, "up").tuft(TUFT_PAT + 0.3, 0, "flick")
-PIP.face(TUFT_PAT + 0.3, eyes="happy", mouth="smile", brows="calm").rest_wings(25.2, 25.6)
-PIP.to(25.2, 25.6, "io", sq=1.0, head_dy=0, look_y=-6, look_x=10)
-CR.reach(25.4, 25.8, "l", (870, 1320)).to(25.5, 26.0, "io", sq=1.0, lean=0, head_dy=0)
-# ================================================================ shot 8 (26-30): Snip's idea
-# round 2 (P2): a clear thinking pose (paw on chin, eyes up, a "hmm" tilt), not a sad droop
-SN.face(26.2, eyes="normal", mouth="flat", brows="think").ears(26.2, 26.6, "curious")
-SN.to(26.2, 26.6, "io", look_x=10, look_y=-18, tilt=7)
-SN.reach(26.2, 26.6, "r", SN.a.face_point(SN.state(26.6), (6, -8)))     # paw on chin
-SN.arms_front.append((26.2, 27.95))
-SN.to(26.75, 27.0, "io", tilt=-4).to(27.0, 27.25, "io", tilt=5)             # hmm ... hmm
-SN.to(27.25, 27.55, "io", look_x=14, look_y=10, hturn=0.3, tilt=0)          # ... the shiny pumpkin
+PIP.face(TUFT_PAT + 0.35, eyes="happy", mouth="smile", brows="calm").rest_wings(24.5, 24.9)
+PIP.to(24.5, 24.9, "io", sq=1.0, head_dy=0, look_y=-8, look_x=-10)
+PIP.walk(25.0, 25.6, 650, steps=3)                                       # beside Crinkle (the plan stays clear)
+CR.reach(24.6, 25.0, "r", (CR_COMFORT + 70, 1380)).to(24.7, 25.2, "io", sq=1.0, lean=0, head_dy=0, look_x=6,
+                                                       look_y=4)
+# ================================================================ shot 8 (25.2-29.3): Snip's idea
+# a clear thinking pose (paw on chin, eyes up, a "hmm" tilt), then he looks over at the pumpkin by the door (off
+# screen, left): idea!
+T_THINK = (25.3, 27.75)
+SN.face(25.3, eyes="normal", mouth="flat", brows="think").ears(25.3, 25.7, "curious")
+SN.to(25.3, 25.7, "io", look_x=-6, look_y=-18, tilt=-7, hturn=0.0)
+SN.reach(25.3, 25.7, "l", SN.a.face_point(SN.state(25.7), (-6, -8)))     # paw on chin
+SN.arms_front.append(T_THINK)
+SN.to(25.9, 26.15, "io", tilt=4).to(26.15, 26.4, "io", tilt=-5)             # hmm ... hmm
+SN.to(26.9, 27.3, "io", look_x=-14, look_y=8, hturn=-0.3, tilt=0)          # ... the pumpkin by the door
 T_IDEA_SN = 27.8
-SN.reach(T_IDEA_SN, T_IDEA_SN + 0.25, "r", (520, 1330))
+SN.reach(T_IDEA_SN, T_IDEA_SN + 0.25, "l", (SN_OPEN - 68, 1206))
 SN.ears(T_IDEA_SN, T_IDEA_SN + 0.3, "perk").face(T_IDEA_SN, eyes="sparkle", mouth="smile_open", brows="up")
 IDEAS.append((T_IDEA_SN, SN))
-SN.to(28.2, 28.5, "io", hturn=0.0, look_x=2, look_y=8)
-scribble(SN, "r", (468, 1206), 28.4, 29.9, rx=12, ry=6, step=0.1)
-# ================================================================ shot 9 (30-32): the plan
-T_FLIP = 30.2
-SN.reach(29.9, 30.2, "r", (500, 1330)).reach(30.0, 30.4, "l", (460, 1262))
-SN.face(30.6, eyes="happy", mouth="smile_open", brows="up")
-# ================================================================ shot 10 (32-39): Pip's turn; the dance
-PIP.to(32.3, 32.6, "io", tilt=-10, look_x=-14, look_y=0).face(32.3, eyes="normal", mouth="o", brows="up")
+SN.to(28.1, 28.4, "io", hturn=0.0, look_x=-4, look_y=8)
+scribble(SN, "l", (SN_OPEN - 68, 1206), 28.1, 29.05, rx=12, ry=6, step=0.1)
+PIP.to(26.0, 26.4, "io", look_x=12, look_y=-10).face(26.0, eyes="normal", mouth="smile", brows="up")
+CR.to(26.2, 26.6, "io", hturn=0.5, look_x=12, look_y=-4)
+# ================================================================ shot 9 (29.3-32.0): the plan (close, >= 2.2x)
+T_FLIP = 29.35
+SN.reach(29.05, 29.35, "l", (SN_OPEN - 2, 1210)).reach(29.4, 29.75, "l", (SN_OPEN - 100, 1330))   # turns the page
+SN.to(29.2, 29.6, "io", look_x=-8, look_y=-4)
+SN.face(29.8, eyes="happy", mouth="smile_open", brows="up")
+PIP.face(30.4, eyes="sparkle", mouth="smile_open", brows="up").tuft(30.4, 30.6, "up")
+CR.face(30.6, eyes="happy", mouth="smile_open", brows="up")
+# ================================================================ shot 10 (32-39.6): Crinkle fetches the pumpkin
+# round 3 (S1): the pumpkin comes into the story here: Crinkle goes to it by the door, pats it ("this one!"), lifts it
+# with both paws and carries it to the wall (where her hearts were); Pip dances, Snip hops; then the marker box
+PIP.to(32.3, 32.6, "io", tilt=-10, look_x=10, look_y=-6).face(32.3, eyes="normal", mouth="o", brows="up")
 PIP.face(32.9, eyes="sparkle", mouth="smile_open", brows="up").to(32.9, 33.2, "io", tilt=0).tuft(32.9, 33.1, "up")
-CR.to(32.2, 32.5, "io", hturn=-0.6, look_x=-14, look_y=4).face(32.2, eyes="normal", mouth="o", brows="up")
-CR.to(32.7, 32.9, "io", hturn=0.0, look_x=-6, look_y=12)
-CR.reach(32.9, 33.15, "l", (980, 1338)).reach(33.25, 33.45, "l", (970, 1352))   # pats it (tap)
-CR.reach(33.45, 33.65, "l", (930, 1320)).face(33.3, eyes="happy", mouth="smile_open", brows="up")
-CR.to(33.5, 33.62, "io", head_dy=5).to(33.62, 33.8, "io", head_dy=0)            # nod
-dance2(CR, 33.8, 35.8)
-PIP.dance(34.3, 36.3, beats=4)
-SN.face(34.0, eyes="happy", mouth="smile_open", brows="up")
-SN.hop(36.4, 36.85, 1, 26).hop(37.0, 37.45, 1, 22).ears(36.4, 36.8, "happy")
-PIP.walk(37.3, 38.6, 560).to(38.6, 38.9, "io", turn=-0.3)
-SN.reach(38.4, 38.8, "l", (340, 1350)).reach(38.4, 38.8, "r", (470, 1350))   # tucks the book under his arm
-T_TUCK = 38.7
+CR.to(32.1, 32.4, "io", sq=1.0, turn=-0.5, hturn=-0.3, look_x=-12, look_y=6).face(32.1, eyes="normal",
+                                                                                  mouth="smile_open", brows="up")
+CR_LIFT_X = PK_EARLY[0] + 30                      # he stands just right of its middle (his left side stays in frame)
+CR.walk(32.4, 33.45, CR_LIFT_X).to(33.35, 33.6, "io", turn=0.0, hturn=0.0, look_x=-6, look_y=14)
+T_PAT = 33.7
+CR.reach(33.4, T_PAT, "l", (PK_EARLY[0] - 10, PK_EARLY[1] - 178))       # pats its top: this one!
+CR.reach(T_PAT, T_PAT + 0.15, "l", (PK_EARLY[0] - 12, PK_EARLY[1] - 196)).reach(T_PAT + 0.15, T_PAT + 0.3, "l",
+                                                                                    (PK_EARLY[0] - 10, PK_EARLY[1] - 178))
+CR.face(T_PAT, eyes="happy", mouth="smile_open", brows="up")
+T_GRIP, T_UP, T_SET, T_LET = 34.35, 34.85, 38.75, 38.95
+PK_LIFT = 62                                      # how high he carries it
+PK_SIDE = PK.RX + 8                               # paw centres just outside its widest point ...
+PK_MID = PK.RY                                    # ... at its middle height
+CR.to(33.95, T_GRIP, "io", sq=0.84, head_dy=8, lean=0)                      # crouches
+for _side, _sg in (("l", -1), ("r", 1)):
+    CR.reach(33.95, T_GRIP, _side, (PK_EARLY[0] + _sg * PK_SIDE, PK_EARLY[1] - PK_MID))
+CR.face(T_GRIP, eyes="closed", mouth="flat", brows="think")                # hup (no sound from him)
+CR.to(T_GRIP + 0.05, T_UP, "io", sq=1.0, head_dy=0)                        # stands up with it
+for _side, _sg in (("l", -1), ("r", 1)):
+    CR.reach(T_GRIP + 0.05, T_UP, _side, (PK_EARLY[0] + _sg * PK_SIDE, PK_EARLY[1] - PK_MID - PK_LIFT))
+CR.face(T_UP + 0.05, eyes="happy", mouth="smile_open", brows="up")
+T_WALK0, T_WALK1 = 35.0, 38.35
+CR.to(T_UP, T_WALK0, "io", turn=0.3)
+CR.walk(T_WALK0, T_WALK1, PK.BASE[0] + 30, steps=7)                 # R1: 7 slow, steady steps
+CR.still_arms.append((T_WALK0, T_WALK1))
+for _tt in np.arange(T_WALK0, T_WALK1 + 0.01, 0.25):
+    _tb = min(T_WALK1, _tt + 0.25)
+    _cx = CR._num("x", _tb) - 30
+    for _side, _sg in (("l", -1), ("r", 1)):
+        CR.reach(_tt, _tb, _side, (_cx + _sg * PK_SIDE, PK_EARLY[1] - PK_MID - PK_LIFT), "lin")
+CR.to(T_WALK1, T_SET, "io", sq=0.84, head_dy=8, turn=0.0)                 # sets it down by the wall
+for _side, _sg in (("l", -1), ("r", 1)):
+    CR.reach(T_WALK1, T_SET, _side, (PK.BASE[0] + _sg * PK_SIDE, PK.BASE[1] - PK_MID))
+CR.reach(T_LET, T_LET + 0.35, "l", (PK.BASE[0] - 40, 1300)).reach(T_LET, T_LET + 0.35, "r", (PK.BASE[0] + 140, 1330))
+CR.to(T_LET, T_LET + 0.4, "io", sq=1.0, head_dy=0, look_x=-10, look_y=10)
+CR.face(T_LET + 0.1, eyes="happy", mouth="smile", brows="calm")
+CR.reach(T_LET + 0.5, T_LET + 0.9, "l", (CR_HELP - 120, 1330))
+# Pip dances, Snip hops; then they go to the marker box at the bench (they pass behind him and the pumpkin)
+PIP.dance(34.0, 36.0, beats=4)
+SN.face(33.8, eyes="happy", mouth="smile_open", brows="up")
+SN.hop(34.6, 35.05, 1, 26).hop(35.2, 35.65, 1, 22).ears(34.6, 35.0, "happy")
+PIP.walk(36.2, 37.6, 560).to(37.6, 37.9, "io", turn=-0.3)
+SN.walk(36.0, 37.75, 410).to(36.0, 36.3, "io", turn=-0.3)
+SN.reach(38.0, 38.35, "r", (380, 1310)).reach(38.0, 38.35, "l", (340, 1350))   # tucks the book under his arm
+T_TUCK = 38.4
 # ================================================================ ACT 2 (39-82): drawing the face together
 # ---- shot 11 (39-43): markers from the box; red for Pip, black for Crinkle
 SN.to(39.0, 39.3, "io", turn=0.6, look_x=10, look_y=10)
@@ -471,10 +560,28 @@ SN.reach(42.1, 42.5, "r", (832, 1296))
 T_GIVE_CR = 42.55
 SN.reach(42.7, 43.0, "r", (760, 1330))
 CR.reach(42.7, 43.0, "l", (880, 1320))
-# ---- shot 12 (43-45): to the pumpkin
-SN.walk(43.0, 43.7, SN_EYES).to(43.7, 43.9, "io", turn=0.4, look_x=12, look_y=12)
+# round 3 (C1): Pip moves her marker to her right wing (the side toward the pumpkin) ...
+PIP.reach(42.45, 42.7, "r", PIPA.anchor(PIP.state(42.7))(-10, -96)).reach(42.45, 42.7, "l",
+                                                                          PIPA.anchor(PIP.state(42.7))(10, -100))
+T_SWAP = 42.65                                                            # the red marker goes to the right wing
+PIP.rest_wings(42.75, 42.95)
+# ---- shot 12 (43-45): to the pumpkin; round 3 (C1): Pip sneaks one extra dot onto it (a little cheek, like her
+#      own); Snip notices, tilts his head; Pip grins. Then he steps in to draw the eyes.
+SN.walk(43.0, 43.6, SN_EYES - 150).to(43.6, 43.8, "io", turn=0.4, look_x=12, look_y=12)
 CR.walk(43.0, 44.0, CR_SMILE).to(44.0, 44.2, "io", turn=-0.3, look_x=-10, look_y=10)
-PIP.walk(43.1, 43.8, 580).to(43.8, 44.0, "io", turn=0.3, look_x=10, look_y=4)
+PIP.walk(42.9, 43.5, PIP_DOT).to(43.5, 43.65, "io", turn=0.3, look_x=12, look_y=10)
+U_DOT = (0.62, 0.78)
+T_DOT = (43.85, 44.2)
+marker_stroke("pip", PIP, "r", "cheek", T_DOT[0], T_DOT[1], U_DOT, n=8, lead=0.25)
+PIP.face(43.7, eyes="normal", mouth="yum", brows="think")                    # concentrating, tongue tip out
+SN.face(44.2, eyes="normal", mouth="o", brows="up").to(44.25, 44.6, "io", tilt=-12, look_x=14, look_y=14)   # hm?
+PIP.reach(44.3, 44.55, "r", PIPA.anchor(PIP.state(44.55))(28, -60))             # marker away from the pumpkin
+PIP.to(44.35, 44.6, "io", hturn=-0.3, look_x=-12, look_y=-10).face(44.4, eyes="happy", mouth="smile_open",
+                                                                    brows="up")   # a cheeky grin at Snip
+PIP.tuft(44.45, 0, "flick")
+SN.face(44.75, eyes="happy", mouth="smile", brows="calm").to(44.75, 45.0, "io", tilt=0)
+PIP.walk(44.75, 45.15, 580, steps=2).to(45.15, 45.35, "io", turn=0.3, hturn=0.0, look_x=10, look_y=4)
+SN.walk(44.85, 45.15, SN_EYES, steps=2)
 # ---- shot 13 (45-49): Snip draws the eyes
 U_SN = (0.36, 0.93)
 marker_stroke("sn", SN, "r", "eye_l", 45.2, 46.0, U_SN, n=14)
@@ -515,17 +622,18 @@ SN.face(60.3, eyes="sparkle", mouth="smile_open", brows="up")
 #      he laughs at himself and the others giggle with him. Then "me?"; "go on!"
 CR.to(61.0, 61.3, "io", lean=5, look_x=-10, look_y=10)
 CR.face(61.35, eyes="wide", mouth="o", brows="up")
-CR.to(61.3, 61.5, "io", lean=-8, arm_l=-80, elb_l=10, arm_r=80, elb_r=-10, x=1090)
-CR.to(61.5, 61.72, "io", lean=9, x=1105).to(61.72, 61.9, "io", lean=-4)
+CR.to(61.3, 61.5, "io", lean=-12, arm_l=-115, elb_l=0, arm_r=80, elb_r=-10, x=1090)   # marker up, clear
+CR.to(61.5, 61.72, "io", lean=12, x=1105).to(61.72, 61.9, "io", lean=-6)
 T_PLOP = 62.05
 CR.to(61.9, T_PLOP, "in", y=FLOOR + 52, sq=0.8, lean=0, head_dy=4, x=1112)
 CR.to(T_PLOP, T_PLOP + 0.12, "io", sq=0.74).to(T_PLOP + 0.12, T_PLOP + 0.3, "io", sq=0.8)   # bottom bump
-CR.to(T_PLOP, T_PLOP + 0.4, "io", arm_l=-24, elb_l=20, arm_r=24, elb_r=-20)
+CR.to(T_PLOP, T_PLOP + 0.4, "io", arm_l=-115, elb_l=0, arm_r=24, elb_r=-20)    # round 3 (C1): marker held up high,
+CR.reach(63.3, 63.8, "l", (1150, 1405))                                           # ... then at his tummy, clear of it
 CR.face(T_PLOP + 0.02, eyes="wide", mouth="O", brows="up")
 CR.face(62.45, eyes="happy", mouth="smile_open", brows="up").wiggle(62.5, "lean", 4, 5, 3)   # laughs at himself
 SN.face(62.65, eyes="happy", mouth="smile_open", brows="up").hop(62.7, 63.05, 1, 14)          # ... they laugh with him
 PIP.face(62.75, eyes="happy", mouth="smile_open", brows="up").flap(62.8, 63.5)
-CR.to(63.2, 63.8, "io", y=FLOOR, sq=0.84, head_dy=8, lean=-8, x=1080)                   # back on his feet (crouched)
+CR.to(63.2, 63.8, "io", y=FLOOR, sq=0.84, head_dy=8, lean=-8, x=1190)                   # back on his feet (crouched)
 CR.face(63.8, eyes="happy", mouth="smile", brows="calm")
 PIP.point(63.5, 63.85, "r", (960, 1420)).face(63.5, eyes="normal", mouth="o", brows="up")   # the empty middle ...
 PIP.unpoint(64.0, 64.15, "r")
@@ -540,7 +648,6 @@ SN.walk(64.9, 65.4, 620, steps=2)
 SN.reach(65.35, 65.65, "r", (880, 1300), "back").face(65.35, eyes="sparkle", mouth="smile_open", brows="up")
 PIP.reach(64.75, 65.0, "r", PIPA.anchor(PIP.state(65.0))(-10, -96)).reach(64.75, 65.0, "l",
                                                                           PIPA.anchor(PIP.state(65.0))(10, -100))
-T_SWAP = 64.95                                                            # the red marker goes to the right wing
 PIP.rest_wings(65.05, 65.3).to(65.05, 65.3, "io", tilt=0)
 PIP.face(65.1, eyes="sparkle", mouth="smile_open", brows="up")
 PIP.walk(65.3, 66.2, PIP_NOSE).to(66.2, 66.4, "io", turn=0.2, look_x=12, look_y=12)
@@ -570,11 +677,11 @@ CR.to(70.0, 70.6, "io", sq=1.0, lean=0, head_dy=0, look_y=6)                    
 clap(SN, 71.2, 4, (720, 1270))
 SN.hop(72.4, 72.85, 1, 24)
 CR.to(70.8, 71.2, "io", turn=-0.4)
-clap(CR, 71.4, 3, (1000, 1255))
+clap(CR, 71.4, 3, (1195, 1315))
 PIP.rest_wings(70.6, 71.0).flap(71.1, 72.3).face(71.1, eyes="sparkle", mouth="smile_open", brows="up")
 PIP.hop(71.2, 71.6, 1, 16)
 rest_arms(SN, 72.4, 72.7)
-rest_arms(CR, 72.4, 72.7)
+CR.reach(72.4, 72.7, "l", (1150, 1405)).to(72.4, 72.7, "io", arm_r=10, elb_r=-14)   # round 3: marker paw clear of the pumpkin
 # ---- shot 21 (74-78): the plan beside the pumpkin; three heads tilt
 T_UNTUCK = 73.6
 SN.reach(73.4, 73.8, "l", (560, 1330)).reach(73.9, 74.4, "l", (720, 1290))
@@ -599,7 +706,7 @@ SN.reach(80.2, 80.6, "l", (430, 1080))                                   # holds
 SN.face(80.3, eyes="normal", mouth="smile_open", brows="up")
 SN.reach(80.7, 81.0, "r", (790, 1290), "back").to(80.7, 81.0, "io", look_x=12, look_y=6)   # "this one!"
 SN.to(81.0, 81.2, "io", look_x=-14, look_y=-14)
-T_THUMB, T_PALM = 81.15, 81.65
+T_THUMB, T_PALM = 81.15, 82.0
 SN.face(T_THUMB + 0.05, eyes="sparkle", mouth="smile_open", brows="up").ears(T_THUMB, T_THUMB + 0.3, "happy")
 PIP.face(T_THUMB + 0.1, eyes="sparkle", mouth="smile", brows="up")
 CR.face(T_THUMB + 0.1, eyes="happy", mouth="smile", brows="calm")
@@ -710,12 +817,12 @@ for i in range(4):
 CR.to(130.0, 130.4, "io", x=960, lean=0)
 # ---- shot 37 (130-136): the step aside; the smile slides off him onto the wall
 CR.walk(130.5, 132.0, CR_ASIDE).to(130.5, 131.0, "io", turn=-0.4, look_y=-12, look_x=-6, head_dy=0)
-CR.face(130.6, eyes="wide", mouth="O", brows="up").face(132.6, eyes="sparkle", mouth="smile_open")
-SN.to(130.4, 130.8, "io", look_y=-14, tilt=-4, hturn=0.25).face(130.6, eyes="wide", mouth="O", brows="up")
-SN.ears(130.6, 130.9, "alarm").face(132.2, eyes="sparkle", mouth="smile_open").ears(132.2, 132.6, "happy")
-PIP.to(130.6, 131.0, "io", look_y=-14, look_x=4, head_dy=0, turn=0.25).face(130.7, eyes="wide", mouth="o",
-                                                                              brows="up")
-PIP.face(132.3, eyes="sparkle", mouth="smile", brows="up").tuft(132.3, 132.6, "up")     # a smile by ~133 s
+CR.face(130.6, eyes="sparkle", mouth="smile_open", brows="up")         # sb3: joy at once (no O mouths, no alarm)
+SN.to(130.4, 130.8, "io", look_y=-14, tilt=-4, hturn=0.25).face(130.6, eyes="sparkle", mouth="smile_open", brows="up")
+SN.ears(130.6, 130.9, "perk")
+PIP.to(130.6, 131.0, "io", look_y=-14, look_x=4, head_dy=0, turn=0.25).face(130.6, eyes="sparkle",
+                                                                              mouth="smile_open", brows="up")
+PIP.tuft(130.6, 130.9, "up")
 PIP.face(133.4, eyes="sparkle", mouth="smile_open", brows="up")
 # ---- shot 38-39 (136-141): Pip's grin, flaps; Snip hops; Crinkle laughs and wiggles
 PIP.face(136.2, eyes="wide", mouth="o", brows="up").face(136.9, eyes="sparkle", mouth="smile_open", brows="up")
@@ -790,8 +897,8 @@ SN.face(156.8, eyes="happy", mouth="smile", brows="calm")
 # ---------------------------------------------------------------- the pumpkin over time
 def pumpkin_state(t):
     strokes = {}
-    for name, a, b in (("eye_l", 45.2, 46.0), ("eye_r", 47.0, 47.8), ("smile", 56.5, 59.5), ("heart_l",) + HEART_L,
-                       ("heart_r",) + HEART_R):
+    for name, a, b in (("cheek",) + T_DOT, ("eye_l", 45.2, 46.0), ("eye_r", 47.0, 47.8), ("smile", 56.5, 59.5),
+                       ("heart_l",) + HEART_L, ("heart_r",) + HEART_R):
         if t > a:
             strokes[name] = seg(t, a, b)
     holes = {}
@@ -807,9 +914,22 @@ def pumpkin_state(t):
     return dict(strokes=strokes, holes=holes, lid=lid, rot=rotd, lit=L.glow_k(t))
 
 
+def pk_base(t):
+    """Where the pumpkin stands (round 3, S1): by the door until Crinkle lifts it; while he holds it, where his paws
+    hold it (between them, at its middle height); by the wall from the moment he sets it down."""
+    if t < T_GRIP:
+        return PK_EARLY
+    if t >= T_SET:
+        return PK.BASE
+    wl, _ = CR.paw(t, "l")
+    wr, _ = CR.paw(t, "r")
+    return (wl[0] + wr[0]) / 2, (wl[1] + wr[1]) / 2 + PK_MID
+
+
 T_TUMMY = next(float(tt) for tt in np.arange(PUSHES[1][0], PUSHES[1][1] + 0.5, 0.01)
                if pumpkin_state(tt)["rot"] >= 165.0)                  # the smile lands on his tummy
-T_BEHIND = next(float(tt) for tt in np.arange(T_RUN0, T_RUN1, 0.02) if PIP.state(tt)["x"] < 1090)
+T_BEHIND = 14.5                                   # round 3: from here she runs behind Crinkle (Snip behind her)
+T_OUT = 19.3                                      # ... she is out in front again (no overlap with him at the switch)
 
 
 def proj_k(rotd):
@@ -821,8 +941,10 @@ def chest_plane(rotd):
     return L.CHEST.shifted(dx=(180.0 - rotd) * 2.2)
 
 
-WING_PLANE = L.Plane(WING_TIP, L.WING.sx, blur=L.WING.blur, name="wing")
-BUMP_PLANE = L.Plane((958, 1296), 0.6, blur=1.2, name="bump")
+WING_SMILE_S = 0.9                         # sb3: the pattern where the wing is: only the SMILE lands on the blade
+WING_PLANE = L.Plane((WING_TIP[0] + 35, WING_TIP[1] - 57), WING_SMILE_S, blur=2.5, name="wing")   # (heart and eyes
+                                                                                         #  pass above it)
+BUMP_PLANE = L.Plane((958, 1296), 0.6, blur=2.5, name="bump")   # sb3: soft edge
 
 
 # ---------------------------------------------------------------- the grown-up's hand (79.6-82.2, 84.4-98.4)
@@ -851,8 +973,8 @@ def _path(t, keys):
 
 def hand_state(t):
     """What the grown-up's hand does now: dict(shoulder, bend, hand, grip or wrist, holds, light_top, lid_at, ...)."""
-    if 79.6 <= t < 82.4:
-        w = _path(t, [(79.6, (-160, 760)), (80.15, (300, 850)), (81.9, (300, 850)), (82.4, (-180, 760))])
+    if 79.6 <= t < 82.75:
+        w = _path(t, [(79.6, (-160, 760)), (80.15, (300, 850)), (82.25, (300, 850)), (82.75, (-180, 760))])
         hand = "rest" if t < T_THUMB - 0.1 else ("thumb" if t < T_PALM else "palm")
         squash = 1.0 - 0.8 * max(0.0, 1 - abs(t - T_PALM) / 0.12)
         return dict(shoulder=SH_LEFT, bend=1, hand=hand, wrist=w, sx=squash)
@@ -948,7 +1070,12 @@ def book_state(t):
 
 def crayon_in_paw(t):
     """Snip holds the crayon only while sketching; otherwise it is clipped on the book (never near a mouth)."""
-    return t < 15.1 or 28.2 <= t < 30.0
+    return t < 15.5 or 28.0 <= t < 29.1
+
+
+def book_paw(t):
+    """Round 3 (S2): until the tuck the book is in his right paw and the crayon in his left (the left points at Pip)."""
+    return "r" if t < T_TUCK else "l"
 
 
 def markers_in_box(t):
@@ -975,7 +1102,7 @@ def draw_snip_props(im, cam, st, t, layer="all"):
         place(im, BOOK_TUCK, cam.S(a(-96, -150)), angle=st["lean"] + 8)
         SN.a._arm(im, cam, st, "l")
     if crayon_in_paw(t):
-        W, fa = SN.paw(t, "r", st)
+        W, fa = SN.paw(t, "l" if t < T_TUCK else "r", st)
         place(im, CRAYON, cam.S(W), angle=fa)
     n = sn_markers(t)
     if n:
@@ -984,23 +1111,25 @@ def draw_snip_props(im, cam, st, t, layer="all"):
             spr = MK[("pip", "red")] if (n == 3 and i == 2) else MK[("sn", "black")]
             place(im, spr, cam.S(W), angle=ang + (i - (n - 1) / 2) * 14)
     if where == "paw_l":
-        W, _ = SN.paw(t, "l", st)
+        W, _ = SN.paw(t, book_paw(t), st)
         place(im, BOOK[view], cam.S((W[0] + 6, W[1] + 12)), sx=sq, angle=st["lean"] * 0.5, scale=BOOK_SCALE)
         if not crayon_in_paw(t) and t < T_TUCK:                  # the crayon clipped in the spiral
             top = (W[0] + 6 + 30 * BOOK_SCALE * sq, W[1] + 12 - (G.BOOK_H + 12) * BOOK_SCALE)
             place(im, CRAYON, cam.S(top), angle=90 + st["lean"] * 0.5)
-        SN.a._arm(im, cam, st, "l")
+        SN.a._arm(im, cam, st, book_paw(t))
+
+
+def cr_marker(t):
+    """Crinkle's marker: None or "paw" (round 3, C1: through the plop he holds it up high, drawn in front)."""
+    return "paw" if T_GIVE_CR <= t < T_BOX_CR else None
 
 
 def draw_crinkle_props(im, cam, st, t, over=False):
-    if t < 15.75:
-        W, _ = CR.paw(t, "r", st)
-        place(im, CLOTH, cam.S(W))
-        if over:
-            CR.a._arm(im, cam, st, "r")
-    else:
-        place(im, CLOTH_CORNER, cam.S(CR.a.anchor(st)(70, -232)), angle=st["lean"])
-    if T_GIVE_CR <= t < T_BOX_CR:
+    place(im, CLOTH_CORNER, cam.S(CR.a.anchor(st)(70, -232)), angle=st["lean"])     # round 3: no polishing
+    where = cr_marker(t)
+    if where == "scarf":
+        place(im, MK[("cr", "black")], cam.S(CR.a.anchor(st)(-40, -238)), angle=st["lean"] + 160)
+    elif where == "paw":
         W, ang = tool_angle(CR, "l", st, TRACK["cr"], t)
         place(im, MK[("cr", "black")], cam.S(W), angle=ang)
 
@@ -1025,13 +1154,15 @@ def draw_pip_marker(im, cam, st, t):
 def arms_over(t):
     """Arms (and what they hold) drawn again after the pumpkin, because they touch or reach over it."""
     out = []
-    if t < 15.75:
-        out.append(("cr", "r"))
+    if 33.35 <= t < 34.1 or T_GRIP - 0.4 <= t < T_LET + 0.3:              # round 3: the pat, the carry
+        out += [("cr", "l"), ("cr", "r")]
+    if 61.0 <= t < 63.9:                                                  # round 3 (C1): the marker held up, clear
+        out.append(("cr", "l"))
+    if 43.55 <= t < 44.6:                                                 # round 3 (C1): Pip's extra dot
+        out.append(("pip", "r"))
     if 44.6 <= t < 48.6:
         out.append(("sn", "r"))
     if 54.9 <= t < 60.4:
-        out.append(("cr", "l"))
-    if 32.85 <= t < 33.7:
         out.append(("cr", "l"))
     if 66.9 <= t < 70.3:
         out.append(("pip", "r"))
@@ -1057,7 +1188,7 @@ def chime_angle(t):
     return a
 
 
-LEAF_RUNS = [(12.6, 1.5, 1560, 1525, 0), (12.85, 1.6, 1600, 1545, 1), (13.1, 1.5, 1580, 1510, 2)]
+LEAF_RUNS = [(BREEZE, 1.5, 1560, 1525, 0), (BREEZE + 0.25, 1.6, 1600, 1545, 1), (BREEZE + 0.5, 1.5, 1580, 1510, 2)]
 
 
 def draw_leaves(f, cam, t):
@@ -1087,17 +1218,20 @@ def draw_fx(f, cam, t, sts):
 
 # ---------------------------------------------------------------- round 2 (B2): sunbeams, gold hearts, the dusk
 BEAM_COL = np.array((255, 240, 196), np.float32)          # the sunbeams in the air (warm, translucent)
-GOLD_OWN = np.array((255, 204, 96), np.float32)          # the hearts on the wall and deck: warm gold
+GOLD_OWN = np.array((255, 180, 34), np.float32)          # round 3 (S1): the hearts a saturated gold, not pale yellow
+GOLD_TINT = np.array((1.26, 0.86, 0.30), np.float32)
+COOL_SHADE = np.array((0.24, 0.20, 0.07), np.float32)     # ... on a slightly darker, cooler wall round them
+
+
 LIGHT_BOX = (960, 960, 1820, 1570)                        # where the sun's light works (world units)
 
 
-def beam_k(t):
-    """The beams thin out and fade as the sun sinks behind the hill (gone by 9.4)."""
-    return 1.0 - ease_in_out(seg(t, 6.6, 9.4))
-
-
-def hearts_k(t):
-    return 1.0 - ease_in_out(seg(t, 7.2, 9.4))
+def light_k(t):
+    """Sb3: the hearts all fade together as the sun sinks and go out on the drawing its last sliver does."""
+    if t >= T_LIGHT_OUT - 1e-6:
+        return 0.0
+    u = seg(t, 6.3, T_LIGHT_OUT)
+    return max(0.06, (1.0 - u) ** 0.8) if u > 0 else 1.0
 
 
 def heart_poly(x, y, w, squash=1.0):
@@ -1132,9 +1266,9 @@ def sun_light2(f, t, cam, albedo, occluders=()):
     the left beam lands on the wall (a big gold heart), the middle one on Pip (her tummy or her wing; the wall when
     she isn't in it), the right one on the deck in front of her. The beams thin and the hearts fade as the sun sets.
     occluders: Layers in the middle beam, FRONT FIRST. Returns {id(layer): (heart map, box)} for L.heart_on_layer."""
-    sk, bk, hk = P.sun_k(t), beam_k(t), hearts_k(t)
+    sk, k = P.sun_k(t), light_k(t)              # sb3: no beams; the hearts fade together, out with the sun
     caught = {}
-    if max(sk, bk, hk) <= 0.003:
+    if max(sk, k) <= 0.003:
         return caught
     a, b = cam.S(LIGHT_BOX[:2]), cam.S(LIGHT_BOX[2:])
     box = L._clip_box((a[0], a[1], b[0], b[1]), f.size)
@@ -1145,41 +1279,24 @@ def sun_light2(f, t, cam, albedo, occluders=()):
     wx, wy = L._world(cam, xx, yy)
     band = L._rail_band(wx, wy) * 0.42 * sk
     sub[..., :3] *= (1 - band)[..., None]
-    # who stands in the middle beam
     covered = np.zeros(sub.shape[:2], np.float32)
     body = _mask(cam, box, [(heart_poly(BODY_HEART[0], BODY_HEART[1], BODY_HEART[2]), 1.0)], 1.0)
-    in_beam = False
     for lay in occluders:
         if lay is None:
             continue
         cx = ((lay.box[0] + lay.box[2]) / 2) / cam.res + cam.ox
         sol = L._into((lay.solid(), lay.box), _Box(box))
         if abs(cx - BODY_HEART[0]) < 48:
-            caught[id(lay)] = (body * sol * (1 - covered) * hk, box)
-            in_beam = in_beam or float((body * sol).max()) > 0.3
+            caught[id(lay)] = (body * sol * (1 - covered) * k, box)
         covered = np.maximum(covered, sol)
-    # the beams in the air (behind the characters: drawn on the set)
-    wk = 0.35 + 0.65 * bk
-    sx, sy = P.sun_pos(t)
-    (c1, c2, c3) = P.RAIL_HEARTS
-    mid_to = (BODY_HEART[0], BODY_HEART[1]) if in_beam else WALL_HEART2[:2]
-    mid_w = BODY_HEART[2] if in_beam else WALL_HEART2[2]
-    shafts = [(_shaft((sx, sy), ((P.RAIL[0] + P.RAIL[1]) / 2, P.RAIL_HEARTS[0][1]), 46 * wk, 78 * wk), 0.35)]
-    shafts += [(_shaft((sx, sy), c, 17 * wk, 24 * wk), 1.0) for c in (c1, c2, c3)]   # a ray to each cut-out
-    shafts += [
-               (_shaft(c1, WALL_HEART[:2], 11 * wk, 0.36 * WALL_HEART[2] * wk), 1.0),
-               (_shaft(c2, mid_to, 11 * wk, 0.36 * mid_w * wk), 1.0),
-               (_shaft(c3, FLOOR_HEART[:2], 11 * wk, 0.36 * FLOOR_HEART[2] * wk * FLOOR_HEART[3] + 6), 1.0)]
-    Ib = _mask(cam, box, shafts, 4.0) * 0.68 * bk
-    sub[..., :3] += (BEAM_COL[None, None, :] - sub[..., :3]) * Ib[..., None]
-    # the hearts
-    if hk > 0.003:
+    if k > 0.003:
         alb = L._arr(albedo.crop(box))[..., :3]
-        polys = [(heart_poly(*WALL_HEART), 1.0), (heart_poly(*WALL_HEART2), 1.0),
-                 (heart_poly(FLOOR_HEART[0], FLOOR_HEART[1], FLOOR_HEART[2], FLOOR_HEART[3]), 1.0)]
-        I = _mask(cam, box, polys, 1.2) * hk * (1 - covered)
-        _, col, _ = L.heart_state(t)
-        L._lit(sub[..., :3], alb, col, I * 0.98, own=0.8, own_col=GOLD_OWN)
+        wall = ((wx < P.HOUSE_X1) & (wy < P.WALL_BASE)).astype(np.float32)
+        halo = _mask(cam, box, [(heart_poly(WALL_HEART[0], WALL_HEART[1] + 8, WALL_HEART[2] * 2.1), k),
+                                (heart_poly(WALL_HEART2[0], WALL_HEART2[1] + 8, WALL_HEART2[2] * 2.1), k)], 24.0)
+        sub[..., :3] *= 1 - (halo * wall)[..., None] * COOL_SHADE[None, None, :]
+        I = _mask(cam, box, [(heart_poly(*WALL_HEART), k), (heart_poly(*WALL_HEART2), k)], 1.2) * (1 - covered)
+        L._lit(sub[..., :3], alb, GOLD_TINT, I * 0.98, own=0.9, own_col=GOLD_OWN)
         L._bloom(sub[..., :3], I, 5.0 * cam.res, 0.4)
     L._put(f, sub, box)
     return caught
@@ -1188,6 +1305,22 @@ def sun_light2(f, t, cam, albedo, occluders=()):
 class _Box:
     def __init__(self, box):
         self.box = box
+
+
+def heart_on_layer_gold(lay, caught, t, cam):
+    """L.heart_on_layer in the round-3 saturated gold (S1): the caught heart on her tummy or wing, never on her face."""
+    if lay is None or id(lay) not in caught:
+        return None
+    full = L._into(caught[id(lay)], lay)
+    if lay.head is not None:
+        full = full * (1 - lay.head)
+    a = L._arr(lay.img)
+    alb = lay.albedo if getattr(lay, "albedo", None) is not None else a[..., :3].copy()
+    L._lit(a[..., :3], alb, GOLD_TINT * L.BODY_BOOST, full * 0.97, own=0.82, own_col=GOLD_OWN)
+    surf = lay.solid() if lay.head is None else lay.solid() * (1 - lay.head)
+    L._bloom(a[..., :3], full, 3.5 * cam.res, 0.4, clip=surf)
+    lay.img = Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
+    return full
 
 
 DUSK_K = (7.5, 12.0)                     # the extra dusk comes in with the sunset and stays
@@ -1259,6 +1392,22 @@ def rail_glow2(f, t, cam):
     L._put(f, sub, box)
 
 
+SKY_PROBE = (1590, 980)                   # a patch of open sky (no star, moon, sun or tree near it)
+
+
+def rail_holes_sky(f, t, cam):
+    """Sb3: the railing's three cut-outs show the sky behind them, all three the same colour (painted on the set,
+    so anyone standing behind the railing still shows through). Gold only while the sun shines (rail_glow2)."""
+    px, py = cam.S(SKY_PROBE)
+    r = int(6 * cam.res)
+    x0, y0 = max(0, int(px) - r), max(0, int(py) - r)
+    patch = np.asarray(f.crop((x0, y0, x0 + 2 * r, y0 + 2 * r)).convert("RGB")).reshape(-1, 3)
+    col = tuple(int(v) for v in patch.mean(axis=0))
+    d = ImageDraw.Draw(f)
+    for hx, hy in P.RAIL_HEARTS:
+        d.polygon([cam.S(q) for q in heart_poly(hx, hy, P.RAIL_HEART_W + 3)], fill=col + (255,))
+
+
 def rail_front(f, t, cam):
     """The railing (props_porch), graded with the set's dusk (a step darker, like the deck)."""
     spr = WORLD._rail_sprite(t)
@@ -1271,10 +1420,112 @@ def rail_front(f, t, cam):
     place(f, spr, cam.S(WORLD.rail_at))
 
 
+# ---------------------------------------------------------------- sb3: the reveal (130-132), the warm cone
+# Crinkle's shadow on the wall while he stands in the beam and steps aside: a soft head-and-shoulders shape (his
+# real silhouette let thin streaks through). It slides right as he steps right and leaves the left eye whole first,
+# then the heart, the other eye and the smile (about 1.6 s in all).
+WIPE_T = (T_TUMMY, 132.3)
+WIPE_KEYS = ((130.5, 852.0), (131.05, 1052.0), (131.4, 1068.0), (132.25, 1900.0))   # (t, body-shadow centre x)
+WIPE_HEAD = (90.0, 760.0, 280.0, 250.0)      # head: dx from the body centre, y, rx, ry (world units, on the wall)
+WIPE_BODY = (1180.0, 650.0, 330.0)           # body: y, rx, ry
+WALL_NOWASH = L.Plane(L.WALL.c, L.WALL.sx, L.WALL.sy, blur=L.WALL.blur, wash=0.0, name="wall")
+
+
+def wipe_x(t):
+    k = WIPE_KEYS
+    if t <= k[0][0]:
+        return k[0][1]
+    for (a, xa), (b, xb) in zip(k, k[1:]):
+        if t <= b:
+            return lerp(xa, xb, ease_in_out(seg(t, a, b)))
+    return k[-1][1]
+
+
+def wipe_shadow(wx, wy, t, soft=7.0):
+    """1 where Crinkle's shadow covers the wall (world coordinate arrays), soft-edged."""
+    xb = wipe_x(t)
+    hdx, hy, hrx, hry = WIPE_HEAD
+    by, brx, bry = WIPE_BODY
+    out = np.zeros(np.shape(wx), np.float32)
+    for cx, cy, rx, ry in ((xb + hdx, hy, hrx, hry), (xb, by, brx, bry)):
+        r = np.sqrt(((wx - cx) / rx) ** 2 + ((wy - cy) / ry) ** 2)
+        d = (1.0 - r) * min(rx, ry)                    # roughly the distance inside the edge, in world units
+        out = np.maximum(out, np.clip(0.5 + d / (2 * soft), 0, 1))
+    return out
+
+
+def wall_light2(f, t, cam, albedo, k, occluders=()):
+    """L.wall_light without the wash and with the bloom kept on the face (sb3: no glow outside it), plus
+    Crinkle's soft shadow during the reveal. Returns (I, box) for checks."""
+    if k <= 0.003:
+        return None, None
+    plane = WALL_NOWASH
+    box = L._clip_box(list(L._pbox(plane, cam)), f.size)
+    pat = L.pattern(plane, cam, box)
+    I = pat * k
+    for mask, mbox, src in occluders:
+        if mask is not None:
+            I = I * (1 - L.map_mask(mask, mbox, src, plane, cam, box))
+    if WIPE_T[0] <= t < WIPE_T[1]:
+        xx, yy = L._grid(box)
+        wx, wy = L._world(cam, xx, yy)
+        I = I * (1 - wipe_shadow(wx, wy, t))
+    sub = L._arr(f.crop(box))
+    alb = L._arr(albedo.crop(box))[..., :3]
+    core = np.clip((I / max(k, 1e-3) - 0.66) / 0.34, 0, 1)
+    L._lit(sub[..., :3], alb, L.WARM_PATTERN, I * 0.95, own=0.15 + 0.55 * core, own_col=L.NEAR_WHITE)
+    near = np.clip(L._blur((pat > 0.03).astype(np.float32), 5.0 * cam.res) * 2.5, 0, 1)
+    L._bloom(sub[..., :3], I, L.WALL_BLOOM * cam.res, 0.42, clip=near)
+    L._put(f, sub, box)
+    return I, box
+
+
+CONE_COL = np.array((255, 206, 128), np.float32)
+CONE_NO_FACE = (880, 1040, 1250)             # 130-136: the cone stays out of x 880-1040 below y 1250
+
+
+def cone_k(t):
+    """The warm cone from the pumpkin to the face: hidden while Crinkle stands in front of the pumpkin."""
+    return ease_in_out(seg(t, 130.6, 131.6))
+
+
+def warm_cone(f, t, cam, k):
+    """Sb3: a faint warm cone (the 0 s sunbeam style) from the pumpkin's top up to the giant face, on the set
+    (behind everyone). Returns (I, box) for the face-clearance check."""
+    if k <= 0.003:
+        return None, None
+    a, b = cam.S((640, 820)), cam.S((1280, 1340))
+    box = L._clip_box((a[0], a[1], b[0], b[1]), f.size)
+    if box[2] <= box[0] or box[3] <= box[1]:
+        return None, None
+    quad = [(946, 1326), (974, 1326), (1120, 925), (800, 925)]       # narrower than the face: clear of heads
+    I = _mask(cam, box, [(quad, 1.0)], 6.0)
+    xx, yy = L._grid(box)
+    wx, wy = L._world(cam, xx, yy)
+    I = I * (0.12 + 0.12 * np.clip((wy - 925) / 400.0, 0, 1)) * k       # a little stronger near the pumpkin
+    if 130.0 <= t < 136.5:
+        x0, x1, y0 = CONE_NO_FACE
+        I = I * (1 - ((wx > x0) & (wx < x1) & (wy > y0)).astype(np.float32))
+        I = L._blur(I, 2.0 * cam.res)
+    sub = L._arr(f.crop(box))
+    sub[..., :3] += (CONE_COL[None, None, :] - sub[..., :3]) * I[..., None]
+    L._put(f, sub, box)
+    return I, box
+
+
+def keep_chime_unlit(f, before, cam, t):
+    """Put the chime back as it was before the pumpkin's light (sb3: it stays unlit)."""
+    m = Image.new("RGBA", f.size, (0, 0, 0, 0))
+    place(m, CHIME, cam.S(G.CHIME_AT), angle=chime_angle(t), scale=1.15)
+    f.paste(before, (0, 0), m.getchannel("A"))
+
+
 # ---------------------------------------------------------------- one frame of the world
 def order_at(t):
-    if T_BEHIND <= t < 21.6:                               # Pip hides behind Crinkle
-        return ["pip", "cr", "sn"]
+    if T_BEHIND <= t < T_OUT:                              # Pip hides behind Crinkle, in front of Snip
+        return ["sn", "pip", "cr"]
+    if 32.0 <= t < 39.6:                                   # Crinkle carries the pumpkin past them (in front)
+        return ["sn", "pip", "cr"]
     if 147.3 <= t < 148.6:
         return ["sn", "cr", "pip"]
     return ["sn", "cr", "pip"]
@@ -1294,6 +1545,7 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
     place(f, BOXES[markers_in_box(t)], cam.S(P.MARKER_BOX_AT))
     place(f, CHIME, cam.S(G.CHIME_AT), angle=chime_angle(t), scale=1.15)
     f = dusk(f, t, cam)                              # round 2 (B2): the set a clear step darker at dusk
+    rail_holes_sky(f, t, cam)
     flat = ps["flat_r"] > 0.5
     over = arms_over(t)
     pip_skip = ("r",) if flat or ("pip", "r") in over else ()
@@ -1307,8 +1559,8 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
         SN.draw(im, t, cam, st=sn)
         if ("sn", "r") not in over:
             draw_snip_props(im, cam, sn, t)
-            if 26.2 <= t < 27.95:                              # the thinking paw, in front of the book
-                SN.a._arm(im, cam, sn, "r")
+            if T_THINK[0] <= t < T_THINK[1]:                     # the thinking paw, in front of the book
+                SN.a._arm(im, cam, sn, "l")
         else:
             draw_snip_props_book_only(im, cam, sn, t)
 
@@ -1324,11 +1576,8 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
     def draw_over(im):
         for who, side in over:
             if who == "cr":
-                if side == "r" and t < 15.75:
-                    draw_crinkle_props(im, cam, cr, t, over=True)
-                    continue
                 CR.a._arm(im, cam, cr, side)
-                if T_GIVE_CR <= t < T_BOX_CR and side == "l":
+                if cr_marker(t) == "paw" and side == "l":
                     W, ang = tool_angle(CR, "l", cr, TRACK["cr"], t)
                     place(im, MK[("cr", "black")], cam.S(W), angle=ang)
             elif who == "sn":
@@ -1351,14 +1600,18 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
     L.floor_pool(f, cam, WORLD.albedo, glow, facing, side=math.sin(math.radians(pk["rot"])))
     pkk = proj_k(pk["rot"]) * glow
     occ = []
-    if lay["cr"] is not None:
+    if lay["cr"] is not None and not (WIPE_T[0] <= t < WIPE_T[1]):   # sb3: his soft shadow instead (wall_light2)
         occ.append((lay["cr"].solid(), lay["cr"].box, L.CHEST))
     if lay_wing is not None and pkk > 0:
         occ.append((_beam_part(lay_wing, WING_PLANE, cam), lay_wing.box, WING_PLANE))
     bump_light = lay_arms is not None and 149.3 <= t < 150.3 and pkk > 0
     if bump_light:
         occ.append((_beam_part(lay_arms, BUMP_PLANE, cam), lay_arms.box, BUMP_PLANE))
-    Iw, bw = L.wall_light(f, cam, WORLD.albedo, pkk, occ)
+    before = f.copy() if pkk > 0.003 else None
+    Iw, bw = wall_light2(f, t, cam, WORLD.albedo, pkk, occ)
+    Ic, bc = warm_cone(f, t, cam, pkk * cone_k(t))
+    if before is not None:
+        keep_chime_unlit(f, before, cam, t)
     # characters: grade, warm glow, sun and beams (never on faces)
     lit = {}
     ck = ease_in_out(seg(pk["rot"], 140.0, 178.0)) * glow
@@ -1367,7 +1620,7 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
         L.grade_layer(ly, t, glow_ch, L.GLOW_AT, cam)
         L.rail_shade(ly, t, cam)
         if name == "pip":
-            lit["pip_heart"] = (L.heart_on_layer(ly, caught, t, cam), ly)
+            lit["pip_heart"] = (heart_on_layer_gold(ly, caught, t, cam), ly)
         if name == "cr" and pkk > 0:
             lit["cr"] = (L.beam_on_layer(ly, chest_plane(pk["rot"]), cam, ck), ly)
         if ly is not None:
@@ -1384,7 +1637,7 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
             lay_sl.paste(f)
     # the pumpkin (a prop: graded with the set), its own light, the lid on the deck
     spr = PUMP.paper(rot=pk["rot"], strokes=pk["strokes"], holes=pk["holes"], lid=pk["lid"])
-    lay_pk = L.Layer.of(size, lambda im: place(im, spr, cam.S(PK.BASE)))
+    lay_pk = L.Layer.of(size, lambda im: place(im, spr, cam.S(pk_base(t))))
     L.grade_layer(lay_pk, t, prop=True)
     lay_pk.paste(f)
     em = PUMP.emissive(rot=pk["rot"], lit=glow, holes=pk["holes"], lid=pk["lid"])
@@ -1400,16 +1653,16 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
         if 118.0 <= t < 127.3 and pkk > 0:
             L.beam_on_layer(lay_arms, chest_plane(pk["rot"]), cam, ck)
         if bump_light:
-            lit["bump"] = (L.beam_on_layer(lay_arms, BUMP_PLANE, cam, pkk, own=(0.6, 0.35)), lay_arms)
+            lit["bump"] = (L.beam_on_layer(lay_arms, BUMP_PLANE, cam, pkk, gain=0.85, bloom=2.0, own=(0.08, 0.22)), lay_arms)
         lay_arms.paste(f)
     if lay_wing is not None:
         L.grade_layer(lay_wing, t, glow_ch, L.GLOW_AT, cam)
         L.rail_shade(lay_wing, t, cam)
         if pkk > 0:
             L.shade_layer(lay_wing, WING_SHADE, pkk)    # Lead L3: the rest of the held-up wing in evening shade
-        lit["wing_heart"] = (L.heart_on_layer(lay_wing, caught, t, cam), lay_wing)
+        lit["wing_heart"] = (heart_on_layer_gold(lay_wing, caught, t, cam), lay_wing)
         if pkk > 0:
-            lit["wing"] = (L.beam_on_layer(lay_wing, WING_PLANE, cam, pkk, bloom=3.0, own=(0.75, 0.25)),
+            lit["wing"] = (L.beam_on_layer(lay_wing, WING_PLANE, cam, pkk, gain=0.85, bloom=2.0, own=(0.08, 0.22)),
                            lay_wing)                     # Lead L3: warm near-white on the yellow wing
         lay_wing.paste(f)
     if lay_hand is not None:
@@ -1425,7 +1678,7 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
     rail_glow2(f, t, cam)
     draw_fx(f, cam, t, sts)
     if report is not None:
-        report.update(dict(sn=sn, cr=cr, pip=ps, lit=lit, wall=(Iw, bw), pk=pk))
+        report.update(dict(sn=sn, cr=cr, pip=ps, lit=lit, wall=(Iw, bw), cone=(Ic, bc), pk=pk))
     return f
 
 
@@ -1451,20 +1704,27 @@ def _beam_part(lay, plane, cam):
 
 
 # ---------------------------------------------------------------- cameras (plan shot list; L3: 40b at 2.8x)
-SHOTS = [   # (start, centre, zoom[, zoom_to, ease_from, ease_to[, centre_to]])
-    (0.0, (1300, 1250), 1.75),                   # 1 golden: beams from the sun through the railing hearts (B2)
-    (4.0, (1215, 1320), 1.9),                    # 2 the heart on her wing
-    (6.0, (1440, 1265), 2.0),                    # 3 sun, beams and hearts together: the sun goes down (B2)
-    (10.0, (1190, 1290), 1.9),                   # 4 empty wing; she looks up at the dark wall
-    (12.5, (960, 1090), 1.2, 1.5, 15.4, 16.5, (880, 1200)),   # 5 the breeze; poof; she runs, hides, peeks (B3)
-    (16.6, (760, 1150), 1.2),                    # 6 behind you!
-    (22.0, (880, 1220), 1.6),                    # 7 Crinkle crouches to her
-    (26.0, (440, 1110), 1.6),                    # 8 Snip thinks: idea
-    (30.0, (470, 1215), 2.0),                    # 9 the plan
-    (32.0, (760, 1120), 1.15),                   # 10 the dance
-    (39.0, (580, 1200), 1.5),                    # 11 markers
-    (43.0, (900, 1180), 1.2),                    # 12 to the pumpkin
-    (45.0, (960, 1380), 1.9),                    # 13 eyes
+def _book_centre(t):
+    W, _ = SN.paw(t, book_paw(t))
+    return W[0] + 6, W[1] + 12 - (G.BOOK_H + 24) * BOOK_SCALE / 2
+
+
+BOOK_C = _book_centre(30.6)
+SHOTS = [   # (start, centre, zoom[, zoom_to, ease_from, ease_to[, centre_to]]); round 3: zoom > 2 only in HI shots
+    (0.0, (1484, 1285), 2.2),                    # 1 sb3: Pip, the hearts, the sun (held to 10.5): it sinks, the
+                                                 #   hearts fade together and go out with it
+    (10.5, (1270, 1320), 1.9),                   # 4 sb3: close: the empty tummy, "where?", the hill's last glow
+    (12.5, (1484, 1190), 2.2),                   # 4b the dark, empty wall (held); the breeze; poof; she runs off
+    (14.85, (885, 1160), 1.6),                   # 5 the bench: she hides behind Crinkle (humming, eyes closed)
+    (16.4, (830, 1140), 1.7),                    # 6 Snip points at her; Crinkle turns and finds her (S2)
+    (20.4, (1484, 1190), 2.2),                   # 6b she points: the empty wall
+    (21.8, (770, 1190), 2.0),                    # 7 she hugs herself; Crinkle comforts her
+    (25.2, (905, 1110), 2.0),                    # 8 Snip thinks: idea
+    (29.3, (BOOK_C[0] + 10, BOOK_C[1] - 30), 2.6),   # 9 the plan, close (S2: >= 2.2x, held)
+    (32.0, (760, 1120), 1.15),                   # 10 Crinkle fetches the pumpkin; Pip dances
+    (39.6, (580, 1200), 1.5),                    # 11 markers
+    (43.0, (800, 1290), 1.8),                    # 12 Pip's extra dot; Snip: hm?; her grin (C1)
+    (45.15, (960, 1380), 1.9),                   # 13 eyes
     (49.0, (690, 960), 1.4),                     # 14 the chime bonk (chime and Pip's face in)
     (53.0, (1080, 1250), 1.3),                   # 15 Crinkle gets ready
     (55.0, (1010, 1320), 1.8),                   # 16 the smile
@@ -1487,15 +1747,16 @@ SHOTS = [   # (start, centre, zoom[, zoom_to, ease_from, ease_to[, centre_to]])
     (110.0, (900, 1000), 1.4),                   # 31 Pip glances back
     (113.5, (1130, 1100), 1.6),                  # 32 Crinkle's idea
     (117.0, (960, 1220), 1.4),                   # 33 the turn: each push seen (P5)
-    (123.5, (960, 1280), 1.9),                   # 34 the smile on his tummy
+    (121.4, (965, 1385), 1.9, 1.9, 123.3, 124.4, (960, 1280)),   # 34 round 3: the last quarter turn close (the
+                                                 #   face slides round to the wall), then up to the smile on him
     (125.3, (700, 1200), 1.5),                   # 35 they see it
     (127.0, (960, 1130), 1.6),                   # 36 he sees it
     (130.0, (960, 1080), 1.15, 1.0, 130.4, 131.6),  # 37 THE WOW
     (136.0, (730, 1260), 1.9),                   # 38 Pip's grin
     (138.5, (960, 1150), 1.2),                   # 39 everyone
     (141.0, (900, 1150), 1.4),                   # 40a the wing goes up
-    (143.5, (880, 1290), 2.8),                   # 40b a tiny glowing face on her wing: out, in (P6)
-    (145.6, (960, 1100), 1.15),                  # 40c in, out, in, out
+    (143.5, (900, 1120), 1.6),                   # 40b sb3: the smile caught on her wing, the cone below it
+    (146.1, (960, 1100), 1.15),                  # 40c in, out, in, out (round 3: the close held +0.5 s)
     (148.6, (950, 1240), 1.7),                   # 41 paw-bump, medium-close (P7)
     (153.0, (960, 1080), 1.0, 1.05, 153.5, 159.0),  # 42 the end
 ]
@@ -1527,17 +1788,31 @@ def shoot(f, centre, z, cam=None):
     return f.resize((1920, 1080), Image.LANCZOS, box=(x0, y0, x0 + cw, y0 + ch))
 
 
-HI40B = os.path.join(ROOT, "build", "ep11_40b_r2")
-HI40B_T = (143.5, 145.6)
+HI40B = os.path.join(ROOT, "build", "ep11_40b_r2")          # round-2 40b frames (reused: nothing there changed)
+HI_DIR = os.path.join(ROOT, "build", "ep11_hi_r3")            # round 3: every shot closer than 2x, rendered at 3x
+
+
+def hi_ranges():
+    """[(t0, t1)] of the shots closer than 2x (they are rendered at 3x by --hires and read back by render_frame)."""
+    out = []
+    for i, s in enumerate(SHOTS):
+        if max(s[2], s[3] if len(s) >= 6 else s[2]) > 2.0 + 1e-6:
+            out.append((s[0], SHOTS[i + 1][0] if i + 1 < len(SHOTS) else DUR))
+    return out
+
+
+HI_T = hi_ranges()
+HI40B_T = (143.5, 146.1)
 
 
 def render_frame(t, view="land", report=None, centre=None, z=None):
     d = K.drawing_of(t)
     tq = d / K.DPS
-    if HI40B_T[0] - 1e-6 <= tq < HI40B_T[1] and centre is None and RES == 2:
-        p = os.path.join(HI40B, f"d{d:05d}.png")
-        if os.path.exists(p):
-            return Image.open(p).convert("RGB")
+    if centre is None and RES == 2 and any(a - 1e-6 <= tq < b for a, b in HI_T):
+        for folder in (HI_DIR, HI40B):
+            p = os.path.join(folder, f"d{d:05d}.png")
+            if os.path.exists(p):
+                return Image.open(p).convert("RGB")
     f = render_world(tq, d, report=report)
     c, zz = shot_at(tq)
     return shoot(f, centre or c, z or zz).convert("RGB")
@@ -1746,56 +2021,64 @@ def make_buses():
     sfx.add(4.55, A.twinkle(0.5))
     sfx.add(4.55, A.glock(M(96), 1.0, 0.35))
     sfx.add(4.8, giggle_snd(0.5, 88))
-    for tt in np.arange(0.2, 6.0, 0.6):
-        sfx.add(tt, scratch(0.35, 0.35, int(tt * 10)))                         # Snip sketching
-    for tt in np.arange(0.0, 15.6, 0.8):
-        sfx.add(tt, rustle(0.6, 0.18))                                         # polishing
-    sfx.add(7.3, A.glock(M(91), 0.5, 0.15))                                     # a glance at the sinking sun
-    sfx.add(8.6, A.glock(M(86), 0.5, 0.15))
+    sfx.add(8.85, A.glock(M(91), 0.5, 0.1))                                     # she looks at the sinking sun
+    for i, m in enumerate((91, 88, 84, 79)):                                    # sb3: one soft glock glide as the
+        sfx.add(T_LIGHT_OUT - 0.24 + i * 0.08, A.glock(M(m), 0.9, 0.16 - 0.02 * i))   # sun and the hearts go out
     sfx.add(T_LOOKUP + 0.1, A.blow(0.4, 0.12))                                 # a small sigh-breath (no voice)
-    sfx.add(15.9, A.boop(0.25))                                                # she peeks out ...
-    sfx.add(16.6, A.whoosh(0.18, 0.2))                                         # ... and ducks back
     music.add(11.0, A.glock(M(108), 0.6, 0.18))                                # first star
     music.add(12.0, A.glock(M(103), 0.6, 0.12))                                # moon
     sfx.add(BREEZE, rustle(1.6, 0.8))
     sfx.add(BREEZE + 0.05, chime_ring(0.7, 2))
-    sfx.add(12.8, poof(0.9))
-    sfx.add(13.4, A.whoosh(0.4, 0.3))
-    sfx.add(15.3, A.boop(0.35))
-    sfx.add(15.8, A.chime_up(0.4, (79, 84)))
-    sfx.add(16.0, A.whoosh(0.2, 0.25))                                         # cloth tucked
-    for tt in (16.6, 18.0, 19.3):
-        sfx.add(tt, A.woodblock(True, 0.4))
-    for tt in (17.0, 18.5):
-        sfx.add(tt, A.boop(0.3))
-    for tt in (17.6, 18.8, 19.8):
-        sfx.add(tt, giggle_snd(0.4, 84))
-    sfx.add(21.5, A.boop(0.45))
-    sfx.add(23.0, A.boop(0.25))
+    sfx.add(BREEZE + 0.2, poof(0.9))
+    sfx.add(T_RUN0, A.whoosh(0.4, 0.3))
+    sfx.add(T_RUN1, A.boop(0.35))                                              # tucked behind him
+    for tt in np.arange(0.2, 15.4, 0.64):
+        sfx.add(tt, scratch(0.35, 0.3, int(tt * 10)))                          # Snip sketching
+    for tt, m in ((15.0, 65), (16.2, 69)):
+        sfx.add(tt, MX.organ(M(m), 1.0, 0.07))                                 # Crinkle's hum: a soft organ note
+    sfx.add(15.45, A.boop(0.3))                                                # Snip sees her
+    sfx.add(16.5, A.whoosh(0.15, 0.2))                                         # she peeks out
+    sfx.add(16.95, A.chime_up(0.35, (79, 84)))                                 # "there she is!"
+    sfx.add(17.35, A.twinkle(0.25))                                            # his eyes open
+    sfx.add(17.9, A.boop(0.4))                                                 # surprise ...
+    sfx.add(18.4, A.glock(M(84), 0.6, 0.2))                                    # ... a gentle smile
+    sfx.add(19.9, A.whoosh(0.2, 0.15))                                         # he crouches
+    sfx.add(20.0, A.boop(0.25))                                                # she points at the wall
+    sfx.add(20.45, A.glock(M(74), 1.2, 0.12))                                  # the empty wall (low, soft)
+    sfx.add(21.85, A.whoosh(0.15, 0.15))                                       # she hugs herself
     sfx.add(TUFT_PAT, A.tap(0.35))
     sfx.add(TUFT_PAT + 0.3, A.boing(0.35, 600))
-    for tt in (26.75, 27.0):
-        sfx.add(tt, A.woodblock(tt < 26.9, 0.16))                              # hmm ... hmm (thinking taps)
+    for tt in (25.9, 26.15):
+        sfx.add(tt, A.woodblock(tt < 26.0, 0.16))                              # hmm ... hmm (thinking taps)
     sfx.add(T_IDEA_SN, A.chime_up(0.5))
-    for tt in np.arange(28.4, 29.9, 0.12):
+    for tt in np.arange(28.1, 29.05, 0.12):
         sfx.add(tt, scratch(0.12, 0.35, int(tt * 100)))
     sfx.add(T_FLIP, A.whoosh(0.3, 0.35))
     sfx.add(T_FLIP + 0.4, A.twinkle(0.4))
-    sfx.add(32.9, A.glock(M(96), 0.6, 0.3))
-    sfx.add(33.05, A.tap(0.35))
-    sfx.add(33.45, A.tap(0.35))
+    sfx.add(30.4, peep(0.4))
+    sfx.add(T_PAT, A.glock(M(96), 0.6, 0.3))                                   # this one!
+    sfx.add(T_PAT + 0.15, A.tap(0.35))
+    sfx.add(T_PAT + 0.3, A.tap(0.3))
+    sfx.add(T_GRIP, A.tap(0.3))
+    sfx.add(T_GRIP + 0.1, A.chime_up(0.3, (60, 67)))                           # up it comes
+    for tt in CR.footfalls():
+        if T_WALK0 <= tt <= T_WALK1 + 0.01:
+            sfx.add(tt, thoonk(0.3))                                           # heavier steps with the pumpkin
+    sfx.add(T_SET, thoonk(0.3))                                                # set down gently (R1: no louder than a step)
+    sfx.add(T_SET + 0.01, A.tap(0.3))
     for i in range(4):
-        sfx.add(33.8 + i * 0.5, A.boing(0.35, 300))
-        sfx.add(34.3 + i * 0.5, A.boing(0.25, 600))
-    for tt in (36.85, 37.45):
-        sfx.add(tt, A.tap(0.35))
-    sfx.add(36.4, giggle_snd(0.5, 79))
+        sfx.add(34.0 + i * 0.5, A.boing(0.25, 600))                            # Pip's dance
+    sfx.add(34.6, giggle_snd(0.5, 79))
     sfx.add(T_TUCK, A.whoosh(0.2, 0.2))
     sfx.add(T_MARKERS, A.tap(0.4))
     sfx.add(T_MARKERS + 0.05, A.pop(0.3))
     sfx.add(T_GIVE_PIP, A.tap(0.35))
     sfx.add(T_GIVE_PIP + 0.1, peep(0.5))
     sfx.add(T_GIVE_CR, A.tap(0.35))
+    sfx.add(T_DOT[0], squeak(T_DOT[1] - T_DOT[0], 0.8, 2600))
+    sfx.add(44.25, A.boop(0.3))
+    sfx.add(44.4, giggle_snd(0.4, 91))
+
     for name, a, b in (("eye_l", 45.2, 46.0), ("eye_r", 47.0, 47.8), ("heart_l",) + HEART_L, ("heart_r",) + HEART_R):
         sfx.add(a, squeak(b - a, 0.9, 2000 if "eye" in name else 2300))
     for a in np.arange(56.5, 59.5, 0.5):
@@ -2059,6 +2342,12 @@ def checks(t, rep):
              "Crinkle": _head_pts_from(L.head_mask(CR.a, cr, CAM, size, grow=0), CAM),
              "Snip": _head_pts_from(L.head_mask(SN.a, sn, CAM, size, grow=0), CAM)}
     beak = _ellipse(PIPA.beak_point(ps), 30 * PIPA.s, 16 * PIPA.s)
+    if rep.get("cone") and rep["cone"][0] is not None:
+        I, box = rep["cone"]
+        pts = _edge_pts(I, box, CAM, 0.02)
+        if len(pts):
+            ds = ", ".join(f"{k} {_min_d(pts, v):.0f}" for k, v in faces.items())
+            out.append(f"{t:.1f}s warm cone: light edge to heads: {ds}; to Pip's beak {_min_d(pts, beak):.0f}")
     for key, what in (("pip_heart", "heart on Pip"), ("wing_heart", "heart on Pip's wing"), ("wing", "face on Pip's wing"),
                       ("cr", "smile on Crinkle"), ("bump", "light on the paws")):
         if key in lit and lit[key][0] is not None:
@@ -2080,8 +2369,8 @@ CHECK = [
 ]
 
 KEYS_R2 = [(0.0, "0.0 s frame 1: mid-hop into the light"), (2.5, "2.5 s sunbeams through the railing hearts"),
-           (4.8, "4.8 s the heart on her wing"), (8.3, "8.3 s the sun sinks, beams thin"),
-           (10.9, "10.9 s the empty wing"), (16.3, "16.3 s hiding: she peeks out"),
+           (4.8, "4.8 s the heart on her wing"), (9.05, "9.05 s the last heart sparkles out"),
+           (10.9, "10.9 s the empty wing"), (17.4, "17.4 s Snip points at her"), (44.1, "44.1 s the extra dot"),
            (50.2, "50.2 s the chime bonk"), (62.15, "62.2 s Crinkle sits down: boing"),
            (93.3, "93.3 s the round tea light: click"), (120.3, "120.3 s push 2: the face turns away")]
 
@@ -2153,16 +2442,19 @@ if __name__ == "__main__":
         contact_sheet(items, os.path.join(ROOT, "reviews", "ep11_friendly_glow_keys.png"), w=800, cols=2)
     elif args == ["--cuts"]:
         print(",".join(f"{c:g}" for c in CUTS))
-    elif args == ["--hires40b"]:
+    elif args == ["--hires"]:
         if RES < 2.5:
             sys.exit("run with EP11_RES=3")
-        os.makedirs(HI40B, exist_ok=True)
-        for d in range(int(round(HI40B_T[0] * K.DPS)), int(round(HI40B_T[1] * K.DPS))):
-            tq = d / K.DPS
-            f = render_world(tq, d)
-            c, z = shot_at(tq)
-            shoot(f, c, z).convert("RGB").save(os.path.join(HI40B, f"d{d:05d}.png"))
-            print("40b", d, flush=True)
+        os.makedirs(HI_DIR, exist_ok=True)
+        for a, b in HI_T:
+            for d in range(int(math.ceil(a * K.DPS - 1e-6)), int(math.ceil(b * K.DPS - 1e-6))):
+                if os.path.exists(os.path.join(HI40B, f"d{d:05d}.png")):
+                    continue                                     # round-2 40b frames: unchanged, reused
+                tq = d / K.DPS
+                f = render_world(tq, d)
+                c, z = shot_at(tq)
+                shoot(f, c, z).convert("RGB").save(os.path.join(HI_DIR, f"d{d:05d}.png"))
+                print("hi", d, flush=True)
     elif args == ["--render"]:
         wav = os.path.join(ROOT, "build", "ep11_audio.wav")
         build_audio(wav)
@@ -2171,4 +2463,4 @@ if __name__ == "__main__":
     elif args == ["--audio"]:
         build_audio(os.path.join(ROOT, "build", "ep11_audio.wav"))
     else:
-        sys.exit("usage: ep11_friendly_glow.py --keys | --cuts | --still T | --check | --hires40b | --render | --audio")
+        sys.exit("usage: ep11_friendly_glow.py --keys | --cuts | --still T | --check | --hires | --render | --audio")
