@@ -25,6 +25,9 @@ The owner approved round 3 (final). Next steps, after the ~09:00 IST limit reset
 only if its retelling matches the story card), then a NEW fresh-eyes-reviewer, round 3
 (`build/rv3/review_video.mp4`).
 
+Channel data: 2 Shorts live (5 and 6 Oct); Studio on 7 Oct showed only the owner's own views. Checkpoint Wed 14 Oct:
+Shorts feed reach, logged in `docs/analytics-log.md` (the owner is signed in to Studio in the built-in browser).
+
 Waiting on the owner: turn on 2-Step Verification and phone verification (custom thumbnails); upload Ep 9 v3
 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode (Wed 21 Oct), text in
 `reviews/pilot02_upload.md` (titles updated, moment first).
