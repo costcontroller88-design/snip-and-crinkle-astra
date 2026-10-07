@@ -32,3 +32,17 @@ The safety-checker starts here and fetches only topics this file doesn't cover, 
 Episodes 1-10 (hot drinks, hand washing, sharing, returning toys, road crossing, sneezing, helmets, turns, booster
 seats and belts, sun safety) were checked when built, but their sources weren't recorded. Add them here the first
 time a topic comes back.
+
+## Lesson topics (read 8 Oct 2026; details in docs/research-policy-safety-oct-2026.md)
+- AAP, handwashing (upd. 7 Feb 2022): 20 s soap, dry; keep sanitiser away from children. https://www.healthychildren.org/English/health-issues/conditions/prevention/Pages/Hand-Washing-A-Powerful-Antidote-to-Illness.aspx
+- AAP, toothbrushing (upd. 14 May 2025): rice-grain smear under 3, pea from 3; spit, don't rinse; help until about 8. https://www.healthychildren.org/English/healthy-living/oral-health/Pages/Toothbrushing-Tips-for-Young-Children.aspx
+- AAP, toilet training age (upd. 24 May 2022): ready 18-24 months; positive, no punishment, shaming or "dirty/naughty". https://www.healthychildren.org/English/ages-stages/toddler/toilet-training/Pages/the-right-age-to-toilet-train.aspx
+- Zero to Three, potty training: child-led; no pressure or anger at accidents. https://www.zerotothree.org/resource/potty-training-learning-to-the-use-the-toilet/
+- NHS, bedwetting (reviewed 11 Apr 2023; review was due Apr 2026): never punish; common under 5. https://www.nhs.uk/conditions/bedwetting/
+- AAP, picky eaters (upd. 26 Apr 2018): 10+ tries, no pressure/bribes, cut food small. https://www.healthychildren.org/English/ages-stages/toddler/nutrition/Pages/Picky-Eaters.aspx
+- AAP, bedtime trouble (upd. 25 Aug 2022): quiet routine, same time nightly. https://www.healthychildren.org/English/healthy-living/sleep/Pages/bedtime-trouble.aspx
+- Zero to Three, sharing: real sharing at 3.5-4; narrate, timer, long turns, never force. https://www.zerotothree.org/resource/helping-young-children-with-sharing/
+- Zero to Three, tantrums 101: stay calm, name feeling, hold the limit; no impulse control until about 3.5-4. https://www.zerotothree.org/resource/toddler-tantrums-101-why-they-happen-and-what-you-can-do/
+- NHS children's therapy, getting dressed: let them try first, start with undressing, no time pressure. https://cambspborochildrenshealth.nhs.uk/child-development-and-growing-up/getting-dressed/
+- YouTube Help, monetization policies (inauthentic content 15 Jul 2025; six low-quality kids principles): https://support.google.com/youtube/answer/1311392
+- YouTube Help, YPP changes (new-creator bar 8,000 h / 20M Shorts from 1 Feb 2027): https://support.google.com/youtube/answer/12843009

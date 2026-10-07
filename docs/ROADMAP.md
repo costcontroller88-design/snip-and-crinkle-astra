@@ -74,9 +74,11 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 2. **Episode 12: "Tidy up together" (every toy has a home) + colour sorting** (Lead go, 8 Oct; evidence
    `docs/benchmark-topic-ep12.md`). Engine A (Snip errs: his mess buries Pip's ball by accident; the three put toys
    in picture baskets, 1-2-3, and the ball appears). One new thing: the playroom. Misread to rule out: "Snip took
-   Pip's ball". Transformation Short: mess → tidy sort.
+   Pip's ball". Transformation Short dressed for Diwali (tidy floor, then rangoli; LED lamps, no fire), Tue 3 Nov.
 3. **Episode 13: "Potty in time"** (the owner's request, 8 Oct): notice the feeling, go in time, potty before bed;
    accidents met kindly (NHS: never punish bedwetting). Clothes on, nothing gross; safety gate first.
+4. Episode 14: bedtime routine (no fear of the dark). 5. Episode 15: getting dressed warm + winter (special Sat 12 Dec).
+6. Episode 16: brushing teeth + New Year (countdown Short 26-29 Dec). Evidence: `docs/research-synthesis-oct-2026.md`.
 2. Washing hands, brushing teeth or bath time (routine, with a dirty → clean Short)
 3. Diwali rangoli Short (blank floor → colourful; LED lamps, no fire): 3-5 Nov
 4. Colour mixing in the art corner (blank → colourful Short)
