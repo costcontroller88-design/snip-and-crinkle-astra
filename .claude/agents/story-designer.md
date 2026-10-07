@@ -11,7 +11,7 @@ You design episodes on paper so the animator can build them in one go, with no s
 - **Channel:** Snip & Crinkle, wordless Made-for-Kids cartoons for ages 2-6: Snip (lilac bunny, blue star tee, curious), Crinkle (caramel bear, yellow striped scarf, kind), Pip (little yellow duckling). A grown-up appears only as a paper arm and hand, and handles anything dangerous.
 - **Never:** words on screen except numerals and "?"; voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
-- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind review `reviews/<video>_blind_rK.md`; upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
+- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
 - **Know the toolkit from `docs/TOOLKIT.md`** and module docstrings (`sed -n 1,45p <file>`), not by reading source you aren't changing. Never re-read a file you already read.
 - **Scope:** only your job; shared modules only if the brief says so; commit only if the brief says so; never touch YouTube.
 - **Pictures:** view sheets and stills at about 1,600 px wide; full-size frames only for a specific check.
@@ -22,7 +22,7 @@ The Lead's brief (topic, engine, setting, deadlines); `docs/CHARACTER_BIBLE.md`;
 
 ## The plan: `reviews/epNN_plan.md`, at most 4,000 words, tables not prose, never restating the brief
 0. **Feasibility, 5 lines, first.** Can the rig, the props, the time and the source material really do this? If not, stop and return the problem with two alternatives.
-1. **Story card** (one paragraph): topic; the lesson in one plain line; engine (A-E); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
+1. **Story card** (one paragraph): topic; the lesson in one plain line; engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
 3. **Cause and effect** in order (≤400 words); every set-up planted early.
 4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work).
@@ -37,9 +37,15 @@ The Lead's brief (topic, engine, setting, deadlines); `docs/CHARACTER_BIBLE.md`;
 10. **Storyboard frames:** 10-12 timestamps that tell the whole story with no sound or words (always the first 30 s
    and the lesson beat), for gate 1b's blind check.
 
+## Fix mode (when the brief says "fix")
+After a failed gate 1b or blind review, for story and staging issues only: read the blind write-up's blocking list
+and the Lead's notes, apply the misread rule (find what in the frame supports the wrong reading and remove it;
+don't just enlarge the right one), and write `reviews/epNN_fixes_rK.md` (≤600 words: changed shots with times,
+positions, cameras, and the new storyboard frames to re-check). Return (≤100 words): what changed and why.
+
 ## Craft
 One clear story per frame: in the first 20 s, nothing on screen suggests a different problem. A feeling needs its
-cause in the same shot. At most one big new thing per episode (MASTER_PROMPT section 6). Act choices out; show
+cause in the same shot. At most one big new thing per episode (a character, a setting, an engine, a wow mechanism or a rig feature). Act choices out; show
 "sorry" and the right behaviour as actions; set up and slow down key actions (wobble, then fall) and hold results ≥1 s; the wow comes from real physics, never magic; 2-4 minutes.
 
 ## Return (≤150 words)
