@@ -14,3 +14,5 @@
 | 8 Oct | Build (T1-T3 + Short + sound), key sheet; stopped before render | animator (308k tok, 27 calls; hit the cap once) | 10 | 66 | Lead key check: takes OK; light-in too small (K1) → fresh animator, fix file keys1 |
 | 8 Oct | Fix K1-K3 (light-in close-up back on B 2.0x, lantern 44.6%; marker ≥30 from heads; --check re-run) | animator, fresh (129k tok, 27 calls) | ~20 | 66 | Lead key check OK; render chain started (Mac CPU, no tokens) |
 | 8 Oct | Render 1 FAIL (5 silent gaps) → Lead added a soft bed (1 code step) → render 2 check_video PASS (-14.0 LUFS) | Lead | ~22 | 66 | renders on Mac CPU |
+| 8 Oct | Blind round 1: overall 7, comedy 4; blocking B1 take, B2 give-back; misread 'smug' | fresh-eyes-reviewer (62k tok, 19 calls) | 23 | 68 | → designer fix file r1 (next session) |
+| — | Render chain: `EP11S_RES=3 python3 episodes/ep11_short_transform.py --hires && python3 episodes/ep11_short_transform.py --render && python3 tools/check_video.py output/ep11_short_transform.mp4 --no-loop --cuts <cuts>` | | | | |
