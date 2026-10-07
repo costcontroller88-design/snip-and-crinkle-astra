@@ -13,12 +13,8 @@ check_video PASS (-14.2 LUFS). Animator's departure to judge: shot 1 is now a 1.
 hearts and the sun; Snip first appears at 12.5 s. A copy waiting in `Videos/` is named `DRAFT-in-review_...` (old
 render; replace it only after gate 2 passes).
 
-Blind review round 2 (`reviews/ep11_blind_r2.md`): overall 6 again (hook 6, clarity 6, comedy 6, lesson
-6; sense, wow, look 8). Same misread as round 1: in 0-17 s Crinkle's paw on his pumpkin in the foreground and Snip
-pointing at him read as "Bear won't share", outweighing the faint hearts. The rule allows two rounds, so the Lead
-stopped and asked the owner. Lead's recommendation: one structural fix of 0-31 s (Crinkle and the pumpkin out of
-Pip's opening; Snip points at the dark wall; stronger gold hearts; shorter 16-31 s) and the comedy beats (62 s
-sit-down reads, the stray marker removed, one gag near 44 s), then one final round 3, after the 09:00 limit reset.
+Blind review round 2 (`reviews/ep11_blind_r2.md`): overall 6 again; the same misread ("Bear won't share") in
+0-17 s, so the Lead stopped and asked the owner.
 
 The owner approved round 3 (final). **Done 7 Oct evening:** fixes_r2 applied in code; storyboard checks sb2
 (cause only guessed) and sb3 (**gate 1b MATCH**: problem, cause, lesson; `reviews/ep11_storyboard_blind_sb3.md`);
