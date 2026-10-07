@@ -184,6 +184,21 @@ safety PASS.
    unchanged.
 8. **Never put an unreleased episode's story in this file or CLAUDE.md** (it could reach the blind reviewer).
 9. **End:** HANDOFF.md (≤500 words, current state only; history goes to `docs/HISTORY.md`), commit, push, report.
+10. **Token savers learned on 7 Oct** (in addition to 2-4 above and the caps in each agent file):
+    - **No polling.** An agent waits on a render in one foreground wait or one watcher chained into its next
+      command (render → check_video), never repeated "is it done?" checks (lesson 10).
+    - **Check sheet before the full render:** fix risky shots on a few stills first (the 7 Oct check sheet
+      caught three unreadable beats for the price of 5 frames, not a 25-min render plus a review round).
+    - **Ask before a second full render;** the Lead decides whether it is worth it.
+    - **Fresh agent, short fix file:** for a new job, a new agent with a ≤50-line fix file usually costs less
+      than resuming one whose memory is already huge; resume only to finish an interrupted job.
+    - **Say what not to read** (e.g. "don't read the blind review, only the fix list"), and when the Lead reviews
+      a sheet, the agent looks at ≤4 frames itself. Images are the most expensive thing to read twice.
+    - **The Lead looks at the key sheet before spending a blind-review round** (cheap catch of obvious misses).
+    - **Watch the limit:** check `get_usage` before each big step and when usage jumps; if usage jumps, look for
+      stray watchers (`ps`). Above ~85% of the 5-hour limit, don't start a render or a review; save, commit,
+      and wait for the reset (an agent cut off mid-run by the limit wastes its context).
+    - **The Lead batches** its own checks into one command and reads logs with `tail`, never whole transcripts.
 
 ## 11. Briefing a subagent
 ```
