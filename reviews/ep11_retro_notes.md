@@ -17,6 +17,7 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
 | Final code (carry, marker colour), no render | animator (resumed) | 236k | 17 | 4 min | 71 -> 79% | Code done; returned exact commands; render run by the Lead in one background job |
 | Render chain (hires + render + check + keys) | Lead (Bash, background) | ~0 | 1 | 42 min | 0 | check_video PASS -14.2 LUFS; the key sheet showed 4 build misses |
 | Lead diagnosis + 3 small code fixes + 2 stills | Lead | ~10 steps (~170k context each) | | 20 min | 79 -> 81% | camera and reuse fixed; 2 misses left for a fresh animator |
+| r3pre feasibility pass (new 5-h window, 7 Oct 23:20 IST) | animator (new) | 133k | 22 | 10 min | 1 -> ?% | Stopped as briefed: real causes found (Pip's body through the cut-outs; the white 'knife' is the tucked book edge-on; 40b not in HI_T); item 4 infeasible (crossing; Crinkle's face >50% hidden 0.87 s). Lead accepted item 4 as a walk-past, with the measurement |
 
 ## Findings so far (candidate agent changes)
 1. **Gate 1b cost estimate was wrong:** MASTER_PROMPT says ~3% of a 5-hour limit; the first sheet cost ~27%,

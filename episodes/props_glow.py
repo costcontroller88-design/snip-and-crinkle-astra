@@ -92,10 +92,14 @@ def sketchbook(view="back"):
 
 
 def book_tucked():
-    c = Cut(40, BOOK_W + 12)
-    c.rrect(10, 6, 30, BOOK_W + 6, 5, KRAFT)
-    c.rrect(14, 8, 26, BOOK_W + 4, 3, PAGE, sil=False)
-    return c.finish(pivot=(20, (BOOK_W + 12) / 2), border=4, shadow_alpha=0.2)
+    """The sketchbook under Snip's arm: its kraft cover with the yellow star toward us (ep11 r3pre: the old edge-on
+    white page strip read as a white marker or a knife)."""
+    w = 56
+    c = Cut(w + 12, BOOK_W + 12)
+    c.rrect(6, 6, 6 + w, BOOK_W + 6, 5, KRAFT)
+    c.rrect(12, 14, w, BOOK_W - 2, 3, mix(KRAFT, (255, 255, 255), 0.12), sil=False)
+    c.polygon(star_pts(6 + w / 2, (BOOK_W + 12) / 2, 13, 5.5), (255, 214, 64), sil=False)
+    return c.finish(pivot=((w + 12) / 2, (BOOK_W + 12) / 2), border=4, shadow_alpha=0.2)
 
 
 def crayon():

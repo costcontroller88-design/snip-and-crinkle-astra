@@ -565,12 +565,15 @@ SN.reach(41.0, 41.4, "r", (1066, 1300))
 T_GIVE_CR = 41.45
 SN.reach(41.55, 41.75, "r", (1080, 1330))
 CR.reach(41.6, 41.9, "r", (1060, 1340))
+# Lead r3 pre (item 4): Snip has to cross Crinkle on his way left. Crinkle steps right to his drawing place as
+# Snip scampers past in front, so the crossing is quick (Crinkle's face covered <= 0.3 s; measured).
+CR.walk(41.75, 42.15, CR_SMILE, steps=2)
 # Pip moves her marker to her right wing (the side toward the pumpkin) ...
 PIP.reach(41.15, 41.4, "r", PIPA.anchor(PIP.state(41.4))(-10, -96)).reach(41.15, 41.4, "l",
                                                                           PIPA.anchor(PIP.state(41.4))(10, -100))
 T_SWAP = 41.4                                                             # the red marker goes to the right wing
 PIP.rest_wings(41.5, 41.7)
-SN.walk(41.7, 43.6, SN_EYES - 150).to(41.7, 41.9, "io", turn=-0.4)       # in front of the pumpkin, to his place
+SN.walk(41.7, 42.15, 860, steps=3).walk(42.15, 43.6, SN_EYES - 150).to(41.7, 41.9, "io", turn=-0.4)       # in front of the pumpkin, to his place
 SN.to(43.6, 43.8, "io", turn=0.4, look_x=12, look_y=12)
 # ---- shot 12 (43-45): to the pumpkin; round 3 (C1): Pip sneaks one extra dot onto it (a little cheek, like her
 #      own); Snip notices, tilts his head; Pip grins. Then he steps in to draw the eyes.
@@ -1412,6 +1415,11 @@ def rail_holes_sky(f, t, cam):
     x0, y0 = max(0, int(px) - r), max(0, int(py) - r)
     patch = np.asarray(f.crop((x0, y0, x0 + 2 * r, y0 + 2 * r)).convert("RGB")).reshape(-1, 3)
     col = tuple(int(v) for v in patch.mean(axis=0))
+    paint_rail_holes(f, cam, col)
+    return col
+
+
+def paint_rail_holes(f, cam, col):
     d = ImageDraw.Draw(f)
     for hx, hy in P.RAIL_HEARTS:
         d.polygon([cam.S(q) for q in heart_poly(hx, hy, P.RAIL_HEART_W + 3)], fill=col + (255,))
@@ -1557,7 +1565,7 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
     place(f, BOXES[markers_in_box(t)], cam.S(P.MARKER_BOX_AT))
     place(f, CHIME, cam.S(G.CHIME_AT), angle=chime_angle(t), scale=1.15)
     f = dusk(f, t, cam)                              # round 2 (B2): the set a clear step darker at dusk
-    rail_holes_sky(f, t, cam)
+    hole_col = rail_holes_sky(f, t, cam)
     flat = ps["flat_r"] > 0.5
     over = arms_over(t)
     pip_skip = ("r",) if flat or ("pip", "r") in over else ()
@@ -1690,6 +1698,8 @@ def render_world(t, d=None, cam=None, bg=None, report=None):
             top = hs["light_top"]
             L.halo(f, cam, 1.0, at=(top[0], top[1] - 8), strength=0.45, sigma=10.0)
     L.halo(f, cam, glow * (0.25 + 0.75 * facing))     # turned to the wall: only a faint glow comes our way
+    if t >= T_LIGHT_OUT - 1e-6:                     # r3pre: after sunset the cut-outs are sky-coloured, never a
+        paint_rail_holes(f, cam, hole_col)          #   body (Pip's yellow, Crinkle's tummy) behind them reading gold
     rail_front(f, t, cam)
     rail_glow2(f, t, cam)
     draw_fx(f, cam, t, sts)
@@ -1817,14 +1827,14 @@ def hi_ranges():
     return out
 
 
-HI_T = hi_ranges()
 HI40B_T = (143.5, 146.1)
+HI_T = hi_ranges() + [HI40B_T]          # r3pre: 40b (1.6x) is re-rendered at 3x by --hires from the current code
 
 
-def render_frame(t, view="land", report=None, centre=None, z=None):
+def render_frame(t, view="land", report=None, centre=None, z=None, fresh=False):
     d = K.drawing_of(t)
     tq = d / K.DPS
-    if centre is None and RES == 2 and any(a - 1e-6 <= tq < b for a, b in HI_T):
+    if not fresh and centre is None and RES == 2 and any(a - 1e-6 <= tq < b for a, b in HI_T):
         for folder in (HI_DIR, HI40B):
             p = os.path.join(folder, f"d{d:05d}.png")
             if os.path.exists(p):
@@ -1834,8 +1844,8 @@ def render_frame(t, view="land", report=None, centre=None, z=None):
     return shoot(f, centre or c, z or zz).convert("RGB")
 
 
-def frame(t, report=None, centre=None, z=None):
-    return render_frame(t, "land", report, centre, z)
+def frame(t, report=None, centre=None, z=None, fresh=False):
+    return render_frame(t, "land", report, centre, z, fresh)
 
 
 # ---------------------------------------------------------------- sound (no voices: effects and music only)
@@ -2437,7 +2447,7 @@ if __name__ == "__main__":
         tt = float(args[1])
         rep = {}
         cand = [c for c in CHECK if abs(c[0] - tt) < 1e-6]
-        img = frame(tt, rep, *(cand[0][1:3] if cand else (None, None)))
+        img = frame(tt, rep, *(cand[0][1:3] if cand else (None, None)), fresh=True)   # r3pre: never a stored frame
         out = os.path.join(ROOT, "build", f"ep11_{tt:.2f}.png")
         img.save(out)
         print("wrote", out)
@@ -2465,8 +2475,6 @@ if __name__ == "__main__":
         os.makedirs(HI_DIR, exist_ok=True)
         for a, b in HI_T:
             for d in range(int(math.ceil(a * K.DPS - 1e-6)), int(math.ceil(b * K.DPS - 1e-6))):
-                if os.path.exists(os.path.join(HI40B, f"d{d:05d}.png")):
-                    continue                                     # round-2 40b frames: unchanged, reused
                 tq = d / K.DPS
                 f = render_world(tq, d)
                 c, z = shot_at(tq)
