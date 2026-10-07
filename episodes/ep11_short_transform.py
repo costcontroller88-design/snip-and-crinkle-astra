@@ -215,8 +215,8 @@ SN.reach(12.25, 12.45, "r", (770, 1360)).walk(12.3, 12.8, SN_X1, steps=2)
 SN.to(12.4, 12.7, "io", turn=0.35, look_x=8, look_y=6)
 SN.reach(12.55, 12.85, "r", (820, 1300), "back").reach(13.2, 13.5, "r", (760, 1395))
 PIP.walk(12.45, 13.5, 845, steps=4).to(13.5, 13.65, "io", turn=0.3, look_x=10, look_y=10)
-PIP.reach(12.3, 12.6, "r", (720, 1335))                             # carried in front of her chest
-H_WAIT, H_PIP = (960, 1330), (975, 1322)
+PIP.reach(12.3, 12.6, "r", (742, 1384))                             # carried flat in front of her tummy
+H_WAIT, H_PIP = (968, 1332), (975, 1322)
 # ---- shot 7 (13.6-16.6, B): Pip draws the heart nose (black), tongue tip out, copying Crinkle
 follow(PIP, "r", "heart_l", 13.8, 14.5, 0.0, 1.0, U_PIP, lead=0.3, n=12)
 PIP.reach(14.5, 14.7, "r", (PL.tip_world("heart_r", 0)[0] - TIP_L * U_PIP[0],
@@ -225,6 +225,7 @@ follow(PIP, "r", "heart_r", 14.7, 15.4, 0.0, 1.0, U_PIP, n=12)
 for tt, m in ((13.85, "yum"), (14.3, "yum_l"), (14.75, "yum"), (15.2, "yum_l")):
     PIP.face(tt, mouth=m, brows="think")
 PIP.face(15.5, eyes="sparkle", mouth="smile_open", brows="up").reach(15.45, 15.9, "r", H_WAIT)   # off the face, ready
+PIP.to(15.45, 15.9, "io", turn=0.25)
 CR.face(14.0, eyes="happy", mouth="smile", brows="calm")
 # ---- shot 8 (16.6-18.2, A): Pip holds the marker up to Crinkle: his turn, given by her
 PIP.to(16.6, 16.9, "io", turn=0.25, look_x=10, look_y=-10).to(16.7, 17.1, "io", lean=6).to(17.4, 17.7, "io", lean=0).face(16.7, eyes="happy", mouth="smile_open", brows="up")
@@ -258,6 +259,7 @@ for perf, lx in ((SN, 6), (CR, -6), (PIP, 6)):
 SN.ears(24.6, 24.9, "perk")
 CR.to(21.9, 22.3, "io", lean=-9).to(24.6, 25.0, "io", lean=0)                # leans out of the hand's way
 PIP.to(21.9, 22.3, "io", lean=6).to(24.6, 25.0, "io", lean=0)
+SN.to(21.9, 22.3, "io", lean=5).to(24.6, 25.0, "io", lean=0)
 SN.to(26.7, 26.9, "io", sq=0.92).hop(26.9, 27.3, 1, 26).to(27.3, 27.5, "io", sq=1.0)
 T_DANCE = (26.8, 28.0)
 TUMMY = (CR_X1 + 8, 1388)
@@ -283,8 +285,9 @@ def marker_pose(t):
     if t < 12.2:
         return "sn", "r", 0.0, ANG["sn"]
     if t < 17.3:
-        off = _ease(t, [(12.2, -18.0), (13.6, 0.0), (15.45, 0.0), (15.9, CAP)])
-        ang = _ease(t, [(12.2, ANG["sn"]), (12.6, ANG["pip"]), (15.45, ANG["pip"]), (15.9, ANG["give"])])
+        off = _ease(t, [(12.2, -18.0), (12.6, 0.0), (15.45, 0.0), (15.9, CAP)])
+        ang = _ease(t, [(12.2, ANG["sn"]), (12.6, A_FLAT), (13.5, A_FLAT), (13.75, ANG["pip"]), (15.45, ANG["pip"]),
+                        (15.9, ANG["give"])])
         return "pip", "r", off, ang
     if t < 20.95:
         ang = _ease(t, [(17.3, ANG["give"]), (17.8, A_HOLD), (18.2, A_HOLD), (18.4, ANG["cr"]), (20.6, ANG["cr"]),
@@ -491,8 +494,8 @@ def render_world(t, d=None, cam=None, bg=None):
 
 # ---------------------------------------------------------------- cameras (plan b4; vertical)
 CAMS = {"A": ((880, 1250), 1.7), "T": ((950, 1300), 2.6), "B2": ((920, 1270), 1.8), "K": ((1060, 1180), 1.9),
-        "B": ((950, 1320), 2.0), "B3": ((965, 1300), 1.85)}   # B3: the light goes in (room for the hand, Crinkle in)
-END_C, END_Z = (950, 1215), 1.45
+        "B": ((950, 1320), 2.0), "B3": ((990, 1290), 1.6)}   # B3: the light goes in (room for the hand, Crinkle in)
+END_C, END_Z = (975, 1215), 1.4
 T_PULL = (26.0, 28.0)
 SHOTS = [(0.0, "A"), (0.6, "T"), (2.0, "B2"), (5.4, "A"), (7.2, "K"), (8.4, "B"), (11.8, "A"), (13.6, "B"),
          (16.6, "A"), (18.2, "B"), (22.0, "B3")]
@@ -624,17 +627,24 @@ def checks():
     lines.append(f"marker to Pip's head 17.3: {worst[17.3]:.1f}; min 16.6-17.8: {min(worst.values()):.1f} "
                  f"at {min(worst, key=worst.get)}")
     tipmin = (1e9, None)
+    body = {}
     for tt in np.arange(0.0, DUR, 0.2):
         sts = states(tt)
         tip = marker_tip_world(tt, sts)
         tm = Image.new("L", (int(1080 * RES), int(1920 * RES)), 0)
         x, y = CAM.S(tip)
         ImageDraw.Draw(tm).ellipse([x - 2, y - 2, x + 2, y + 2], fill=255)
+        mk = _mask_of(lambda im: draw_marker(im, tt, sts))
         for who in ("sn", "cr", "pip"):
-            g = _gap(tm, head_mask(who, sts[who]))
+            hmk = head_mask(who, sts[who])
+            g = _gap(tm, hmk)
             if g < tipmin[0]:
                 tipmin = (g, (round(float(tt), 1), who))
+            gb = _gap(mk, hmk)
+            if gb < body.get(who, (1e9,))[0]:
+                body[who] = (round(gb, 1), round(float(tt), 1))
     lines.append(f"marker tip to nearest head (whole Short, every 0.2 s): {tipmin[0]:.1f} at {tipmin[1]}")
+    lines.append(f"whole marker to each head (min, at): {body}")
     # 4. the hand and the tea light: gap to every head, 22.0-24.9
     hm = (1e9, None)
     for tt in np.arange(22.0, 24.9, 1 / 15):

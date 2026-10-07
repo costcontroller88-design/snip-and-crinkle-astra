@@ -227,7 +227,8 @@ safety PASS.
    `acting.py`, `hires.py`) changes only in a toolkit work package, and only if the pilot's `--keys` sheet re-renders
    unchanged.
 8. **Never put an unreleased episode's story in this file or CLAUDE.md** (it could reach the blind reviewer).
-9. **End:** HANDOFF.md (≤500 words, current state only; history goes to `docs/HISTORY.md`), commit, push, report.
+9. **End:** mistake self-audit first (every fix, gate FIX, failed or repeated step, extra commit, cap hit and owner
+   correction this session is a row in `reviews/mistake_log.md`, Lead mistakes included); then HANDOFF.md (≤500 words, current state only; history goes to `docs/HISTORY.md`), commit, push, report.
 10. **Token savers learned on 7 Oct** (in addition to 2-4 above and the caps in each agent file):
     - **No polling.** An agent waits on a render in one foreground wait or one watcher chained into its next
       command (render → check_video), never repeated "is it done?" checks (lesson 10).
@@ -270,7 +271,7 @@ For gate 1b, only: `fresh-eyes-reviewer: storyboard blind check. Sheet: build/sb
 
 ## 12. Reporting to the owner
 Each work package ≤200 words, each phase ≤400: 1. Done. 2. Scorecard (1-10) with the weakest item named. 3. Numbers
-vs targets. 4. Risks. 5. What the owner must click or approve, as numbered steps. 6. Firm recommendation. Ask only
+vs targets. 4. Risks. 5. What the owner must click or approve, as numbered steps. 5b. Mistakes logged this step (count and IDs; "none found" only after the self-audit). 6. Firm recommendation. Ask only
 when a decision is truly the owner's: multiple choice, recommended option first.
 
 ## 13. Zero-based review, 6 Oct 2026 (what changed from version 1, and why)
