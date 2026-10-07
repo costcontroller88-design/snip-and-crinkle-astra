@@ -10,3 +10,4 @@
 | 8 Oct | Owner: "continue, I don't have an issue" (overrides the 5-hour band too). Gate 1b reviewer started | Lead | 77 | 62 | |
 | 8 Oct | Gate 1b round 1: MATCH (problem, cause, lesson); 2 staging risks → designer fix mode | fresh-eyes-reviewer (23k tok, 8 calls) | 77+ | 62 | |
 | 8 Oct | Fix mode S1/S2 (new close camera T for the take; clean let-go) | story-designer (41k tok, 12 calls) | — | — | heart → black ink (Lead) |
+| 8 Oct | Animator build hit the 5-hour cap (429); resumed after the reset (SendMessage) | animator | 0 (reset) | 65 | |
