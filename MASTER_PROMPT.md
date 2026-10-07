@@ -36,6 +36,7 @@ a child's safety or parents' trust at risk.
 | `docs/analytics-log.md`, `docs/benchmark-*.md`, `docs/research-oct-2026.md` | Our numbers; market scans; policy and money research | growth-analyst |
 | `docs/HISTORY.md` | Episodes 1-10, channel setup, old notes (read only when needed) | — |
 | `EPISODE_GUIDE.md` | Episodes 1-10 format. Its hard rules 1-8 apply to all work | rarely |
+| `reviews/mistake_log.md` | Every mistake by any agent or the Lead, and the rule it became | Lead, the moment a mistake is found |
 | `reviews/`, `episodes/`, `output/`, `Videos/` | Plans and reviews; code; renders; the owner's copies (not in git) | the agents |
 
 **File names (every agent uses these, so a brief only names the episode):** plan `reviews/epNN_plan.md`; safety
@@ -189,7 +190,7 @@ follow it" and give it the model from the table.
    salvage a Short, or drop).
 6. **animator:** the story Short and the transformation Short; one blind review covers both.
 7. **packaging** (only after gate 2 passes), then **gate 3, safety-checker** on the finished videos and the text.
-8. **Lead:** files in `Videos/`, HANDOFF, commit and push, report to the owner.
+8. **Lead:** files in `Videos/`, HANDOFF, retrain from the mistake log (section 10, item 11.9), commit and push, report to the owner.
 9. **growth-analyst:** logs the numbers at 7 and 28 days after upload.
 
 If an agent stops on a server error, resume the same agent with SendMessage (it keeps its progress); never start
@@ -251,6 +252,10 @@ safety PASS.
     6. Key sheet: every labelled beat must be visible at 1,600 px; a label the Lead can't see is a build miss.
     7. Briefs ≤6 lines; the agent's budget is in its file.
     8. HANDOFF ≤500 words (`wc -w`); `git show --stat` before every push.
+    9. **Mistake log** (owner, 8 Oct): every mistake by any agent or the Lead goes into `reviews/mistake_log.md` the moment
+       it is found (who, what, evidence, cost, the rule it should become). After every finished video, and at once for a
+       repeat or a safety miss, turn the OPEN rows into rules in Appendix A (rule budget), tag the old version, run
+       `python3 tools/build_agents.py`, mark them APPLIED. A repeat of an APPLIED row means rewrite that rule.
     - **The Lead batches** its own checks into one command and reads logs with `tail`, never whole transcripts.
 
 ## 11. Briefing a subagent
@@ -299,6 +304,7 @@ Rules card (inserted where an agent file says {{RULES_CARD}}):
 - **Pictures:** view sheets and stills at about 1,600 px wide; full-size frames only for a specific check.
 - **Evidence or it isn't checked:** every check you report carries a still's path or a number measured by a script; otherwise write "not checked". Estimates are labelled as estimates.
 - **Budget:** your file gives a tool-call budget per job; at the budget, stop and report what is done and what is left (a hard stop, `maxTurns`, follows soon after). Work in parallel tool calls where you can.
+- **Own mistakes:** if you broke a rule, skipped a check, or find the plan or brief you got was wrong, add one line "Mistakes:" to your return; the Lead logs it for retraining.
 - **Stop when the job is done.** Return ≤150 words: the result and decision first, then open problems and file paths; no account of your process.
 ````
 

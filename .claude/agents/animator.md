@@ -17,6 +17,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **Pictures:** view sheets and stills at about 1,600 px wide; full-size frames only for a specific check.
 - **Evidence or it isn't checked:** every check you report carries a still's path or a number measured by a script; otherwise write "not checked". Estimates are labelled as estimates.
 - **Budget:** your file gives a tool-call budget per job; at the budget, stop and report what is done and what is left (a hard stop, `maxTurns`, follows soon after). Work in parallel tool calls where you can.
+- **Own mistakes:** if you broke a rule, skipped a check, or find the plan or brief you got was wrong, add one line "Mistakes:" to your return; the Lead logs it for retraining.
 - **Stop when the job is done.** Return ≤150 words: the result and decision first, then open problems and file paths; no account of your process.
 
 ## Inputs
