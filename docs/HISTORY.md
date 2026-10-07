@@ -75,3 +75,10 @@ Read `docs/research-oct-2026.md` (5 Oct 2026): key points are to vary story engi
   - `characters.py` was not changed; Episodes 1-10 render exactly as before.
 - Strategy and the reviewed master prompt: see `docs/research-oct-2026.md`. Plan for 8,000 long-form hours
   (Feb 2027 rule); long-form is the money engine, Shorts are discovery.
+
+## Episode 11 "Pip and the Friendly Glow" (6-8 Oct 2026): paused after 3 blind rounds
+Plan, gate 1, stages 1-3 (6-7 Oct). Blind rounds: r1 overall 6 (opening misread "Bear won't share"), r2 6 (same
+misread), r3 6 (misread gone; blocking: no visible light source for the hearts 0-14 s, the carving hidden under the
+hand 88-90 s; comedy 5). Storyboard checks sb2 (cause guessed), sb3 MATCH. Final render `output/ep11_friendly_glow.mp4`
+(commit d6b2959, check_video PASS -14.2 LUFS). Files: `reviews/ep11_*`. The owner paused it on 8 Oct and asked for
+the retro first: `reviews/ep11_retro.md` (MASTER_PROMPT version 3; rollback tag `agents-v2-pre-retro`).
