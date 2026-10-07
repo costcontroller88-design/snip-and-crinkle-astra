@@ -18,6 +18,9 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
 | Render chain (hires + render + check + keys) | Lead (Bash, background) | ~0 | 1 | 42 min | 0 | check_video PASS -14.2 LUFS; the key sheet showed 4 build misses |
 | Lead diagnosis + 3 small code fixes + 2 stills | Lead | ~10 steps (~170k context each) | | 20 min | 79 -> 81% | camera and reuse fixed; 2 misses left for a fresh animator |
 | r3pre feasibility pass (new 5-h window, 7 Oct 23:20 IST) | animator (new) | 133k | 22 | 10 min | 1 -> ?% | Stopped as briefed: real causes found (Pip's body through the cut-outs; the white 'knife' is the tucked book edge-on; 40b not in HI_T); item 4 infeasible (crossing; Crinkle's face >50% hidden 0.87 s). Lead accepted item 4 as a walk-past, with the measurement |
+| r3pre items 1-3, resumed, stills only | animator (resumed) | 145k | 9 | 3 min | -> 17% (both sessions) | 1-3 PASS on 10 stills; the Lead checked them on one 1,560 px contact sheet |
+| Last build fixes (fixes_r3pre 1-4), stills only (other Lead session) | animator (new) | 136k | 25 | 10 min | 5 -> ?% | All 4 done with still evidence (item 4: face hidden 0.27 s); edited the same file in parallel with the row above |
+| Render chain (hires + render + check + keys), commit d6b2959 | Lead (Bash, background) | ~0 | 1 | ~42 min | 0 | running |
 
 ## Findings so far (candidate agent changes)
 1. **Gate 1b cost estimate was wrong:** MASTER_PROMPT says ~3% of a 5-hour limit; the first sheet cost ~27%,
@@ -74,6 +77,7 @@ Token cost = subagent tokens from each return; "limit" = 5-hour limit % before -
 | S2 | safety-checker | The re-check didn't spot the white marker reading as a knife; the blind reviewer did | A safety-relevant read nearly shipped | Gate 3 looks at props near any cutting scene |
 | L7 | Lead | Guessed the cause of the gold cut-outs (sky sampling), changed code, and only then tested: wrong | One wasted step; a stray code change | Test the guess with one still before changing code |
 | L8 | Lead | HANDOFF went over its 500-word cap | Small, but a rule that existed was broken | The Lead checklist |
+| L9 | Lead | Two Lead sessions ran at once (a scheduled restart at 23:27 in the old session + a new session started by the owner): two animators edited the same file, and the two Leads made different item-4 decisions | ~136k duplicate animator tokens; a risk of mixed code (checked: consistent) | Before acting, the Lead runs ListAgents and stops if another Lead is active; a scheduled restart is cancelled when the owner starts a session |
 | R- | fresh-eyes-reviewer | No mistakes: cheap (17-19k) and sharp in both storyboard rounds | | Keep as is |
 Earlier mistakes (pilot 1 self-scoring, the whale Short, polling watchers, a story-hinting file name, packaging run
 too early, a wrong commit message) are already in MASTER_PROMPT sections 5 and 13.
