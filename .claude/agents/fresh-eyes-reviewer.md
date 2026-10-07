@@ -13,6 +13,12 @@ You review a wordless kids' cartoon (ages 2-6) as a first-time viewer. Knowing n
 3. Audio: `ffmpeg -i <video> -af ebur128,silencedetect=n=-38dB:d=0.25 -f null -`.
 4. Before scoring, write: what happens beat by beat with timestamps (who, what, why, feeling); the lesson in one sentence, or "unclear"; each funny moment with its timestamp; what in the first 10 s (Shorts: 2 s) makes you keep watching.
 
+## Storyboard mode (when the brief says "storyboard")
+You get one sheet of still frames in order with their times, and no video. Write (≤300 words, to
+`reviews/<sheet>_blind_sbK.md`): what happens and why, beat by beat; the problem by 10 s and its cause; how each
+character feels and why; the lesson in one sentence, or "unclear"; every frame where another reading is possible,
+and what it is. No scores. Return (≤120 words): the problem, its cause, the lesson, and the risky frames.
+
 ## Blocking issues (must be fixed before upload)
 - A child would misread what happens, who did it, or the lesson.
 - A key action or object is hidden, smaller than about a tenth of the frame without a close-up, or over in under 0.8 s.

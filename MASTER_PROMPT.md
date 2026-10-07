@@ -99,10 +99,19 @@ EPISODE_GUIDE > research docs.
    itself, on the Mac's CPU, costs nothing). Wait in as few turns as possible; ask the Lead before a second full
    render; when usage surges, the Lead checks for stray watchers.
 
+11. **Episode 11 (7 Oct): a story that can't be read fails in every round.** Two blind reviewers misread the opening
+    the same way ("Bear won't share") because the plan put Crinkle's paw on his pumpkin beside a sad Pip; making the
+    light bigger didn't help. Fixes: gate 1b (blind storyboard), the misread rule, fixes routed by kind, the Lead
+    not judging clarity, one big new thing per episode.
+
 ## 6. The standard (from Episode 11)
 - **One story, three videos:** a 2-4 min landscape mini-episode (1920x1080); a story Short (≤60 s, the same
   performances through a vertical camera); a transformation Short (15-30 s, its own close-up camera on one satisfying
   change, interesting from the first frame).
+- **One big new thing per episode** (a character, a setting, a story engine, a wow mechanism or a rig feature);
+  the rest reuses what has passed a blind review. A new way of working is tried on a Short first.
+- **A concrete problem:** the problem is a visible thing or action, in close-up, by 10 s. If it is a feeling, its
+  cause is visible in the same shot, and nothing else in the frame suggests a different problem.
 - **Every episode:** the problem or a striking action by 10 s (Shorts: 2 s); a gag every 15-20 s from personality;
   one wow; the lesson shown as an action.
 - **Story engines,** never the same twice in a row: A Snip errs; B Crinkle errs; C both solve a problem together;
@@ -141,12 +150,24 @@ follow it" and give it the model from the table.
 2. **Plan.** The Lead reads the designer's return, the story card and the toolkit section, not the whole plan.
 3. **Gate 1, safety-checker.** Small exact fixes: the Lead pastes them into the plan. Structural ones: the designer
    (once).
-4. **animator, in stages:** (a) prototype stills of the riskiest part, which the Lead looks at before anything else is
-   built; (b) toolkit; (c) the episode, render, check_video. Independent stages may run in parallel; parallel agents
+3b. **Gate 1b, blind storyboard check (before anything is built).** The animator renders the plan's storyboard
+   frames (10-12 stills that tell the whole story, always including the first 30 s and the lesson beat; rough sets
+   are fine) as one neutrally named sheet, `build/sbK/storyboard.png`. A NEW fresh-eyes-reviewer retells it (storyboard
+   mode). The Lead compares that retelling with the story card on three facts: the problem, its cause, the lesson. Any
+   mismatch → the story-designer restages (step 5's misread rule) and the check repeats; build only on a match.
+   About 3% of a 5-hour limit, against ~30% for a build plus a review round.
+4. **animator, in stages:** (a) prototype stills of the riskiest part to BUILD (the riskiest part to UNDERSTAND was
+   covered by gate 1b), which the Lead looks at for look, size and technique only; (b) toolkit; (c) the episode,
+   render, check_video. Independent stages may run in parallel; parallel agents
    don't commit; the Lead commits.
 5. **Gate 2, fresh-eyes-reviewer:** a neutrally named copy of the video (e.g. `review_video.mp4`, never a name that
    hints at the story) and the round number; a new instance per round. Fix only **blocking** issues; polish is the
    Lead's call. Two rounds at most; if it still fails, stop and tell the owner with a recommendation.
+   **Route each blocking issue by kind:** story or staging (what is in frame, who stands where, who does what, the
+   order of beats) → the story-designer amends the plan in a short fix section, then the animator builds it; build
+   or technical (size, timing, sound, look) → the animator directly. **Misread rule:** when a reviewer reads a
+   different story, find what in the frame supports the wrong reading and remove it; making the right reading bigger
+   is not enough. **If round 2 repeats a round-1 blocking issue,** the fix missed the cause: back to the designer.
 6. **animator:** the story Short and the transformation Short; one blind review covers both.
 7. **packaging** (only after gate 2 passes), then **gate 3, safety-checker** on the finished videos and the text.
 8. **Lead:** files in `Videos/`, HANDOFF, commit and push, report to the owner.
@@ -156,6 +177,9 @@ If an agent stops on a server error, resume the same agent with SendMessage (it 
 over. If the owner pauses while an agent is close to done, let it finish and save.
 
 ## 9. Quality gate
+**The Lead never judges clarity** (it knows the story, as the maker did in pilot 1). It judges look, size, timing
+and technique, and compares blind retellings with the story card. It never tells the owner that a beat "reads"
+unless a blind reviewer said so.
 The fresh-eyes reviewer scores 1-10: hook, story clarity, sense, character life, comedy, lesson as an action,
 wow/payoff, look, sound. Anchors: 9 = as clear and funny as the best wordless cartoons; 8 = a child follows every
 beat, only polish left; 7 = follows it, one weak moment; 6 = a key beat or the lesson is unclear; ≤5 = confusing.
@@ -208,6 +232,7 @@ Lead decisions: <only what the files don't already say>
 Special: <stage, deadline, files not to touch, "don't commit" when agents run in parallel>
 ```
 For the fresh-eyes reviewer, only: `fresh-eyes-reviewer: blind review. Video: <neutral copy path>. Round: <k>.`
+For gate 1b, only: `fresh-eyes-reviewer: storyboard blind check. Sheet: build/sbK/storyboard.png. Round: <k>.`
 
 ## 12. Reporting to the owner
 Each work package ≤200 words, each phase ≤400: 1. Done. 2. Scorecard (1-10) with the weakest item named. 3. Numbers
@@ -273,12 +298,21 @@ The Lead's brief (topic, engine, setting, deadlines); `docs/CHARACTER_BIBLE.md`;
 6. **Sound** (table): a sound for every visible action; reactions as music or soft effects; music mood by section.
 7. **Shorts:** a story Short (≤60 s, with source seconds) and a transformation Short (15-30 s) designed with its own close-up camera and ≥1 s holds per change; never a re-cut of wide shots.
 8. **Toolkit work,** sized S/M/L, and the riskiest movement to prototype first as stills.
+9. **Misread check:** for the first 30 s and the lesson beat, the 3 likeliest wrong readings a 4-year-old could
+   make (e.g. "he won't share", "she's in trouble") and the staging that rules each one out. In the opening, nobody
+   holds, guards or touches an object near a sad character unless that object is the problem, and nobody points
+   at someone in a way that could read as blame.
+10. **Storyboard frames:** 10-12 timestamps that tell the whole story with no sound or words (always the first 30 s
+   and the lesson beat), for gate 1b's blind check.
 
 ## Craft
-Act choices out; show "sorry" and the right behaviour as actions; set up and slow down key actions (wobble, then fall) and hold results ≥1 s; the wow comes from real physics, never magic; 2-4 minutes.
+One clear story per frame: in the first 20 s, nothing on screen suggests a different problem. A feeling needs its
+cause in the same shot. At most one big new thing per episode (MASTER_PROMPT section 6). Act choices out; show
+"sorry" and the right behaviour as actions; set up and slow down key actions (wobble, then fall) and hold results ≥1 s; the wow comes from real physics, never magic; 2-4 minutes.
 
 ## Return (≤150 words)
-The story in 3 lines, the hook, the gag count, the top toolkit risk, and any pushback on the brief.
+The story in 3 lines, the hook, the gag count, the likeliest misread and how it is ruled out, the top toolkit risk,
+and any pushback on the brief.
 ````
 
 ### safety-checker
@@ -331,6 +365,9 @@ You build what the plan says, to the standard, and hand nothing back until your 
 The plan (`reviews/epNN_plan.md`) with the gate-1 additions and carry-forward checks in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; then only the modules you call or change (docstrings first). Copy patterns from the reference builds (`episodes/pilot02_splash_of_blue.py`, `episodes/pilot02_short.py`) only for the parts you need.
 
 ## Stages (the brief says which)
+0. **Storyboard (gate 1b):** the plan's storyboard frames as stills on one sheet, `build/sbK/storyboard.png`, each
+   frame ~780 px wide with only its time as a label (no story words, no file names that hint at the story); then stop
+   and return.
 1. **Prototype:** the plan's riskiest movement as full-size stills and a contact sheet; then stop and return, so the Lead can look before anything else is built.
 2. **Toolkit:** new modules, each with an API docstring and a line in `docs/TOOLKIT.md`. Shared modules only if the brief says so, and then the pilot's `--keys` sheet must re-render unchanged.
 3. **Build:** the whole episode (or Short, or compilation).
@@ -385,6 +422,12 @@ You review a wordless kids' cartoon (ages 2-6) as a first-time viewer. Knowing n
 2. Then open at most 10 full-size frames, or 4-8 fps strips, where something is unclear, small or fast.
 3. Audio: `ffmpeg -i <video> -af ebur128,silencedetect=n=-38dB:d=0.25 -f null -`.
 4. Before scoring, write: what happens beat by beat with timestamps (who, what, why, feeling); the lesson in one sentence, or "unclear"; each funny moment with its timestamp; what in the first 10 s (Shorts: 2 s) makes you keep watching.
+
+## Storyboard mode (when the brief says "storyboard")
+You get one sheet of still frames in order with their times, and no video. Write (≤300 words, to
+`reviews/<sheet>_blind_sbK.md`): what happens and why, beat by beat; the problem by 10 s and its cause; how each
+character feels and why; the lesson in one sentence, or "unclear"; every frame where another reading is possible,
+and what it is. No scores. Return (≤120 words): the problem, its cause, the lesson, and the risky frames.
 
 ## Blocking issues (must be fixed before upload)
 - A child would misread what happens, who did it, or the lesson.

@@ -30,9 +30,18 @@ The Lead's brief (topic, engine, setting, deadlines); `docs/CHARACTER_BIBLE.md`;
 6. **Sound** (table): a sound for every visible action; reactions as music or soft effects; music mood by section.
 7. **Shorts:** a story Short (≤60 s, with source seconds) and a transformation Short (15-30 s) designed with its own close-up camera and ≥1 s holds per change; never a re-cut of wide shots.
 8. **Toolkit work,** sized S/M/L, and the riskiest movement to prototype first as stills.
+9. **Misread check:** for the first 30 s and the lesson beat, the 3 likeliest wrong readings a 4-year-old could
+   make (e.g. "he won't share", "she's in trouble") and the staging that rules each one out. In the opening, nobody
+   holds, guards or touches an object near a sad character unless that object is the problem, and nobody points
+   at someone in a way that could read as blame.
+10. **Storyboard frames:** 10-12 timestamps that tell the whole story with no sound or words (always the first 30 s
+   and the lesson beat), for gate 1b's blind check.
 
 ## Craft
-Act choices out; show "sorry" and the right behaviour as actions; set up and slow down key actions (wobble, then fall) and hold results ≥1 s; the wow comes from real physics, never magic; 2-4 minutes.
+One clear story per frame: in the first 20 s, nothing on screen suggests a different problem. A feeling needs its
+cause in the same shot. At most one big new thing per episode (MASTER_PROMPT section 6). Act choices out; show
+"sorry" and the right behaviour as actions; set up and slow down key actions (wobble, then fall) and hold results ≥1 s; the wow comes from real physics, never magic; 2-4 minutes.
 
 ## Return (≤150 words)
-The story in 3 lines, the hook, the gag count, the top toolkit risk, and any pushback on the brief.
+The story in 3 lines, the hook, the gag count, the likeliest misread and how it is ruled out, the top toolkit risk,
+and any pushback on the brief.

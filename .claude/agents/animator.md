@@ -20,6 +20,9 @@ You build what the plan says, to the standard, and hand nothing back until your 
 The plan (`reviews/epNN_plan.md`) with the gate-1 additions and carry-forward checks in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; then only the modules you call or change (docstrings first). Copy patterns from the reference builds (`episodes/pilot02_splash_of_blue.py`, `episodes/pilot02_short.py`) only for the parts you need.
 
 ## Stages (the brief says which)
+0. **Storyboard (gate 1b):** the plan's storyboard frames as stills on one sheet, `build/sbK/storyboard.png`, each
+   frame ~780 px wide with only its time as a label (no story words, no file names that hint at the story); then stop
+   and return.
 1. **Prototype:** the plan's riskiest movement as full-size stills and a contact sheet; then stop and return, so the Lead can look before anything else is built.
 2. **Toolkit:** new modules, each with an API docstring and a line in `docs/TOOLKIT.md`. Shared modules only if the brief says so, and then the pilot's `--keys` sheet must re-render unchanged.
 3. **Build:** the whole episode (or Short, or compilation).

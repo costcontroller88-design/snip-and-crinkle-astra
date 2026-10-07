@@ -32,7 +32,8 @@ foreground beside a sad Pip, and Snip pointing at Crinkle, outweigh the faint he
 - 141-146 s: hold the wing close +0.5 s.
 
 ## Order and budget (MASTER_PROMPT 10.10)
-1. Check sheet `reviews/ep11_check_r2.png` (~780 px per frame): 1, 5, 9, 11 s, 14, 18, 24 and 44, 62 s. Return and
-   stop; the Lead checks it.
-2. After the Lead's go (resumed): one full render, waited on in a single foreground call or one chained watcher;
+1. Storyboard sheet (gate 1b) `build/sb2/storyboard.png`, labels = times only: 1, 5, 9, 11, 14, 18, 24, 30, 44,
+   62, 131, 144 s. Return and stop. A NEW fresh-eyes-reviewer retells it blind; the Lead compares the problem, its
+   cause and the lesson with the story card. Build only on a match.
+2. After the go (resumed): one full render, waited on in a single foreground call or one chained watcher;
    check_video; key sheet; return. No second render without asking.
