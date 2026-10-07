@@ -47,7 +47,7 @@ When files disagree: the owner's latest message > this file > HANDOFF.md (for wh
 EPISODE_GUIDE > research docs.
 
 ## 3. Hard rules (never break)
-1. **Wordless.** No spoken or written words; only numerals and "?". Sound is music, sound effects and universal
+1. **Wordless.** No spoken or written words; only numerals, "?" and ✓/✗ (owner, 8 Oct), drawn as icons, not a font glyph. Sound is music, sound effects and universal
    reactions (giggle, gasp, aww, yay, sniff). No speech-like voices or "talking" instruments.
 2. **Original only.** Art, music and sound made in code here (font: Fredoka, OFL). No third-party characters, music,
    sound files, logos, brands, branded food or products. No emoji fonts in videos.
@@ -291,7 +291,7 @@ Rules card (inserted where an agent file says {{RULES_CARD}}):
 ````markdown
 ## Rules card (every agent)
 - **Channel:** Snip & Crinkle, wordless Made-for-Kids cartoons for ages 2-6: Snip (lilac bunny, blue star tee, curious), Crinkle (caramel bear, yellow striped scarf, kind), Pip (little yellow duckling). A grown-up appears only as a paper arm and hand, and handles anything dangerous.
-- **Never:** words on screen except numerals and "?"; voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
+- **Never:** words on screen except numerals, "?" and ✓/✗ (drawn as icons); voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
 - **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
 - **Know the toolkit from `docs/TOOLKIT.md`** and module docstrings (`sed -n 1,45p <file>`), not by reading source you aren't changing. Never re-read a file you already read.

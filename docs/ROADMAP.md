@@ -76,7 +76,7 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
    in picture baskets, 1-2-3, and the ball appears). One new thing: the playroom. Misread to rule out: "Snip took
    Pip's ball". Transformation Short dressed for Diwali (tidy floor, then rangoli; LED lamps, no fire), Tue 3 Nov.
 3. **Episode 13: "Potty in time"** (the owner's request, 8 Oct): notice the feeling, go in time, potty before bed;
-   accidents met kindly (NHS: never punish bedwetting). Clothes on, nothing gross; safety gate first.
+   accidents met kindly (NHS: never punish bedwetting). Never a wet bed on screen (owner, 8 Oct). Clothes on, nothing gross; safety gate first.
 4. Episode 14: bedtime routine (no fear of the dark). 5. Episode 15: getting dressed warm + winter (special Sat 12 Dec).
 6. Episode 16: brushing teeth + New Year (countdown Short 26-29 Dec). Evidence: `docs/research-synthesis-oct-2026.md`.
 2. Washing hands, brushing teeth or bath time (routine, with a dirty → clean Short)

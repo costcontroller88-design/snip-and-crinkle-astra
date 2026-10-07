@@ -6,7 +6,7 @@
 A wordless YouTube Shorts series for kids worldwide (ages 2–6). Two paper-cut-out friends, **Snip** (lilac bunny, blue star tee, curious, sometimes makes the mistake) and **Crinkle** (caramel bear, yellow striped scarf, kind helper), learn one safety, kindness or healthy-habit lesson per episode. Every video is made entirely in code: paper art (`paperlib.py`, `characters.py`, `scene.py`, `icons.py`), original synthesized music and sound effects (`audio.py`), and ffmpeg. **Episode 1 is the reference: `episodes/ep01_v3_can_snip_wait.py`.** Read it fully before starting.
 
 ## Hard rules (never break)
-1. **Wordless.** No spoken or written words except numerals (1, 2, 3) and the single "?" icon. Story is told by action, icons, music and sound.
+1. **Wordless.** No spoken or written words except numerals (1, 2, 3), the single "?" icon and ✓/✗ icons (owner, 8 Oct 2026). Story is told by action, icons, music and sound.
 2. **No emoji fonts and no third-party art.** Draw every icon as a paper cut-out (see `icons.py` for the style). No brands, logos or known characters.
 3. **Original audio only**, made with `audio.py` (add new instruments or sound effects in your own file if needed). No samples or downloaded music.
 4. **The lesson must be correct and safe** by mainstream child-safety advice. Dangerous things (hot drinks, roads, sharp objects, medicine) are handled by the **grown-up's paper hand** (`scene.grown_up_hand()`), never by Snip or Crinkle alone. Kids learn to *wait, ask or hold a grown-up's hand*.
