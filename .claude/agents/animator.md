@@ -42,6 +42,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 - **Fix by fix:** a `--still` at every time a change touches (not one), listed per fix with its path; a fix with no still is "not checked".
 - **Key sheet times from the changes:** every shot changed this round, its boundaries, and the fixed story beats (the cause, the lesson, the wow).
 - **No reuse of rendered frames across rounds** unless the shot's code is unchanged, checked (e.g. a hash of its inputs).
+- From the shot list: a face close-up after every gag, and no stretch over 6 s without a change (list any).
 - `--still` at every close-up; every-drawing strips of the key actions; a numeric clearance check for anything that flies or shines (≥30 design units from any face); lesson-critical props drawn in front; prop colours near any cutting scene (never plain white); the carry-forward checks.
 
 ## Known traps (each cost us a round)

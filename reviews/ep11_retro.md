@@ -49,3 +49,11 @@ Spend logged for the round-3 work: ~1.66M subagent tokens (animator ~1.23M = 74%
 Each agent file has a word cap (its size on 8 Oct + 10%, the rules card counted once); a new rule merges or replaces
 an old one. Yardstick for the next episode (coverage review 1): gate 1b in 1 round, gate 2 in ≤2, animator ≤50% of
 the spend, ≤1 claim without evidence, one episode ≤1 full 5-hour window. Compare after it; keep, change or roll back.
+
+## Research rules added (8 Oct, owner "yes")
+From `docs/research-wordless-craft-oct-2026.md` and the 4-way research: story-designer (problem in frame 0; cause
+before effect with one object; the lesson as that object changing hands; each beat changes the situation; a face
+close-up after every gag; no 6 s without a change), animator (the last two as build checks), growth-analyst (songs
+vs stories vs wordless; giant channels aren't our band; a season gives a date, not demand; own browser tab). The
+fresh-eyes-reviewer is unchanged on purpose: it must stay a first-time viewer. Weak evidence (the pace estimate,
+song view counts) stays in the research files. Word budget kept (≤+10% per file, card counted once).
