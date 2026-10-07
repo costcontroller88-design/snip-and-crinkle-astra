@@ -21,6 +21,12 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 - [owner: DROPPED, 6 Oct] The whale transformation Short cut from the pilot failed two blind reviews (7, then 6/10);
   the owner said no to a rebuild. The transformation-Short test moves to Episode 11's own transformation Short.
 
+- Agent quality (Lead, 8 Oct; owner asked how to make agents sharper): (1) the Halloween Short (13-17 Oct) is the test of
+  MASTER_PROMPT v3 against the retro yardstick; change no agent before it. (2) Right after: calibrate the
+  fresh-eyes-reviewer on pilot 1 (owner couldn't follow) vs pilot 2 (owner approved); pilot 2 must score clearly higher.
+  (3) From ~25 Oct: growth-analyst sends each retention drop (Studio, by second) to the story-designer. (4) Only if comedy
+  scores <7 again: designer checks each gag against gags that passed, before any build.
+
 ## Phase 1: Test the new style (20 Oct – 15 Nov)
 - Uploads at 6:00 PM IST, one a day: Sun 18 Oct the Episode 11 Halloween transformation Short (queued, owner 8 Oct);
   Tue 20 Oct pilot Short; Wed 21 Oct pilot episode. Mon 19 and Sat 24 Oct are open (the Episode 11 story Short
