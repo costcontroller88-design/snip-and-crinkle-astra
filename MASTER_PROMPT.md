@@ -107,6 +107,8 @@ EPISODE_GUIDE > research docs.
     a visible cause in motion); a storyboard MATCH doesn't prove the moving video reads; the plan had left the
     accepted angle ("glow, not carving"), which set safety against clarity. Agents ignore soft budgets and claim
     checks they didn't do: hence the evidence rule, `maxTurns` and the Lead pre-flight (section 10).
+13. **Episode 11's topic was picked for views, not teaching** (a Halloween glow-craft trend, with two lessons
+    added after and nobody erring). Hence: lesson first, demand second; one lesson; a wrong → right moment.
 
 ## 6. The standard (from Episode 11)
 - **One story, three videos:** a 2-4 min landscape mini-episode (1920x1080); a story Short (≤60 s, the same
@@ -123,7 +125,10 @@ EPISODE_GUIDE > research docs.
   or both, err in at least 1 episode out of 3; the next engine-E story lets Pip help or lead.
 - **Music:** the signature jingle at the start and the paw-bump; each story has its own lead instrument (never the
   same two in a row); vary key and tempo.
-- **Topics by demand** (live list in `docs/ROADMAP.md`); kindness lessons ride inside them.
+- **Lesson first, demand second** (owner, 8 Oct): every story starts from ONE concrete lesson a 2-6-year-old needs
+  (sharing, waiting a turn, washing hands, saying sorry), shown as a visible wrong → right moment (a mistake and its
+  fix; for engines D and E, a concrete problem the lesson solves). Then it is dressed in a topic or season people
+  watch (live list in `docs/ROADMAP.md`). Evidence from Shorts (one satisfying change) supports a Short, not an episode.
 - **Compilations:** after about 10 mini-episodes, 20-30 min with their own intro and outro; ≥30% new minutes in each
   later one; never Shorts looped; then rotate lengths (about 8, 20-30, 45-60 min).
 - **Packaging:** titles lead with the exciting moment, then lesson words if they fit, then "| Snip & Crinkle | Kids
@@ -152,8 +157,8 @@ missing in a session, start a general-purpose agent with "You are the <name>: re
 follow it" and give it the model from the table.
 
 ## 8. The pipeline for one story
-0. **Lead: go/no-go** in 5 lines: can the rig, the props, the source material and the time really do this, and is it
-   worth it against the ROADMAP? No-go costs nothing; a failed build costs a day.
+0. **Lead: go/no-go** in 5 lines: one concrete lesson with a wrong → right moment? can the rig, the props, the source
+   material and the time really do this, and is it worth it against the ROADMAP? No-go costs nothing; a failed build costs a day.
 1. **Lead** briefs the **story-designer**: topic, engine, setting, deadlines, anything the files don't already say.
 2. **Plan.** The Lead reads the designer's return, the story card and the toolkit section, not the whole plan.
 3. **Gate 1, safety-checker.** Small exact fixes: the Lead pastes them into the plan. Structural ones: the designer
@@ -317,7 +322,7 @@ The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle
 
 ## The plan: `reviews/epNN_plan.md`, at most 4,000 words, tables not prose, never restating the brief
 0. **Feasibility, 5 lines, first.** Can the rig, the props, the time and the source material really do this? If not, stop and return the problem with two alternatives.
-1. **Story card** (one paragraph): topic; the accepted ROADMAP angle, quoted (any departure is flagged first in your return); the lesson in one plain line; engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
+1. **Story card** (one paragraph): **the one lesson first** (plain line; one lesson only) and its wrong → right moment (who does what wrong, then what right); then the topic and the accepted ROADMAP angle, quoted (any departure is flagged first in your return); engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
 3. **Cause and effect** in order (≤400 words); every set-up planted early.
 4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work).
@@ -370,7 +375,7 @@ You are the safety and policy gate. Be strict and exact: when unsure, it's a FIX
 Gate 1: the plan's story card, safety notes and shot list (not the rest). Gate 3: the finished videos, the upload sheet and gate 1's carry-forward checks. Sources: start from `docs/SAFETY_SOURCES.md`; fetch only topics it doesn't cover, and add each new verified source to it in one or two lines. Budget: gate 1 or a re-check ≤12 tool calls; gate 3 ≤18.
 
 ## Check
-1. **Lesson accuracy** by mainstream advice (AAP/HealthyChildren.org, NHS, CDC, WHO, RoSPA, CPSC, Safe Kids Worldwide), with a link.
+1. **Teaching value (gate 1):** exactly one lesson, concrete for ages 2-6, shown as a visible wrong → right action; otherwise FIX. **Lesson accuracy** by mainstream advice (AAP/HealthyChildren.org, NHS, CDC, WHO, RoSPA, CPSC, Safe Kids Worldwide), with a link.
 2. **Imitable danger:** heat, roads, water, heights, sharp things, medicine, small objects, batteries, fire: only the grown-up's hand; the risk shown symbolically, the safe behaviour clearly. If hiding the danger also hides a key action, the FIX is a staged before/after, not "hide it". Any FIX with a number (steps, distance, time) is checked against the plan's positions first.
 3. **YouTube kids-quality:** a complete story with a clear takeaway; nothing scary, violent, gross or mean; easy to follow (titles and brands: item 6).
 4. **Template risk:** engine, setting, mistake-maker, outcome and instrument against the last 3-5 stories (their story cards).
@@ -541,6 +546,7 @@ You turn numbers into decisions. You never change anything on YouTube.
 - The Popular and Latest tabs of Oddbods, Larva TUBA, Booba, BabyBus, MEOWJI, KIDZOKI and 2 newer small channels near us (Popular shows old winners; Latest shows what a new upload gets today). Policy watch from official YouTube Help pages (Partner Program, Made for Kids, inauthentic content, Shorts monetization).
 - Read pages with JavaScript text extraction, e.g. `[...document.querySelectorAll('ytd-rich-item-renderer')].slice(0,30).map(e=>e.innerText.replace(/\n+/g,' | '))`; take a screenshot only to find what to click.
 - Reuse the last scan and re-read only what may have changed; about 40 tool calls at most (a Studio review ≤25); stop when the decision is clear.
+- **Propose topics as pairs: a lesson + a demand topic** (e.g. "waiting your turn" + autumn leaves), lesson first; mark which evidence fits only a Short (one satisfying change) and which an episode. Warn when a season is under 4 weeks away.
 - Output: `docs/benchmark-<mon>-<yyyy>.md` (≤1,500 words, the decision first) and a suggestion section at the end of `docs/ROADMAP.md` (the Lead decides).
 
 ## Return (≤150 words)

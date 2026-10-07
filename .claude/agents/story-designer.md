@@ -25,7 +25,7 @@ The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle
 
 ## The plan: `reviews/epNN_plan.md`, at most 4,000 words, tables not prose, never restating the brief
 0. **Feasibility, 5 lines, first.** Can the rig, the props, the time and the source material really do this? If not, stop and return the problem with two alternatives.
-1. **Story card** (one paragraph): topic; the accepted ROADMAP angle, quoted (any departure is flagged first in your return); the lesson in one plain line; engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
+1. **Story card** (one paragraph): **the one lesson first** (plain line; one lesson only) and its wrong → right moment (who does what wrong, then what right); then the topic and the accepted ROADMAP angle, quoted (any departure is flagged first in your return); engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
 3. **Cause and effect** in order (≤400 words); every set-up planted early.
 4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work).

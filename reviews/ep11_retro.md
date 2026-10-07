@@ -35,6 +35,7 @@ Spend logged for the round-3 work: ~1.66M subagent tokens (animator ~1.23M = 74%
 | S2 (knife read missed) | Gate 3 looks at frames around every hazard and cutting scene (props near hands) | safety-checker |
 | 19 (plateau) | If a round scores the same overall as the last, stop fixing: the owner decides (redesign, salvage or drop) | MASTER_PROMPT 8 |
 | L1, L2, L5, L6, L7, L8, L9 (Lead) | **Lead pre-flight checklist** (≤10 lines): one Lead only, usage bands, route by kind, designer picks frames, proof for every exception, ≤3 code steps, HANDOFF word count | MASTER_PROMPT 10 |
+| Topic picked for views, two lessons, nobody errs (owner question, 8 Oct) | **Lesson first, demand second:** one concrete lesson with a wrong → right moment; the go/no-go, the story card and gate 1 check it; the growth-analyst proposes lesson + topic pairs | MASTER_PROMPT 6, 8; story-designer, safety-checker, growth-analyst |
 | L3, L4, 1, 10 (pricing) | Real prices from the ledger; the animator codes, the Lead renders in one background command | MASTER_PROMPT 8, 10 |
 
 ## Token checkpoints

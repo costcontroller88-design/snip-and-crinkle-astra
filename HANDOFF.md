@@ -18,6 +18,7 @@ Shorts Sun 18 / Mon 19 Oct, the episode Sat 24 Oct. The owner chose "retro first
 budgets on the rules card; `maxTurns` hard caps in every agent file; the safety-checker on Opus; a feasibility pass
 before any build; key sheets from the changes; the plan as the one source of truth; the plateau rule; the Lead
 pre-flight checklist and usage bands (section 10, items 10-11). Effort can't be set per agent (not documented).
+Owner rule (8 Oct): **lesson first, demand second** (MASTER_PROMPT 6): ROADMAP topics need a lesson before use.
 Rollback: `git checkout agents-v2-pre-retro -- MASTER_PROMPT.md && python3 tools/build_agents.py`.
 **Test:** the next episode's gate 1b; judge against the yardstick in `reviews/ep11_retro.md` (gate 1b in 1 round,
 gate 2 in ≤2, animator ≤50% of the spend, ≤1 unproven check, one episode ≤1 full 5-hour window). From Episode 12,
