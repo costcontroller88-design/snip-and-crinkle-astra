@@ -27,7 +27,7 @@ gate 2 in ≤2, animator ≤50% of the spend, ≤1 unproven check, one episode �
 the ledger lives in `reviews/epNN_ledger.md`.
 
 Channel data: 2 Shorts live (5 and 6 Oct); Studio on 7 Oct showed only the owner's own views. Checkpoint Wed 14 Oct:
-Shorts feed reach, logged in `docs/analytics-log.md` (the owner is signed in to Studio in the built-in browser).
+Shorts feed reach, logged in `docs/analytics-log.md`.
 
 Waiting on the owner: turn on 2-Step Verification and phone verification (custom
 thumbnails); upload Ep 9 v3 (Thu 15 Oct) and Ep 5 v2 (Fri 16 Oct); the pilot story Short (Tue 20 Oct) and episode
