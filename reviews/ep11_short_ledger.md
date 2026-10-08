@@ -28,3 +28,4 @@
 | 8 Oct | Designer fix r3 (16 calls vs ≤14, M31): R4 pasted, Snip 660, camera G 2.5x give-back 10.6-15.3%, let-go ≥30, ≥95% visible rule, B3/END/K2; plan_check PASS (Lead ran it). Open: hand gap to Crinkle 5.5 (lean +6 estimate, else 1290); gate post over Crinkle at the end. Animator waits for the reset (M8) | Lead | 62 | 78 | preflight: SMALL AGENTS ONLY: 60-75% (reviewer, safety, designer, packaging) |
 | 8 Oct | Owner: deep scan of all agents + checkpoints → read-only auditor (general-purpose), report only | Lead | 74 | 80 | preflight: SMALL AGENTS ONLY: reset <90 min away (M8); no animator or market scan until after it |
 | 8 Oct | session start (Lead): preflight | Lead | 81 | 81 | preflight: NO AGENT: 75-85%, save and commit |
+| 8 Oct | after reset: audit H1-H8 → fresh general-purpose agent (Sonnet), scratch-tested | Lead | 0 | 81 | preflight: ANY AGENT: <60% |

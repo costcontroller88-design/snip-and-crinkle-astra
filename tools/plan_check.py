@@ -4,15 +4,16 @@
     python3 tools/plan_check.py reviews/ep11_short_plan.md
 
 Exits 1 and lists every failure. A plan must contain a line `**Length:** <seconds> s` (≤60 s counts as a Short) and
-a line `**Lesson beat:** <a>-<b> s` (the wrong → right moment, from the mistake to the fix), and
+a line `**Lesson beat:** <a>-<b> s` (the mistake +-2 s; H1), and
 these tables (header cells in this order; extra text after a header word is fine, e.g. "Set-up (s)"):
 
   Gag table (docs/COMEDY_PLAYBOOK.md sections 3-4):
   | Time (s) | Type | Trait | Set-up (s) | Pause (s) | Break (s) | Break size (%) | Joke signal | Reaction (s) | Sound | Topper | Test |
     Time "a-b"; Type G1-G9; set-up ≥1.5; pause 0.3-0.6; break ≥0.8; break size ≥10 (% of frame width, or a close-up);
     reaction ≥1.0; Test says PASS; no empty cell (write "none" for no topper). Density: Shorts first gag by 5 s, then
-    a gag every ≤15 s (or by 2 s after the lesson beat when the mistake is the hook); episodes every ≤20 s; no
-    gag starts inside the lesson beat (playbook 4: no gag on the erring moment). Never the same type twice in a row. Episodes: ≥3 types, a G4 or G5
+    a gag every ≤15 s (or by 2 s after the lesson beat when the mistake is the hook); episodes every ≤20 s, except
+    that the gap across the lesson beat may reach 25 s; no gag starts inside the lesson beat (playbook 4: none on the
+    erring moment). Never the same type twice in a row. Episodes: ≥3 types, a G4 or G5
     (rule of three), a row whose Trait says "callback", ≥1 topper.
   Key actions table (lesson 2; M3, M14):
   | Key action | Time (s) | Object | Size (%) | Uncovered (s) |
@@ -37,6 +38,7 @@ import sys
 
 NUM = re.compile(r"-?\d+(?:\.\d+)?")
 WORD_CAP = 4000
+ACROSS_LESSON = 25
 
 
 def tables(text):
@@ -175,8 +177,10 @@ def check(text):
             if starts[0] > first:
                 fails.append(f"first gag at {starts[0]:g} s (by {first} s)")
             for a, b in zip(starts, starts[1:] + [length]):
-                if b - a > gap:
-                    fails.append(f"{b - a:.1f} s without a gag after {a:g} s (max {gap})")
+                # the gap across the lesson beat (the mistake +-2 s) may reach 25 s: no gag on the erring moment
+                limit = max(gap, ACROSS_LESSON) if a < lesson[1] and b > lesson[0] else gap
+                if b - a > limit:
+                    fails.append(f"{b - a:.1f} s without a gag after {a:g} s (max {limit})")
         if not short:
             if len(set(types)) < 3:
                 fails.append(f"{len(set(types))} gag types (needs ≥3)")

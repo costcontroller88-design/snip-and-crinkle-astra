@@ -5,7 +5,9 @@
 
 --used and --reset-min come from get_usage (5-hour % and minutes to its reset). Prints: git status, the band
 verdict (what may start now), the last ledger row, OPEN mistakes by agent, and HANDOFF's word count. --log appends
-a dated ledger row with both limits. ListAgents is a tool, not a script: run it first (one Lead only).
+a dated ledger row with both limits. --ctx <k tokens of the Lead's context>: above 200 it prints "LEAD CODES NOTHING"
+(L5, M32: write a <=20-line change spec for a fresh session or agent). --estimate <points of the 5-hour limit> saves
+the Lead's own estimate for the work about to start; the next run prints estimate vs actual (points used since). ListAgents is a tool, not a script: run it first (one Lead only).
 """
 import argparse
 import datetime
@@ -34,12 +36,26 @@ def main():
     ap.add_argument("--used", type=float, required=True)
     ap.add_argument("--reset-min", type=float, required=True)
     ap.add_argument("--weekly", type=float, default=None)
+    ap.add_argument("--ctx", type=float, default=None, help="Lead context in k tokens")
+    ap.add_argument("--estimate", type=float, default=None, help="estimated 5-hour points for the next piece of Lead work")
     ap.add_argument("--log", default=None)
     ap.add_argument("--ledger", default=None)
     a = ap.parse_args()
     st = subprocess.run(["git", "status", "--short"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print("git status:", st.replace("\n", "; ") or "clean")
     print("band:", band(a.used, a.reset_min))
+    if a.ctx is not None and a.ctx > 200:
+        print(f"LEAD CODES NOTHING: context {a.ctx:g}k > 200k; write a <=20-line change spec for a fresh session or agent (L5, M32)")
+    est = os.path.join(ROOT, ".preflight_estimate")
+    if os.path.exists(est):
+        old = [float(x) for x in open(est, encoding="utf-8").read().split()]
+        print(f"last estimate {old[0]:g} points vs actual {a.used - old[1]:g} (5-hour % now {a.used:g}, then {old[1]:g}); "
+              "if actual > 1.5x, say so in the mistake log")
+        os.remove(est)
+    if a.estimate is not None:
+        with open(est, "w", encoding="utf-8") as fh:
+            fh.write(f"{a.estimate:g} {a.used:g}\n")
+        print(f"estimate {a.estimate:g} points saved; the next preflight prints it against the actual")
     ledgers = sorted(glob.glob(os.path.join(ROOT, "reviews", "*ledger*.md")), key=os.path.getmtime)
     ledger = os.path.join(ROOT, a.ledger) if a.ledger else (ledgers[-1] if ledgers else None)
     if ledger and os.path.exists(ledger):
@@ -53,7 +69,7 @@ def main():
     print("OPEN mistakes:", "; ".join(f"{w} {','.join(ids)}" for w, ids in by.items()) or "none")
     words = len(open(os.path.join(ROOT, "HANDOFF.md"), encoding="utf-8").read().split())
     print(f"HANDOFF: {words} words (cap 500)")
-    print("build brief: 'Stage: feasibility first: measure every estimate in the plan's Measured checks, then build' (M27)")
+    print("build brief: 'Stage: feasibility first: measure every estimate in the plan's Measured checks, then build' (M27); check the brief: python3 tools/brief_check.py <file>")
     print("times to the owner: a range + the main risk; never 'ready by' before handover_check PASS")
     print("before you claim or ask: read the file that knows (bible: who errs; Studio: account steps; "
           "benchmark docs: channel handles)")

@@ -3,7 +3,8 @@
     python3 tools/title_check.py reviews/ep11_short_transform_upload.md   (packaging, before returning)
     python3 tools/title_check.py --title "Pip's Pumpkin Glows! ..."       (growth-analyst, any title)
 
-Compares each `**Title:**` line of the sheet with the titles of the last 5 other upload sheets and the quoted titles
+Exits 1 when the sheet has no `**Title:**` line. In --title mode an old title with the same core words is skipped
+(the live title is quoted in the log and its own sheet). Compares each `**Title:**` line of the sheet with the titles of the last 5 other upload sheets and the quoted titles
 in docs/analytics-log.md. FAIL (exit 1) when, after dropping the brand and emoji: the word sets overlap ≥50%; the
 first two words are the same; or its shape (length band, end mark, opening name) matches ≥3 of the last 5.
 """
@@ -39,6 +40,9 @@ def main():
     else:
         own = os.path.abspath(args[0])
         new = titles_in(own)
+        if not new:
+            print("title_check: FAIL no `**Title:**` line in the sheet (write each option as `**Title:** <text>`, your pick first)")
+            sys.exit(1)
     sheets = sorted((p for p in glob.glob(os.path.join(ROOT, "reviews", "*_upload.md")) if os.path.abspath(p) != own),
                     key=os.path.getmtime)[-5:]
     old = [t for p in sheets for t in titles_in(p)[:1]]   # the first title in a sheet is its pick
@@ -53,6 +57,8 @@ def main():
             v = core(o)
             if not w or not v:
                 continue
+            if own is None and set(w) == set(v):
+                continue   # --title: the live title's own quote in the log or sheet is not a repeat
             overlap = len(set(w) & set(v)) / min(len(set(w)), len(set(v)))
             if overlap >= 0.5:
                 fails.append(f"'{t[:50]}' shares {overlap:.0%} of its words with '{o[:50]}'")

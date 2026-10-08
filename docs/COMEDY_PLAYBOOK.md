@@ -53,8 +53,9 @@ Optional **topper:** one more beat that pushes it one step further (Pip copies t
 - **Per episode:** one rule-of-three build (G4 or G5), one running-joke callback from the bible, one topper, and
   the ending's wow followed by a last small gag (the callback is ideal).
 - **Mix:** at least 3 different gag types per episode; never the same type twice in a row.
-- **Lesson and gags stay apart:** no gag on the erring moment or on the sad character; the lesson's mistake gets
-  the "oops" signal. Gags come before the problem (to win the viewer) and after the fix (relief laughter).
+- **Lesson and gags stay apart:** no gag within 2 s of the mistake or on the sad character; the lesson's mistake gets
+  the "oops" signal. Gags come before the problem (to win the viewer) and after the fix (relief laughter); between
+  problem and fix, gags come from the helper's trait.
 - **Transformation Short:** the change itself should be a G2 (wrong feature) or G5 (too far) at its peak, with a reaction.
 - **Act it out:** Aardman's directors performed gags for the animators. The designer writes each gag's timing as
   set-up, pause, break and reaction seconds, so the animator can stage it once.
