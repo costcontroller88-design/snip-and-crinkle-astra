@@ -2,6 +2,10 @@
 
     python3 tools/build_agents.py           (write or refresh every agent file)
     python3 tools/build_agents.py --check   (only report files that differ; exits 1 if any do)
+    python3 tools/build_agents.py --allow-growth   (write even if a block grew >10%; prints the growth)
+
+Audit M10: exits 1 and writes nothing if any agent block has >10% more words than the same block at the newest
+`agents-*` git tag (`git tag -l 'agents-*' --sort=-creatordate`); --allow-growth overrides and prints the growth.
 
 MASTER_PROMPT.md is the source: edit an agent there, then run this. The shared "Rules card" block is inserted
 wherever an agent block says {{RULES_CARD}}, so every agent carries the same short rules without reading the
@@ -9,12 +13,25 @@ master prompt.
 """
 import os
 import re
+import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BLOCK = re.compile(r"^File: `(\.claude/agents/[\w-]+\.md)`\n````markdown\n(.*?)\n````$", re.M | re.S)
 CARD = re.compile(r"^Rules card \(inserted where an agent file says \{\{RULES_CARD\}\}\):\n````markdown\n(.*?)\n````$",
                   re.M | re.S)
+
+
+def words_at_newest_tag():
+    """({file: word count of the built agent block}, tag) at the newest agents-* tag; ({}, None) if there is none."""
+    git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
+    tags = git("tag", "-l", "agents-*", "--sort=-creatordate").stdout.split()
+    old = git("show", f"{tags[0]}:MASTER_PROMPT.md") if tags else None
+    if not old or old.returncode:
+        return {}, None
+    card = CARD.search(old.stdout)
+    return {rel: len(body.replace("{{RULES_CARD}}", card.group(1) if card else "").split())
+            for rel, body in BLOCK.findall(old.stdout)}, tags[0]
 
 
 def main():
@@ -26,6 +43,18 @@ def main():
         sys.exit("agent blocks or the rules card not found in MASTER_PROMPT.md")
     check = "--check" in sys.argv
     stale = 0
+    if not check:
+        base, tag = words_at_newest_tag()
+        grown = []
+        for rel, body in blocks:
+            n, o = len(body.replace("{{RULES_CARD}}", card.group(1)).split()), base.get(rel)
+            if o and n > o * 1.10:
+                grown.append(f"{rel}: {o} -> {n} words (+{(n - o) / o:.0%}) vs {tag}")
+        for g in grown:
+            print("growth  ", g)
+        if grown and "--allow-growth" not in sys.argv:
+            print("FAIL agent block(s) grew >10%: cut words, or rerun with --allow-growth (nothing written)")
+            return 1
     for rel, body in blocks:
         path = os.path.join(ROOT, rel)
         new = body.replace("{{RULES_CARD}}", card.group(1)) + "\n"

@@ -8,6 +8,10 @@ verdict (what may start now), the last ledger row, OPEN mistakes by agent, and H
 a dated ledger row with both limits. --ctx <k tokens of the Lead's context>: above 200 it prints "LEAD CODES NOTHING"
 (L5, M32: write a <=20-line change spec for a fresh session or agent). --estimate <points of the 5-hour limit> saves
 the Lead's own estimate for the work about to start; the next run prints estimate vs actual (points used since). ListAgents is a tool, not a script: run it first (one Lead only).
+Weekly pace (audit M6): --weekly-reset-days <d> (days to the weekly reset) with --weekly: if weekly % > (7 - d)/7 x 100
++ 10 the band is at most "SMALL AGENTS ONLY (weekly above pace)", unless --weekly-ok (the owner's word, 9 Oct).
+Exit 2 (nothing logged) when --log names an agent the band forbids: SMALL: animator, growth-analyst, general-purpose;
+NO AGENT / STOP: any agent.
 """
 import argparse
 import datetime
@@ -15,11 +19,17 @@ import glob
 import os
 import re
 import subprocess
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def band(used, reset_min):
+AGENTS = ["animator", "growth-analyst", "general-purpose", "fresh-eyes-reviewer", "safety-checker", "story-designer",
+          "packaging"]
+SMALL_FORBIDDEN = ["animator", "growth-analyst", "general-purpose"]
+
+
+def band(used, reset_min, weekly=None, reset_days=None, weekly_ok=False):
     if used > 85:
         return "STOP: >85%, wait for the reset"
     if used >= 75:
@@ -28,7 +38,19 @@ def band(used, reset_min):
         return "SMALL AGENTS ONLY: reset <90 min away (M8); no animator or market scan until after it"
     if used >= 60:
         return "SMALL AGENTS ONLY: 60-75% (reviewer, safety, designer, packaging)"
+    if weekly is not None and reset_days is not None and not weekly_ok and weekly > (7 - reset_days) / 7 * 100 + 10:
+        return "SMALL AGENTS ONLY (weekly above pace)"
     return "ANY AGENT: <60%"
+
+
+def forbidden(b, text):
+    """Agents named in `text` that band `b` forbids."""
+    named = [a for a in AGENTS if re.search(rf"(?<![\w-]){a}(?![\w-])", text)]
+    if b.startswith(("STOP", "NO AGENT")):
+        return named
+    if b.startswith("SMALL"):
+        return [a for a in named if a in SMALL_FORBIDDEN]
+    return []
 
 
 def main():
@@ -36,6 +58,8 @@ def main():
     ap.add_argument("--used", type=float, required=True)
     ap.add_argument("--reset-min", type=float, required=True)
     ap.add_argument("--weekly", type=float, default=None)
+    ap.add_argument("--weekly-reset-days", type=float, default=None, help="days to the weekly reset (with --weekly)")
+    ap.add_argument("--weekly-ok", action="store_true", help="the owner's word that the weekly pace is fine")
     ap.add_argument("--ctx", type=float, default=None, help="Lead context in k tokens")
     ap.add_argument("--estimate", type=float, default=None, help="estimated 5-hour points for the next piece of Lead work")
     ap.add_argument("--log", default=None)
@@ -43,7 +67,11 @@ def main():
     a = ap.parse_args()
     st = subprocess.run(["git", "status", "--short"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print("git status:", st.replace("\n", "; ") or "clean")
-    print("band:", band(a.used, a.reset_min))
+    b = band(a.used, a.reset_min, a.weekly, a.weekly_reset_days, a.weekly_ok)
+    print("band:", b)
+    if a.weekly is not None and a.weekly_reset_days is not None:
+        print(f"weekly pace: {a.weekly:g}% used, {(7 - a.weekly_reset_days) / 7 * 100:g}% of the week gone "
+              f"(over pace above {(7 - a.weekly_reset_days) / 7 * 100 + 10:g}%){'; --weekly-ok given' if a.weekly_ok else ''}")
     if a.ctx is not None and a.ctx > 200:
         print(f"LEAD CODES NOTHING: context {a.ctx:g}k > 200k; write a <=20-line change spec for a fresh session or agent (L5, M32)")
     est = os.path.join(ROOT, ".preflight_estimate")
@@ -74,12 +102,16 @@ def main():
     print("before you claim or ask: read the file that knows (bible: who errs; Studio: account steps; "
           "benchmark docs: channel handles)")
     if a.log:
+        bad = forbidden(b, a.log)
+        if bad:
+            print(f"FAIL band '{b}' forbids {', '.join(bad)}: not logged; start something the band allows", file=sys.stderr)
+            sys.exit(2)
         if not ledger:
             raise SystemExit("no ledger: pass --ledger reviews/epNN_ledger.md")
         wk = f"{a.weekly:g}" if a.weekly is not None else "—"
         day = datetime.date.today().strftime("%-d %b")
         with open(ledger, "a", encoding="utf-8") as fh:
-            fh.write(f"| {day} | {a.log} | Lead | {a.used:g} | {wk} | preflight: {band(a.used, a.reset_min)} |\n")
+            fh.write(f"| {day} | {a.log} | Lead | {a.used:g} | {wk} | preflight: {b} |\n")
         print("logged to", os.path.relpath(ledger, ROOT))
 
 

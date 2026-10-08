@@ -10,12 +10,19 @@ Full mode, in order (exit 1 on any failure):
   3. key sizes (M11): every row of the plan's key actions table needs `--check` lines `keysize <t> <pct>` (the key
      object's measured width as % of the frame width, from its mask) at ≥2 times inside its span, each at least the
      plan's Size. The plan is reviews/<epNN>_short_plan.md for a Short script, else reviews/<epNN>_plan.md.
+     Audit M4 (v3.8: Shorts are cut from the episode and have no plan of their own): a `*short*` script with no
+     reviews/<epNN>_short_plan.md skips the episode plan's key-action rows (their times are episode times) and needs
+     ≥2 `keysize` lines, each ≥10 (% of the frame width). Step 4 still reads the episode plan; step 3b stays.
   3b. Shorts safe zones (M42, audit M5): in a script whose name has "short", every `keysize <t>` time needs a
      `safezone <t> <object> ok` line (tools/safezone.py); a missing one fails, and a FAIL line fails in step 2.
   4. the plan's measured checks table: no estimate left, no measured value under its Need (M26-M29).
-  5. writes build/handover/<script>.ok with a hash of every .py file in the repo and the plan.
---verify fails if that file is missing or any code or the plan changed since, so nothing unchecked gets rendered.
+  5. writes build/handover/<script>.ok with a hash of the script, the repo modules it imports (recursive; found
+     under ROOT, ROOT/episodes, ROOT/tools; audit M3: a parallel build of another script no longer breaks this .ok)
+     and the plan.
+--verify fails if that file is missing or any of those or the plan changed since, so nothing unchecked gets rendered.
+    python3 tools/handover_check.py episodes/ep11_short_transform.py --modules     prints the hashed module list
 """
+import ast
 import glob
 import hashlib
 import os
@@ -41,13 +48,40 @@ def plan_for(script):
     return p if os.path.exists(p) else None
 
 
-def code_hash(plan):
-    h = hashlib.sha256()
-    files = sorted(glob.glob(os.path.join(ROOT, "**", "*.py"), recursive=True))
-    for f in files + ([plan] if plan else []):
-        if "/venv" in f or "/build/" in f or "__pycache__" in f:
+def has_own_short_plan(script):
+    m = re.match(r"(ep\d+)", os.path.basename(script))
+    return bool(m) and os.path.exists(os.path.join(ROOT, "reviews", f"{m.group(1)}_short_plan.md"))
+
+
+def modules(script):
+    """The script plus every repo module it imports, recursively (audit M3). Modules are looked up as <name>.py under
+    ROOT, ROOT/episodes and ROOT/tools; anything else (stdlib, numpy, PIL) is not part of the hash."""
+    seen, todo = [], [os.path.abspath(script)]
+    while todo:
+        f = todo.pop()
+        if f in seen:
             continue
-        h.update(f.encode())
+        seen.append(f)
+        try:
+            tree = ast.parse(open(f, encoding="utf-8").read())
+        except (OSError, SyntaxError):
+            continue
+        for n in ast.walk(tree):
+            names = [a.name for a in n.names] if isinstance(n, ast.Import) else \
+                [n.module] if isinstance(n, ast.ImportFrom) and n.module and not n.level else []
+            for name in names:
+                for d in (ROOT, os.path.join(ROOT, "episodes"), os.path.join(ROOT, "tools")):
+                    p = os.path.join(d, name.split(".")[0] + ".py")
+                    if os.path.exists(p):
+                        todo.append(p)
+                        break
+    return sorted(seen)
+
+
+def code_hash(plan, script):
+    h = hashlib.sha256()
+    for f in modules(script) + ([plan] if plan else []):
+        h.update(os.path.relpath(f, ROOT).encode())
         h.update(open(f, "rb").read())
     return h.hexdigest()
 
@@ -64,10 +98,13 @@ def main():
     script = os.path.abspath(args[0])
     plan = plan_for(script)
     ok_file = os.path.join(ROOT, "build", "handover", os.path.basename(script) + ".ok")
+    if "--modules" in args:
+        print("\n".join(os.path.relpath(f, ROOT) for f in modules(script) + ([plan] if plan else [])))
+        return
     if "--verify" in args:
         if not os.path.exists(ok_file):
             sys.exit("FAIL no handover check on record: the animator runs tools/handover_check.py last")
-        if open(ok_file).read().split()[0] != code_hash(plan):
+        if open(ok_file).read().split()[0] != code_hash(plan, script):
             sys.exit("FAIL code or plan changed after the handover check: run it again before rendering")
         print("handover verify: PASS")
         return
@@ -96,7 +133,11 @@ def main():
     # 3. key object sizes against the plan
     sizes = [(float(a), float(b)) for a, b in re.findall(r"keysize\s+([\d.]+)\s+([\d.]+)", out)]
     keys = find(tables(open(plan, encoding="utf-8").read()), "key action", "uncovered") if plan else None
-    if not keys:
+    if "short" in os.path.basename(script) and not has_own_short_plan(script):
+        # audit M4: a Short cut from the episode has no plan of its own; the episode plan's rows are episode times
+        if len(sizes) < 2 or min(p for _, p in sizes) < 10:
+            fails.append(f"Short without its own plan: needs ≥2 `keysize` lines each ≥10, got {[p for _, p in sizes]}")
+    elif not keys:
         fails.append(f"no key actions table in {plan or 'the plan (not found)'}: key sizes not checked")
     else:
         for r in keys[1]:
@@ -125,7 +166,7 @@ def main():
         sys.exit(f"handover_check: {len(fails)} failure(s); fix them, don't list them (M6)")
     os.makedirs(os.path.dirname(ok_file), exist_ok=True)
     with open(ok_file, "w") as fh:
-        fh.write(code_hash(plan) + "\n")
+        fh.write(code_hash(plan, script) + "\n")
     print("handover_check: PASS; render chain starts with: python3 tools/handover_check.py",
           os.path.relpath(script, ROOT), "--verify &&")
 

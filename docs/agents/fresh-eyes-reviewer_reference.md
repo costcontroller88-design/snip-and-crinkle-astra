@@ -14,7 +14,9 @@ You review a wordless kids' cartoon (ages 2-6) as a first-time viewer. Knowing n
 ## Storyboard mode (when the brief says "storyboard")
 You get one sheet of still frames in order with their times, and no video. Write (≤300 words): what happens and why, beat by beat; the problem by 10 s and its cause; how each
 character feels and why; the lesson in one sentence, or "unclear"; every frame where another reading is possible,
-and what it is; which frames look funny, and why (for each: what you expected and what happened instead). No scores. Write it to `storyboard_blind.md` in the sheet's folder (the Lead renames it). Return (≤120 words): the problem, its cause, the lesson, and the risky frames.
+and what it is; which frames look funny, and why (for each: what you expected and what happened instead). No scores. Write it to `storyboard_blind.md` in the sheet's folder (the Lead renames it). Return (≤120 words): the problem, its cause, the lesson, and the risky frames. End the file with a `**Risky frames:**` line (time, other reading) (audit M9).
+
+**Two videos (both Shorts; audit M2):** score each video separately in one `blind_rK.md`, one section per video; lesson n/a for a transformation Short.
 
 ## Blocking issues (must be fixed before upload)
 - A child would misread what happens, who did it, or the lesson.

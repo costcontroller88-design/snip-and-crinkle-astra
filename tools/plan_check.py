@@ -21,13 +21,15 @@ these tables (header cells in this order; extra text after a header word is fine
     width in that shot, uncovered ≥1.0 s.
   Storyboard table (gate 1b; M5):
   | Frame (s) | Shot | Shows |
-    episodes 10-12 frames, Shorts 6-12; a frame inside every key action's time span (so the cause of every change
-    is on the sheet).
+    episodes 10-12 frames, Shorts 6-12, but up to 14 (PASS with a WARN line) when the key actions need more frames
+    (audit M11: the fewest frames that touch every key action's span, plus 2 for set-up and finish, exceed the cap);
+    a frame inside every key action's time span (so the cause of every change is on the sheet).
   Props table (M7):
   | Prop | Colour | ... |  every object's colour and state; no empty cell.
   Measured checks table, under a `## Measured checks` heading (M26-M29: measure first):
   | Check | Need | Measured | Source |
-    one row for every distance rule in the plan ("≥N from", "≥N clear", "≥N and"): Need is that N; Measured is a
+    one row for every distance rule in the plan ("≥N from", "≥N clear", "≥N and"; also "at least N", ">= N" and
+    "N or more" before from/clear/and; audit L1): Need is that N; Measured is a
     number from the real code with its Source (`--check` or a still path), or "estimate" (allowed in a plan for a
     scene not built yet; tools/handover_check.py fails on any estimate left, so the animator measures before building).
     A measured value below its Need fails.
@@ -79,7 +81,18 @@ def span(cell):
     return (ns[0], ns[1] if len(ns) > 1 else ns[0]) if ns else None
 
 
-RULE_RE = re.compile(r"≥\s*(\d+(?:\.\d+)?)(?=\s*(?:units\s*)?(?:from|clear|and\b))")
+ACROSS = r"(?=\s*(?:units\s*)?(?:from|clear|and\b))"
+RULE_RE = re.compile(r"(?:≥|>=|at least)\s*(\d+(?:\.\d+)?)" + ACROSS + r"|(\d+(?:\.\d+)?)\s*(?:units\s*)?or more" + ACROSS)
+MAX_FRAMES = 14  # audit M11
+
+
+def stab(spans):
+    """Fewest frame times that touch every (a, b) span (greedy)."""
+    n, last = 0, None
+    for a, b in sorted(spans, key=lambda s: s[1]):
+        if last is None or a > last + 0.05:
+            n, last = n + 1, b
+    return n
 
 
 def measured(tabs):
@@ -223,14 +236,16 @@ def check(text):
     else:
         times = [num(r[0]) for r in sb[1] if num(r[0]) is not None]
         lo, hi = (6, 12) if short else (10, 12)
-        if not lo <= len(times) <= hi:
-            fails.append(f"storyboard has {len(times)} frames ({lo}-{hi})")
+        if hi < len(times) <= MAX_FRAMES and stab([s for s, _ in spans]) + 2 > hi:
+            print(f"WARN storyboard has {len(times)} frames (normal {lo}-{hi}): allowed up to {MAX_FRAMES} because the key actions need them")
+        elif not lo <= len(times) <= hi:
+            fails.append(f"storyboard has {len(times)} frames ({lo}-{hi}; up to {MAX_FRAMES} when the key actions need more)")
         for (a, b), tag in spans:
             if not any(a - 0.05 <= t <= b + 0.05 for t in times):
                 fails.append(f"{tag}: no storyboard frame inside {a:g}-{b:g} s (the cause must be on the sheet)")
 
     rows = measured(tabs)
-    needs = sorted({float(n) for n in RULE_RE.findall(text)})
+    needs = sorted({float(a or b) for a, b in RULE_RE.findall(text)})
     if needs and rows is None:
         fails.append(f"no measured checks table (Check | Need | Measured | Source) for the plan's distance rules {needs}")
     elif rows is not None:

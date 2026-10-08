@@ -18,6 +18,7 @@ The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
 3. **Cause and effect** in order (≤400 words); every set-up planted early.
 4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work). Each acting cue names its body part (ears, brows, paw), checked inside that shot's camera box.
+- **Table headers (plan_check reads them; audit M8):** gag table `| Time (s) | Type | Trait | Set-up (s) | Pause (s) | Break (s) | Break size (%) | Joke signal | Reaction (s) | Sound | Topper | Test |` (a callback says `callback` in Trait); key actions `| Key action | Time (s) | Object | Size (%) | Uncovered (s) |`; one `**Lesson beat:** a-b s` line.
 5. **Hook:** the problem in frame 0, no intro (`docs/research-wordless-craft-oct-2026.md`); **gag table** (playbook 2-4), one row per gag: time, type (G1-G9), whose trait, set-up (what we expect, s), pause (s), break (what happens instead, s, size or close-up), joke signal (who grins or laughs), reaction close-up (s), sound, topper. ≥1 landed gag every 15-20 s; one rule-of-three build, one callback, one topper, ≥3 types; charm rows don't count; no gag on the erring moment. Self-check every row against the 7-part test and mark it PASS; **close-ups** (anything under a tenth of the frame gets ≥1.2 s); **no 6 s without a change** in the situation.
 6. **Sound** (table): a sound for every visible action; reactions as music or soft effects; music mood by section.
 7. **Shorts:** a story Short (≤60 s, with source seconds) and a transformation Short (15-30 s) designed with its own close-up camera and ≥1 s holds per change; never a re-cut of wide shots.
@@ -27,11 +28,12 @@ The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle
    holds, guards or touches an object near a sad character unless that object is the problem, and nobody points
    at someone in a way that could read as blame. List every face or pose within 2 s of the mistake and why none supports the wrong reading (a grin or tongue reads "smug").
 10. **Storyboard frames:** 10-12 timestamps that tell the whole story (always the first 30 s,
-   the cause of the problem, the lesson beat and the 2 strongest gags), for gate 1b's blind check.
+   the cause of the problem, the lesson beat and the 2 strongest gags), for gate 1b's blind check. A standalone Short's frames: 6-12, up to 14 when the key actions need it (audit M11).
 11. **Hidden key actions:** where safety hides an action (the grown-up's hand cutting, heat), stage a clear
    before/after (a cutaway or a reveal with a sound) so the change itself is seen.
 
 ## Fix mode (when the brief says "fix")
+After gate 1b, the reviewer's `**Risky frames:**` line is the blocking list (audit M9).
 After a failed gate 1b or blind review, for story and staging issues only: read the blind write-up's blocking list
 and the Lead's notes, apply the misread rule (find what in the frame supports the wrong reading and remove it;
 don't just enlarge the right one). For a low comedy score, run each gag through the playbook's 7-part test and fix the part that failed (usually the set-up, the pause or the reaction). Read the real positions and sizes from the code before writing any number

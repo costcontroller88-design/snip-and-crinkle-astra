@@ -89,7 +89,7 @@ EPISODE_GUIDE > research docs.
 - **A concrete problem:** the problem is a visible thing or action, in close-up, by 10 s. If it is a feeling, its
   cause is visible in the same shot, and nothing else in the frame suggests a different problem.
 - **Every episode:** the problem or a striking action by 10 s (Shorts: 2 s); a landed gag every 15-20 s from personality;
-  one wow; the lesson shown as an action. A gag counts only if it passes the playbook's 7-part test; charm doesn't count; per episode one rule-of-three build, one callback, one topper, ≥3 gag types.
+  one wow; the lesson shown as an action. A gag counts only if it passes the playbook's 7-part test; charm doesn't count; per episode one rule-of-three build, one callback, one topper, ≥3 gag types. Shorts: the first gag by 5 s, then one every ≤15 s (audit L3).
 - **Story engines,** never the same twice in a row: A Snip errs; B Crinkle errs; C both solve a problem together;
   D "What happens next?" (no mistake; kids predict, then the reveal); E looking after the little one (Pip). Crinkle,
   or both, err in at least 1 episode out of 3; the next engine-E story lets Pip help or lead.
@@ -128,7 +128,7 @@ follow it" and give it the model from the table.
 
 ## 8. The pipeline for one story
 0. **Lead: go/no-go** in 5 lines: one concrete lesson with a wrong → right moment? can the rig, the props, the source
-   material and the time really do this, and is it worth it against the ROADMAP? No-go costs nothing; a failed build costs a day.
+   material and the time really do this, and is it worth it against the ROADMAP? No-go costs nothing; a failed build costs a day. The go/no-go is the episode ledger's first row (audit M10).
 1. **Lead** briefs the **story-designer**: topic, engine, setting, deadlines, anything the files don't already say.
 2. **Plan.** The Lead reads the designer's return, the story card and the toolkit section, not the whole plan. The plan
    states intent; every distance and size row has Measured = "estimate" (`plan_check.py` allows it).
@@ -145,7 +145,7 @@ follow it" and give it the model from the table.
    Two storyboard rounds at most, then the owner decides. Restaged shots that touch a gate-1 safety note (the hand,
    tools, heat, light near faces) go back to the safety-checker for those shots only.
    Price (Episode 11 ledger): the reviewer ~0.5%; a storyboard built from code 15-25%; still far less than a
-   failed build plus a review round. A MATCH is necessary, not proof: the cause must also show in motion.
+   failed build plus a review round. A MATCH is necessary, not proof: the cause must also show in motion. The Lead logs card vs retelling (problem, cause, lesson) as a ledger row (audit M9). A standalone Short's sheet: 6-12 stills, up to 14 when the key actions need it (audit M11).
 4. **animator, in stages** (it codes and checks stills; the Lead runs the render chain in one background command):
    (a) prototype stills of the riskiest part to BUILD (the riskiest part to UNDERSTAND was
    covered by gate 1b), which the Lead looks at for look, size and technique only; (b) toolkit; (c) the episode,
@@ -161,7 +161,7 @@ follow it" and give it the model from the table.
    is not enough. **If round 2 repeats a round-1 blocking issue,** the fix missed the cause: back to the designer.
    **Plateau rule:** if a round's overall equals the last round's, stop fixing; the owner decides (redesign,
    salvage a Short, or drop).
-6. **animator:** the story Short and the transformation Short, cut from the episode (section 6): one build, ≤1 fix round; one blind review covers both.
+6. **animator:** the story Short and the transformation Short, cut from the episode (section 6): one build, ≤1 fix round; one blind review covers both. Its brief: `Videos: <a>, <b>`; the reviewer scores each video (lesson n/a for a transformation Short); the Lead files it as `reviews/epNN_short_blind_rK.md` (audit M2).
 7. **packaging** (only after gate 2 passes), then **gate 3, safety-checker** on the finished videos and the text.
 8. **Lead:** files in `Videos/`, HANDOFF, retrain from the mistake log (section 10, item 11.9), commit and push, report to the owner.
 9. **growth-analyst:** logs the numbers at 7 and 28 days after upload.
@@ -248,6 +248,7 @@ Special: <stage, deadline, files not to touch, "don't commit" when agents run in
 A build brief always says "Stage: feasibility first, then build" and sets no budget; `tools/brief_check.py` fails it otherwise (M27). While the plan has an "estimate" row, the brief is "Stage: feasibility only" (`brief_check.py <brief> --plan <plan>`); the Lead reads the numbers, then sends "build" to the same agent (SendMessage) (M39).
 For the fresh-eyes reviewer, only: `fresh-eyes-reviewer: blind review. Video: <neutral copy path>. Round: <k>.`
 For gate 1b, only: `fresh-eyes-reviewer: storyboard blind check. Sheet: build/sbK/storyboard.png. Round: <k>.`
+For both Shorts, only: `fresh-eyes-reviewer: blind review. Videos: <a>, <b>. Round: <k>.`
 
 ## 12. Reporting to the owner
 Each work package ≤200 words, each phase ≤400: 1. Done. 2. Scorecard (1-10) with the weakest item named. 3. Numbers

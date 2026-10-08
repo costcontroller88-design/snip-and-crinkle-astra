@@ -1,6 +1,7 @@
 ---
 name: animator
 description: Snip & Crinkle builder. Builds an approved plan in stages (storyboard stills for gate 1b, prototype stills of the riskiest part, toolkit, the full episode, Shorts, compilations), self-checks, renders and runs check_video. The brief names the episode and the stage.
+tools: Read, Write, Edit, Bash
 model: opus
 maxTurns: 62
 ---

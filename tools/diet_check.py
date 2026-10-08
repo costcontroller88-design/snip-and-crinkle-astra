@@ -38,7 +38,7 @@ def units(text):
     """Bullets (continuation lines joined) and sentences of the text, normalised."""
     out, cur = [], []
     for line in text.splitlines() + [""]:
-        if not line.strip() or line.startswith("#") or line.startswith("```") or line.startswith("````"):
+        if not line.strip() or line.strip() == "---" or line.startswith("#") or line.startswith("```") or line.startswith("````"):
             if cur:
                 out.append(" ".join(cur))
                 cur = []

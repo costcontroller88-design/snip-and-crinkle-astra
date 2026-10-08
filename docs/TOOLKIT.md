@@ -24,13 +24,14 @@ here and an API docstring at its top.
 | `episodes/pilot02_splash_of_blue.py` | Reference episode: `render_world(t, d, cam, bg)`, `make_buses()`, flags `--keys`, `--cuts`, `--still T` |
 | `episodes/pilot02_short.py` | Reference vertical Short: re-films an episode through a vertical camera, cuts its sound effects, own music bed |
 | `tools/check_video.py` | `--landscape --no-loop --cuts t1,t2,...`; vertical Shorts 12-180 s; `--dur 15-30` (transformation Short) or `12-60` (story Short); prints RESULT: PASS |
-| `tools/build_agents.py` | Writes `.claude/agents/` from MASTER_PROMPT.md Appendix A |
+| `tools/build_agents.py` | Writes `.claude/agents/` from MASTER_PROMPT.md Appendix A `--allow-growth`: write even if a block has >10% more words than at the newest `agents-*` tag (otherwise exit 1, nothing written; M10). |
+| `tools/blind_guard.py` | PreToolUse hook in the fresh-eyes-reviewer's frontmatter (Read, Bash, Glob, Grep): exit 2 on reviews/, episodes/, output/, Videos/, docs/ (except its reference), MASTER_PROMPT/HANDOFF/CLAUDE.md (M1); test: pipe `{"tool_name":"Read","tool_input":{"file_path":"reviews/x"}}` |
 | `tools/handoff_check.py` | Checks HANDOFF.md: ≤500 words, paths exist, no trimmed fact lost; `--install` sets the pre-commit hook |
 | `tools/plan_check.py` | `<plan>`: the designer's gate (gag table vs the playbook, key actions ≥1.0 s and ≥10%, storyboard covers every key action, props, ≤4,000 words); docstring = the required tables |
-| `tools/handover_check.py` | `<script>`: the animator's last command (audio silence/loudness, `--check`, `keysize` vs plan; a Short also needs a `safezone <t>` line at every `keysize <t>`); `--verify` starts the render chain |
+| `tools/handover_check.py` | `<script>`: the animator's last command (audio silence/loudness, `--check`, `keysize` vs plan; a Short also needs a `safezone <t>` line at every `keysize <t>`); `--verify` starts the render chain `--modules` prints the hashed list (the script, its repo imports, the plan; M3). A `*short*` script with no `<epNN>_short_plan.md` needs ≥2 `keysize` ≥10 instead of the episode plan's rows (M4). |
 | `tools/safezone.py` | Shorts safe zones: `to_frame(mask, RES, (CAM.ox, CAM.oy), c, z)` then `line(t, name, mask)` → `safezone <t> <name> ok/FAIL` for a Short's `--check`; `--overlay frame.png` draws the zones on a still |
 | `tools/title_check.py` | `<upload sheet>` or `--title "..."`: flags titles that repeat the last 5 or the live ones |
-| `tools/preflight.py` | `--used --reset-min --weekly [--log step]`: the Lead's pre-flight (band, ledger row, OPEN mistakes, HANDOFF count) |
+| `tools/preflight.py` | `--used --reset-min --weekly [--log step]`: the Lead's pre-flight (band, ledger row, OPEN mistakes, HANDOFF count) `--weekly-reset-days <d>` caps the band at SMALL when weekly % is >10 points over pace, `--weekly-ok` (owner's word) lifts it; exit 2 if `--log` names a forbidden agent (M6). |
 
 ## Facts you'd otherwise dig for
 - Render speed: about 3.5 s of rendering per second of 2x landscape video on 8 cores (Episode 11's porch with light:

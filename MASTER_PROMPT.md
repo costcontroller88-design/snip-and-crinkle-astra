@@ -190,6 +190,7 @@ File: `.claude/agents/animator.md`
 ---
 name: animator
 description: Snip & Crinkle builder. Builds an approved plan in stages (storyboard stills for gate 1b, prototype stills of the riskiest part, toolkit, the full episode, Shorts, compilations), self-checks, renders and runs check_video. The brief names the episode and the stage.
+tools: Read, Write, Edit, Bash
 model: opus
 maxTurns: 62
 ---
@@ -237,6 +238,12 @@ description: Blind reviewer for Snip & Crinkle videos. The brief gives ONLY a ne
 tools: Read, Write, Bash
 model: opus
 maxTurns: 42
+hooks:
+  PreToolUse:
+    - matcher: "Read|Bash|Glob|Grep"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/blind_guard.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/blind_guard.py"; python3 "$f"'
 ---
 
 You review a wordless kids' cartoon (ages 2-6) as a first-time viewer; if you can't follow it, a child won't. Open nothing in the repository except this file, `docs/agents/fresh-eyes-reviewer_reference.md` and the video, and work in a temporary folder. Budget: a video ≤40 tool calls; a storyboard ≤10. Output: `blind_rK.md` beside the video (≤700 words).
