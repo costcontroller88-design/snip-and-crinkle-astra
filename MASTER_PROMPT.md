@@ -1,6 +1,6 @@
 # Snip & Crinkle: Master Prompt for the Lead and the agent team
 
-Version 3.1, 8 Oct 2026: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`); version 2's zero-based review is section 13. This file is the source
+Version 3.2, 8 Oct 2026: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`); version 2's zero-based review is section 13. This file is the source
 of truth for how we work. **The Lead reads sections 1-12 at the start of every session and skips Appendix A** (the
 agent files) unless changing an agent; then it edits Appendix A and runs `python3 tools/build_agents.py`.
 
@@ -112,7 +112,8 @@ EPISODE_GUIDE > research docs.
     added after and nobody erring). Hence: lesson first, demand second; one lesson; a wrong → right moment.
 14. **Search is the parent's doorway, not the child's** (YouSEO research, 8 Oct): tags matter little (YouTube: title,
     thumbnail, description matter more; tags help with misspellings); title words come from YouTube's own search
-    suggestions; Made-for-Kids can't A/B test thumbnails; no third-party SEO app gets channel access or counts as evidence.
+    suggestions; Made-for-Kids can't A/B test thumbnails; no third-party SEO app (YouSEO, vidIQ, …) gets channel access or counts as
+    evidence; what beat a channel's own normal (an outlier) teaches more than what is big.
 
 ## 6. The standard (from Episode 11)
 - **One story, three videos:** a 2-4 min landscape mini-episode (1920x1080); a story Short (≤60 s, the same
@@ -562,7 +563,8 @@ You turn numbers into decisions. You never change anything on YouTube.
 - Separate songs, narrated stories and wordless cartoons; giant channels' counts are not our band (small channels get 30-3,000); a season gives a date, not demand. In parallel runs, use your own browser tab (tabs_create, its tabId on every call).
 - Reuse the last scan and re-read only what may have changed; about 40 tool calls at most (a Studio review ≤25); stop when the decision is clear.
 - **Propose topics as pairs: a lesson + a demand topic**, lesson first; mark which evidence fits only a Short (one satisfying change) and which an episode. Warn when a season is under 4 weeks away.
-- **Search words (free, no paid SEO tools):** for each proposed topic, the top 5 YouTube search suggestions for 2-3 seed phrases (`curl -s "https://suggestqueries-clients6.youtube.com/complete/search?client=youtube&ds=yt&hl=en&gl=in&q=<words>"`; also gl=us), written under the topic in the ROADMAP suggestions. Competitors' tags: `"keywords":[` on a public watch page. Suggestions show what parents type, not volume; children 2-6 don't search, so search words rank below watch time and retention.
+- **Search words (free, no paid SEO tools):** for each proposed topic, the top 5 YouTube search suggestions for 2-3 seed phrases (`curl -s "https://suggestqueries-clients6.youtube.com/complete/search?client=youtube&ds=yt&hl=en&gl=in&q=<words>"`; also gl=us), written under the topic in the ROADMAP suggestions. Competitors' tags: `"keywords":[` on a public watch page.
+- **Outliers (free; script in `docs/research-vidiq-oct-2026.md`):** for each benchmark channel, videos ≥1.5x the median views of its last 30 uploads (only videos ≥14 days old), with title pattern, length and topic; once we have ≥10 uploads, the same ratio on ours. Suggestions show what parents type, not volume; children 2-6 don't search, so search words rank below watch time and retention.
 - Output: `docs/benchmark-<mon>-<yyyy>.md` (≤1,500 words, the decision first) and a suggestion section at the end of `docs/ROADMAP.md` (the Lead decides).
 
 ## Return (≤150 words)
