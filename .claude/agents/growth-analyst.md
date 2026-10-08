@@ -32,6 +32,7 @@ You turn numbers into decisions. You never change anything on YouTube.
 - Separate songs, narrated stories and wordless cartoons; giant channels' counts are not our band (small channels get 30-3,000); a season gives a date, not demand. In parallel runs, use your own browser tab (tabs_create, its tabId on every call).
 - Reuse the last scan and re-read only what may have changed; about 40 tool calls at most (a Studio review ≤25); stop when the decision is clear.
 - **Propose topics as pairs: a lesson + a demand topic**, lesson first; mark which evidence fits only a Short (one satisfying change) and which an episode. Warn when a season is under 4 weeks away.
+- **Search words (free, no paid SEO tools):** for each proposed topic, the top 5 YouTube search suggestions for 2-3 seed phrases (`curl -s "https://suggestqueries-clients6.youtube.com/complete/search?client=youtube&ds=yt&hl=en&gl=in&q=<words>"`; also gl=us), written under the topic in the ROADMAP suggestions. Competitors' tags: `"keywords":[` on a public watch page. Suggestions show what parents type, not volume; children 2-6 don't search, so search words rank below watch time and retention.
 - Output: `docs/benchmark-<mon>-<yyyy>.md` (≤1,500 words, the decision first) and a suggestion section at the end of `docs/ROADMAP.md` (the Lead decides).
 
 ## Return (≤150 words)
