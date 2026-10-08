@@ -308,18 +308,24 @@ CR.to(24.05, 24.3, "io", lean=-6).to(25.3, 25.8, "io", lean=0)               # r
 CR.to(25.5, 25.9, "io", turn=-0.35)                                         # + is toward the lantern); turns back
 PIP.to(22.9, 23.3, "io", lean=-5).to(25.4, 25.8, "io", lean=0)
 SN.to(22.9, 23.3, "io", lean=-5).to(25.4, 25.8, "io", lean=0)
-# ---- shot 13 (26.2-29.0, W; r4: paws up, no sideways swing, every mask <= x 1479): Snip hops; gag 3 (G5): two wiggles, still, the third spins him round
+# ---- shot 13 (26.2-29.0, W; r5: Crinkle at 1180 from 26.2, paws up, every mask <= x 1479): Snip hops; gag 3 (G5): two wiggles, still, the third spins him round
 SN.to(26.4, 26.6, "io", sq=0.92).hop(26.6, 27.0, 1, 26).to(27.0, 27.2, "io", sq=1.0)
 TUMMY = BELLY2
-CR.to(25.35, 25.65, "io", arm_r=172, elb_r=22)                      # r4 (Lead): right paw up over his head, raised
-#                                     while he is out of D (the raise reaches x 1500: never seen, never near the hand)
+CR_XA = 1180                                                         # r5 (Lead, Option A / gate 1 A1): after the cut
+CR.walk(25.7, 26.2, CR_XA, steps=2)                                  # to W he steps left behind the lantern's right side
+CR.reach(25.7, 26.2, "l", (CR_XA + BELLY_D[0] + 8, BELLY_D[1]), "io")  # marker at belly height, tucked 8 right
+#                                                                     (A1: 9.4 at 27.53 untucked, need >= 10)
+CR.to(26.2, 26.4, "io", arm_r=172, elb_r=22)                         # right paw up over his head, once at 1180
+#                                                                     (raised during the walk it reached x 1500 at 26.13)
 CR.face(26.4, eyes="happy", mouth="smile_open", brows="up")
 for i, (a, b) in enumerate(((26.4, 26.775), (26.775, 27.15), (27.15, 27.525), (27.525, 27.9))):
     CR.to(a, b, "io", sq=0.95 if i % 2 == 0 else 1.03, arm_r=182 if i % 2 == 0 else 166)   # r4: no sideways swing
-CR.hop(26.4, 27.9, 4, 12)
-CR.to(27.9, 28.2, "io", sq=0.9, arm_r=172)                           # squashes down, still (the pause)
-CR.to(28.2, 28.5, "io", turn=0.2, sq=1.0, look_x=10)                # wiggle 3 swings him round, feet down (r4: +0.2
-#                                                                     keeps his head inside W: 0.3 measured 1486)
+CR.hop(26.4, 27.525, 3, 12)   # r5: three hops (landings 26.775, 27.15, 27.525), the 4th wiggle on the spot, so the
+#                                          landing has settled before the pause (was still only 28.07-28.2)
+CR.to(27.87, 27.93, "io", sq=0.9, arm_r=172)                        # squashes down in one drawing, then still
+#                                                                     (r5: the pause 27.97-28.2 measured still)
+CR.to(28.2, 28.5, "io", turn=0.55, sq=1.0, look_x=10)               # wiggle 3 swings him right round, feet down
+#                                                                     (r5: +0.55 at 1180, right edge 1426.5 measured)
 CR.to(28.5, 28.75, "io", sq=0.95, arm_r=182).to(28.75, 29.0, "io", sq=1.03, arm_r=166)   # dances on, the wrong way
 # ---- shot 14 (29.0-30.0, K2): he looks back over his shoulder, blinks, laughs at himself
 CR.to(29.0, 29.2, "io", lean=0, tilt=0, hturn=-0.6, look_x=-10, look_y=2).blink(29.2)
@@ -869,24 +875,39 @@ def checks():
     lan = _mask_of(lambda im: place(im, LANTERN.paper({}), CAM.S(BASE)))
     lan_a = np.asarray(lan) > 0
     lan_top = _wbox(lan)[1]
-    worst, ex, held = (0, None), (0, None), set()
+    worst, ex, held = (0, ()), (0, ()), set()
     for tt in drawings(6.5, DUR):
         sts = states(tt)
         who_mk, side_mk = marker_pose(tt)[:2]
-        turn = tt < 20.4
+        turn = tt < 21.2                                           # r5: the lesson exemption runs to 21.2
         ms = [(w + sd, _arm_mask(w, sd, sts)) for w, sd in arms_over(tt)]
         ms.append(("mk", _mask_of(lambda im: draw_marker(im, tt, sts))))
         for tag, m in ms:
             n = int((np.asarray(m) > 0)[lan_a].sum())
-            if turn and tag in ("mk", who_mk + side_mk, "crl" if 17.15 <= tt < 17.6 else "mk"):
+            if turn and (tag in ("mk", who_mk + side_mk) or (17.15 <= tt < 17.65 and tag in ("crl", "pipr"))):
                 held.add(tag)
                 ex = max(ex, (n, (round(tt, 2), tag)))
             else:
                 worst = max(worst, (n, (round(tt, 2), tag)))
-    lines.append(f"{'FAIL' if worst[0] else 'ok  '} R4-1 r4 (a) paw, wing and marker pixels drawn over the lantern "
+    lines.append(f"{'FAIL' if worst[0] else 'ok  '} R4-1 r5 (a) paw, wing and marker pixels drawn over the lantern "
                  f"6.5-30.0: {worst[0] if worst[0] else 'none'} (max, at {worst[1]})")
-    lines.append(f"     exempt (the lesson: drawing turns and hand-overs to 20.4, the marker, its holder's paw and "
-                 f"Crinkle's taking paw 17.15-17.6) {sorted(held)}: max {ex[0]} px at {ex[1]}")
+    lines.append(f"     exempt (the lesson 6.5-21.2: the marker, the paw holding it, Pip's giving and Crinkle's taking "
+                 f"paws 17.15-17.65) {sorted(held)}: max {ex[0]} px at {ex[1]}")
+    # 5c. Option A (gate 1 A1, Lead r5): Crinkle at 1180 behind the lantern's right side; his arms and the marker
+    #     >= 10 from the lantern mask, his body overlap <= 71 wide, 25.3-30.0
+    gap, ov = (1e9, None), (0.0, None)
+    for tt in drawings(25.3, DUR):
+        sts = states(tt)
+        am = ImageChops.lighter(_arm_mask("cr", "l", sts), _arm_mask("cr", "r", sts))
+        if marker_pose(tt)[0] == "cr":
+            am = ImageChops.lighter(am, _mk_only(tt, sts))
+        gap = min(gap, (round(_gap(am, lan), 1), round(float(tt), 2)))
+        b = (np.asarray(_body_mask("cr", tt, sts)) > 0) & lan_a
+        if b.any():
+            xs = np.nonzero(b.any(0))[0]
+            ov = max(ov, (round((xs.max() - xs.min() + 1) / RES, 1), round(float(tt), 2)))
+    ok(gap[0], 10, f"A1 Crinkle's arms + marker to the lantern mask 25.3-30.0 (min, at {gap[1]})")
+    ok(ov[0], 71, f"A1 Crinkle's body overlap width behind the lantern 25.3-30.0 (max, at {ov[1]})", ge=False)
     worst = (1e9, None)
     for tt in drawings(21.2, DUR):
         sts = states(tt)
@@ -1210,7 +1231,8 @@ def build_audio(path):
 
 # ---------------------------------------------------------------- key sheet (r3: every changed shot, its edges, beats)
 KEYS = [1.0, 2.4, 5.0, 6.3, 17.2, 20.7, 21.2, 21.4, 21.8, 22.2, 22.6, 22.93, 23.0, 23.3, 24.0, 24.8, 25.5, 25.67,
-        25.7, 25.8, 26.2, 26.6, 27.0, 27.5, 28.0, 28.3, 28.6, 28.93, 29.0, 29.5]   # r4: changed shots, edges, beats
+        25.7, 25.95, 26.2, 26.35, 26.6, 27.0, 27.53, 28.0, 28.2, 28.35, 28.5, 28.93, 29.0, 29.5]   # r5: changed
+#                                                     shots, edges, beats (walk 25.7-26.2, raise, wrong-way turn)
 
 
 def sheet(frames, path, w=480, cols=8):

@@ -146,18 +146,18 @@ Own timeline and cameras (b4); holds ≥1 s (b5).
 |---|---|---|---|
 | Hand and tea light to Crinkle's head 23.0-25.3 (at 1260, +6 lean) | 30 | 63.2 (sleeve 59.7); lean is -6 in code (+ leans toward the lantern: +6 meas. 13.6, sleeve 0.0) | `--check` r3 build |
 | Hand and tea light to Snip's head 23.0-25.3 (at 660) | 30 | 40.7 | `--check` (designer r3) |
-| Crinkle's masks, right edge, 25.7-29.0 (Lead r5, Option A at 1180) | ≤1479 | 1426.5 at 28.93 (+0.55 turn; K2 (1180, 1129)) | `--check` r4 |
-| Lantern mask inside D with margin 23.0-25.7 (Lead r4) | 10 | 10.2 | `--check` r4 build (animator) |
-| Sleeve to every head mask, ears included, 23.0-25.3 | 10 | 40.7 (Snip; Pip 48.6, Crinkle 59.7) | `--check` r3 build |
-| Let-go: Crinkle's paw to the marker by 5.55 | 30 | 33.0 | `--check` r2 build, 5.55-5.80 |
-| Marker tip to every head mask 20.4-22.8 | 60 | 134.8 | `--check` r2 build |
-| Paws, wings, marker pixels drawn over the lantern outside the lesson exemption 6.5-30.0 (R4-1 r5) | 0 | 0 (r4 runs end 20.93, all exempt) | safety script, r4 build |
-| Crinkle's arms + marker to the lantern mask 25.3-30.0 (Option A, A1) | 10 | 10.7 at 27.53 (thin: raise or tuck the paw if it drops) | animator feasibility, scratch patch |
-| Crinkle's body overlap width behind the lantern 25.3-30.0 (Option A) | ≤71 | 70.5 at 27.53 | animator feasibility; frames at gate 3 |
-| Paw/wing/marker overlap top below the lantern top 21.2-30.0 (R4-1 r4) | ≥20 | 23.5 (Pip right wing; Crinkle no overlap reported) | safety script, r3 build |
-| Head masks inside W 22.2-23.0 and 25.7-26.2 (every head) | 0 | 25.3 (Snip 22.67; Crinkle 28.3, Pip ≥114) | designer script r4 (`head_mask`, `_body_mask`), stills `build/ep11s/r4_plan/` |
-| Snip's and Pip's heads inside D 23.0-25.7 | 0 | 19.7 (Snip 23.0) | designer script r4 |
-| Crinkle's head and body clear outside D 23.0-25.7 | 0 | 14.8 (23.0) | designer script r4 |
+| Crinkle's masks, right edge, 25.7-29.0 (Lead r5, Option A at 1180) | ≤1479 | 1466.5 at 26.27 (paw raised at 1180 after the walk 25.7-26.2; +0.55 turn; K2 (1180, 1129)) | `--check` r5 build |
+| Lantern mask inside D with margin 23.0-25.7 (Lead r4) | 10 | 10.2 | `--check` r5 build |
+| Sleeve to every head mask, ears included, 23.0-25.3 | 10 | 40.7 (Snip; Pip 48.6, Crinkle 59.7) | `--check` r5 build |
+| Let-go: Crinkle's paw to the marker by 5.55 | 30 | 33.0 | `--check` r5 build, 5.55-5.80 |
+| Marker tip to every head mask 20.4-22.8 | 60 | 131.2 (22.33) | `--check` r5 build |
+| Paws, wings, marker pixels drawn over the lantern outside the lesson exemption 6.5-30.0 (R4-1 r5) | 0 | 0 (none; exempt max 35929 px at 17.2, the take) | `--check` r5 build |
+| Crinkle's arms + marker to the lantern mask 25.3-30.0 (Option A, A1) | 10 | 10.3 at 27.53 (paw tucked 8 right; thin) | `--check` r5 build |
+| Crinkle's body overlap width behind the lantern 25.3-30.0 (Option A) | ≤71 | 70.5 at 27.53 | `--check` r5 build; frames at gate 3 |
+| Paw/wing/marker overlap top below the lantern top 21.2-30.0 (R4-1 r4) | ≥20 | 23.5 (Pip right wing, 26.93) | `--check` r5 build |
+| Head masks inside W 22.2-23.0 and 25.7-26.2 (every head) | 0 | 25.3 (Snip 22.67) | `--check` r5 build (M34, 22.2-23.0 and 25.7-29.0) |
+| Snip's and Pip's heads inside D 23.0-25.7 | 0 | 10.2 (Snip 23.0) | `--check` r5 build |
+| Crinkle's head and body clear outside D 23.0-25.7 | 0 | 64.8 eyes outside (25.67); head side sliver 29.7 at 24.0, ≤31 accepted (Lead r4) | `--check` r5 build |
 | Crinkle's left arm pixels seen while behind the lantern 6.80-7.13 | 0 | not seen at 6.80, 6.87, 6.93 (crops); 7.00-7.13 not checked | full frames, gate 3 |
 
 ## b11. Hidden key actions
