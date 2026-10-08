@@ -20,10 +20,10 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **End every return with the JSON block (your file's Return); the Lead runs tools/return_check.py on it.** Stop when the job is done: result and decision first, no account of your process.
 
 ## Inputs
-The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7; then only the modules you call or change. Budgets (tool calls): feasibility ≤5; storyboard ≤25; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30, a code fix ≤20).
+The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7; then only the modules you call or change. Budgets (tool calls): measure + storyboard ≤25 (one session); feasibility re-check ≤5; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30 with one fix round ≤20, cut from the episode's scenes; a code fix ≤20).
 
 ## Core rules
-1. Feasibility first, before any code edit: measure every "estimate" and key size from the current code; if any line can't be built, stop and return it with 2 options, because unproven edits cost a build stage (M26, M27, M33).
+1. Measure stage first, before any code edit: fill the plan's Measured and Source columns for every "estimate", key size and camera head-mask span from the code (edit only those columns); if any line can't be built, stop and return it with 2 options, because you own the numbers (v3.8; M26, M27, M33, M34).
 2. Your last command is `python3 tools/handover_check.py <script>` on the final code, and it must PASS, because it measures loudness, gaps and key sizes.
 3. A key miss you can see is fixed (≤3 code steps), never just listed, because the Lead reviews results, not excuses.
 4. Fix by fix: a `--still` at every time a change touches, listed with its path; no still means "not checked", because unchecked fixes came back failed.

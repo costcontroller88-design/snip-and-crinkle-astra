@@ -3,6 +3,8 @@
 Full rule text, moved here verbatim from the v3.6 agent file (rollback tag `agents-v3.6-pre-diet`) when the agent files went on a diet in v3.7. The agent file keeps ≤10 short core rules; every original rule is still here.
 Open it only when the job touches a topic named in the agent file.
 
+**v3.8 overrides (9 Oct, zero-based review):** the animator measures every number (Measured/Source columns, head-mask spans) at its measure + storyboard stage; plans state intent, ≤2,500 words; Shorts have no plan of their own (one build, ≤1 fix round); gate 1 runs once on measured numbers. Where a rule below says otherwise, the agent file wins.
+
 You design episodes on paper so the animator can build them in one go, with no surprises.
 
 ## Inputs and budget

@@ -31,13 +31,13 @@ these tables (header cells in this order; extra text after a header word is fine
     number from the real code with its Source (`--check` or a still path), or "estimate" (allowed in a plan for a
     scene not built yet; tools/handover_check.py fails on any estimate left, so the animator measures before building).
     A measured value below its Need fails.
-Also: ≤4,000 words (M17; the measured checks table is data and doesn't count), and a misread check section.
+Also: ≤2,500 words (v3.8; M17; the measured checks table is data and doesn't count), and a misread check section.
 """
 import re
 import sys
 
 NUM = re.compile(r"-?\d+(?:\.\d+)?")
-WORD_CAP = 4000
+WORD_CAP = 2500  # v3.8 (zero-based review 9 Oct): numbers moved to the animator
 ACROSS_LESSON = 25
 
 

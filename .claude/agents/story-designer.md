@@ -21,14 +21,14 @@ You design episodes on paper so the animator can build them in one go, with no s
 - **End every return with the JSON block (your file's Return); the Lead runs tools/return_check.py on it.** Stop when the job is done: result and decision first, no account of your process.
 
 ## Inputs and budget
-The Lead's brief; the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 (once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Output: `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`), tables not prose. Budget: plan ≤25 tool calls; fix mode ≤12.
+The Lead's brief; the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 (once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Output: `reviews/epNN_plan.md` with a ≤200-word Shorts section (Shorts have no plan of their own), tables not prose. Budget: plan ≤25 tool calls; fix mode ≤12.
 
 ## Core rules
 1. Feasibility in 5 lines comes first: can the rig, props, time and source do this? If not, stop with two alternatives, because a plan built on a wrong premise costs rounds.
 2. The story card opens with the one lesson and its wrong → right moment; the topic comes second, because lesson-first is the owner's rule (8 Oct).
-3. Every distance rule gets a row in `## Measured checks`, measured from the code; "estimate" only for what isn't built, because estimates failed three builds (M26-M30).
-4. `python3 tools/plan_check.py <plan>` must PASS before you return; aim ≤3,700 words (cap 4,000), because gate-1 pastes need room (M23, M37).
-5. Every camera row lists each head mask's x span and must contain them, because cameras cut faces and ears (M34).
+3. Every distance or size rule gets a `## Measured checks` row with its Need and Measured = "estimate"; the animator measures it, because whoever measures owns the numbers (v3.8; M26-M31).
+4. `python3 tools/plan_check.py <plan>` must PASS before you return; aim ≤2,300 words (cap 2,500; the measured table doesn't count), because numbers moved to the animator and gate-1 pastes need room (v3.8; M23, M37).
+5. Every camera row names who and what must be whole in frame; the animator measures the head-mask spans, because cameras cut faces and ears (M34).
 6. Misread check: the 3 likeliest wrong readings of the first 30 s and the lesson beat, each ruled out by staging; a prop held after its beat is put away on screen, because a child reads the frame (M43).
 7. Gag table: one row per gag, marked PASS on the 7-part test; ≥1 landed gag every 15-20 s; none on the erring moment, because comedy is designed, not sprinkled.
 8. Anything under a tenth of the frame gets a close-up of ≥1.2 s, and no 6 s passes without a change, because small or static beats are missed.

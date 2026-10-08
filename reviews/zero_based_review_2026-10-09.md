@@ -18,7 +18,7 @@ designer. Mistakes from this one hand-off: M26-M31, M34, M35, M38, M39, M40 (11 
 **Fix:** whoever measures owns the numbers. The designer writes the story card, the gag map, the beats and *intent*
 ("close-up ≥1.2 s", "lantern whole in frame"); the animator's feasibility stage turns intent into measured numbers
 and renders the gate-1b storyboard in the same session; safety runs gate 1 once, on measured numbers. Plan cap
-4,000 → 2,000 words.
+4,000 → 2,500 words (the measured table doesn't count).
 
 ## Finding 2: comedy is designed on paper and first tested after a full build
 Gate 1b checks the problem, cause and lesson, not the jokes; lesson 12 says a storyboard match doesn't prove motion.
@@ -57,3 +57,5 @@ untested comedy, which more agents would make worse.
 2. **Finding 2 with the A2 rig acting job** after the weekly reset (Tue 13 Oct); first used on Episode 12's Short.
 3. **Finding 4** as its own small job.
 **Test:** Episode 12: gate-2 pass in ≤2 rounds; comedy ≥7; ≤2 safety checks and ≤2 builds per video.
+
+**Status (9 Oct, owner: no preference, so the recommendation):** findings 1 + 3 APPLIED as v3.8 (section 6, 7, 8; story-designer, animator, safety-checker; `plan_check.py` cap 2,500; rollback tag `agents-v3.7-pre-zbr`; diet_check PASS). Findings 2 and 4 OPEN.
