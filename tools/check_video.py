@@ -3,6 +3,7 @@
     python3 tools/check_video.py output/ep02_xxx.mp4                 (vertical Short, must loop)
     python3 tools/check_video.py output/x.mp4 --landscape --no-loop  (1920x1080 long-form or test scene)
     ... --cuts 3.0,5.2,8.95                                          (deliberate camera cuts: not "harsh")
+    ... --dur 15-30                                                  (a transformation Short; a story Short 12-60)
 
 Checks: duration, vertical size, loudness (YouTube ~ -14 LUFS), silent gaps,
 the biggest frame-to-frame jump (harsh cuts), and the loop seam (last -> first frame).
@@ -61,6 +62,8 @@ def main(path):
         fails.append(f"not {want[0]}x{want[1]}")
     if not LANDSCAPE and not 12 <= dur <= 180:
         fails.append("duration outside 12–180s (YouTube Shorts limit)")
+    if DUR and not DUR[0] <= dur <= DUR[1]:
+        fails.append(f"duration outside {DUR[0]:g}-{DUR[1]:g}s (--dur)")
     if lufs is None or abs(lufs + 14) > 1.0:
         fails.append("loudness not -14±1 LUFS")
     if silences:
@@ -76,6 +79,7 @@ def main(path):
 LANDSCAPE = "--landscape" in sys.argv
 CUTS = ([float(x) for x in sys.argv[sys.argv.index("--cuts") + 1].split(",")] if "--cuts" in sys.argv else [])
 LOOP = "--no-loop" not in sys.argv
+DUR = ([float(x) for x in sys.argv[sys.argv.index("--dur") + 1].split("-")] if "--dur" in sys.argv else None)
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1]))

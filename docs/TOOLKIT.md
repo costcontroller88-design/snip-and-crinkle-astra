@@ -23,11 +23,12 @@ here and an API docstring at its top.
 | `episodes/music_extra.py`, `audio.py` | Synth instruments (toy piano, melodica, organ, steel pan, marimba, glock, pads, bass), sound effects, `jingle`, `Mix`, `reverb`, `write_wav` |
 | `episodes/pilot02_splash_of_blue.py` | Reference episode: `render_world(t, d, cam, bg)`, `make_buses()`, flags `--keys`, `--cuts`, `--still T` |
 | `episodes/pilot02_short.py` | Reference vertical Short: re-films an episode through a vertical camera, cuts its sound effects, own music bed |
-| `tools/check_video.py` | `--landscape --no-loop --cuts t1,t2,...`; vertical Shorts 12-180 s; prints RESULT: PASS |
+| `tools/check_video.py` | `--landscape --no-loop --cuts t1,t2,...`; vertical Shorts 12-180 s; `--dur 15-30` (transformation Short) or `12-60` (story Short); prints RESULT: PASS |
 | `tools/build_agents.py` | Writes `.claude/agents/` from MASTER_PROMPT.md Appendix A |
 | `tools/handoff_check.py` | Checks HANDOFF.md: ≤500 words, paths exist, no trimmed fact lost; `--install` sets the pre-commit hook |
 | `tools/plan_check.py` | `<plan>`: the designer's gate (gag table vs the playbook, key actions ≥1.0 s and ≥10%, storyboard covers every key action, props, ≤4,000 words); docstring = the required tables |
-| `tools/handover_check.py` | `<script>`: the animator's last command (audio silence/loudness, `--check`, `keysize` vs plan); `--verify` starts the render chain |
+| `tools/handover_check.py` | `<script>`: the animator's last command (audio silence/loudness, `--check`, `keysize` vs plan; a Short also needs a `safezone <t>` line at every `keysize <t>`); `--verify` starts the render chain |
+| `tools/safezone.py` | Shorts safe zones: `to_frame(mask, RES, (CAM.ox, CAM.oy), c, z)` then `line(t, name, mask)` → `safezone <t> <name> ok/FAIL` for a Short's `--check`; `--overlay frame.png` draws the zones on a still |
 | `tools/title_check.py` | `<upload sheet>` or `--title "..."`: flags titles that repeat the last 5 or the live ones |
 | `tools/preflight.py` | `--used --reset-min --weekly [--log step]`: the Lead's pre-flight (band, ledger row, OPEN mistakes, HANDOFF count) |
 

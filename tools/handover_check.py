@@ -10,6 +10,8 @@ Full mode, in order (exit 1 on any failure):
   3. key sizes (M11): every row of the plan's key actions table needs `--check` lines `keysize <t> <pct>` (the key
      object's measured width as % of the frame width, from its mask) at ≥2 times inside its span, each at least the
      plan's Size. The plan is reviews/<epNN>_short_plan.md for a Short script, else reviews/<epNN>_plan.md.
+  3b. Shorts safe zones (M42, audit M5): in a script whose name has "short", every `keysize <t>` time needs a
+     `safezone <t> <object> ok` line (tools/safezone.py); a missing one fails, and a FAIL line fails in step 2.
   4. the plan's measured checks table: no estimate left, no measured value under its Need (M26-M29).
   5. writes build/handover/<script>.ok with a hash of every .py file in the repo and the plan.
 --verify fails if that file is missing or any code or the plan changed since, so nothing unchecked gets rendered.
@@ -107,6 +109,11 @@ def main():
                 fails.append(f"{tag}: {len(got)} keysize line(s) from --check (needs ≥2)")
             elif min(got) < need:
                 fails.append(f"{tag}: measured {min(got):.1f}% < plan {need:g}%")
+    if "short" in os.path.basename(script):
+        zoned = [float(a) for a in re.findall(r"safezone\s+([\d.]+)", out)]
+        for t, _ in sizes:
+            if not any(abs(t - z) < 0.011 for z in zoned):
+                fails.append(f"keysize {t:g}: no 'safezone {t:g} <object> ok' line from --check (M42; tools/safezone.py)")
     rows = measured(tables(open(plan, encoding="utf-8").read())) if plan else None
     if rows is None:
         fails.append("no measured checks table in the plan")

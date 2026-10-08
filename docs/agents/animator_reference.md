@@ -24,6 +24,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 - One 1920x1920 world filmed by cameras; landscape 1920x1080 at 30 fps, 15 drawings a second on twos; `hires.set_res(2)`; zoom ≤2x (a closer shot only with a raised render scale for that shot, never in shared code); `render_video(..., workers=8)`.
 - Expose `render_world(t, d, cam, bg)` and `make_buses()`; flags `--keys`, `--cuts`, `--still T`. Original synthesized audio only.
 - Shorts re-film the same performances with a vertical camera: faces at about 40% of the height; nothing important in the bottom 19% or in the right 12% between 50% and 90% of the height; beats ≥0.8 s, key beats 1.5-4 s; their own music bed; sound effects cut with the pictures. A transformation Short has its own locked close-up camera.
+- Safe zones in code (M42, 9 Oct): a Short's `--check` prints a `tools/safezone.py` line for every key object at every `keysize` time, plus the lesson object; handover_check fails without them.
 - Compilations: ffmpeg concat of rendered episodes plus a new intro and outro; never re-render 30 minutes in one go.
 
 ## Self-checks before the full render
