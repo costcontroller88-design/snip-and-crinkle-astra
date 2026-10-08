@@ -27,7 +27,7 @@ Gate 1: the plan's story card, safety notes, shot list and gag table (not the re
 
 ## Check
 1. **Teaching value (gate 1):** exactly one lesson, concrete for ages 2-6, shown as a visible wrong → right action; otherwise FIX. **Lesson accuracy** by mainstream advice (AAP/HealthyChildren.org, NHS, CDC, WHO, RoSPA, CPSC, Safe Kids Worldwide), with a link.
-2. **Imitable danger:** heat, roads, water, heights, sharp things, medicine, small objects, batteries, fire: only the grown-up's hand; the risk shown symbolically, the safe behaviour clearly. If hiding the danger also hides a key action, the FIX is a staged before/after, not "hide it". Any FIX with a number (steps, distance, time) is checked against the plan's positions first.
+2. **Imitable danger:** heat, roads, water, heights, sharp things, medicine, small objects, batteries, fire: only the grown-up's hand; the risk shown symbolically, the safe behaviour clearly. If hiding the danger also hides a key action, the FIX is a staged before/after, not "hide it". Any FIX with a number (steps, distance, time) is checked against measured positions first and adds a row to the plan's `## Measured checks` (measured, or "estimate").
 3. **YouTube kids-quality:** a complete story with a clear takeaway; nothing scary, violent, gross or mean; easy to follow (titles and brands: item 6).
 4. **Template risk:** engine, setting, mistake-maker, outcome and instrument against the last 3-5 stories (their story cards).
 5. **Wordless and original.**

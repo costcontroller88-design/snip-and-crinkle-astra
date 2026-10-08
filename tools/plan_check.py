@@ -24,7 +24,13 @@ these tables (header cells in this order; extra text after a header word is fine
     is on the sheet).
   Props table (M7):
   | Prop | Colour | ... |  every object's colour and state; no empty cell.
-Also: ≤4,000 words (M17), and a misread check section (the word "Misread").
+  Measured checks table, under a `## Measured checks` heading (M26-M29: measure first):
+  | Check | Need | Measured | Source |
+    one row for every distance rule in the plan ("≥N from", "≥N clear", "≥N and"): Need is that N; Measured is a
+    number from the real code with its Source (`--check` or a still path), or "estimate" (allowed in a plan for a
+    scene not built yet; tools/handover_check.py fails on any estimate left, so the animator measures before building).
+    A measured value below its Need fails.
+Also: ≤4,000 words (M17; the measured checks table is data and doesn't count), and a misread check section.
 """
 import re
 import sys
@@ -71,9 +77,41 @@ def span(cell):
     return (ns[0], ns[1] if len(ns) > 1 else ns[0]) if ns else None
 
 
+RULE_RE = re.compile(r"≥\s*(\d+(?:\.\d+)?)(?=\s*(?:units\s*)?(?:from|clear|and\b))")
+
+
+def measured(tabs):
+    """Rows of the measured checks table as (check, need, value or None for an estimate, source)."""
+    t = find(tabs, "need", "measured", "source")
+    if not t:
+        return None
+    out = []
+    for r in t[1]:
+        r = r + [""] * (4 - len(r))
+        est = "estimate" in (r[2] + r[3]).lower()
+        out.append((r[0], num(r[1]), None if est else num(r[2]), r[3]))
+    return out
+
+
+def measure_fails(rows, allow_estimates):
+    fails = []
+    for chk, need, val, src in rows:
+        tag = f"measured check '{chk[:40]}'"
+        if need is None:
+            fails.append(f"{tag}: Need has no number")
+        elif val is None:
+            if not allow_estimates:
+                fails.append(f"{tag}: still an estimate: measure it from the code before building")
+        elif val < need:
+            fails.append(f"{tag}: measured {val:g} < need {need:g}")
+        if not src.strip():
+            fails.append(f"{tag}: no Source (`--check` or a still path)")
+    return fails
+
+
 def check(text):
     fails = []
-    words = len(text.split())
+    words = len(re.sub(r"(?ms)^## Measured checks.*?(?=^## |\Z)", "", text).split())
     if words > WORD_CAP:
         fails.append(f"plan is {words} words (cap {WORD_CAP}): cut prose, keep tables")
     m = re.search(r"\*\*Length:\*\*\s*([\d.]+)\s*s", text)
@@ -181,6 +219,20 @@ def check(text):
         for (a, b), tag in spans:
             if not any(a - 0.05 <= t <= b + 0.05 for t in times):
                 fails.append(f"{tag}: no storyboard frame inside {a:g}-{b:g} s (the cause must be on the sheet)")
+
+    rows = measured(tabs)
+    needs = sorted({float(n) for n in RULE_RE.findall(text)})
+    if needs and rows is None:
+        fails.append(f"no measured checks table (Check | Need | Measured | Source) for the plan's distance rules {needs}")
+    elif rows is not None:
+        have = {r[1] for r in rows}
+        for n in needs:
+            if n not in have:
+                fails.append(f"distance rule ≥{n:g} has no measured checks row (Need {n:g})")
+        fails += measure_fails(rows, allow_estimates=True)
+        est = [r[0] for r in rows if r[2] is None]
+        if est:
+            print(f"NOTE {len(est)} estimate(s) the animator must measure before building: {est}")
 
     props = find(tabs, "prop", "colour")
     if not props:

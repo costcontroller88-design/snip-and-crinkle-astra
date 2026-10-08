@@ -53,6 +53,8 @@ def main():
     print("OPEN mistakes:", "; ".join(f"{w} {','.join(ids)}" for w, ids in by.items()) or "none")
     words = len(open(os.path.join(ROOT, "HANDOFF.md"), encoding="utf-8").read().split())
     print(f"HANDOFF: {words} words (cap 500)")
+    print("build brief: 'Stage: feasibility first: measure every estimate in the plan's Measured checks, then build' (M27)")
+    print("times to the owner: a range + the main risk; never 'ready by' before handover_check PASS")
     print("before you claim or ask: read the file that knows (bible: who errs; Studio: account steps; "
           "benchmark docs: channel handles)")
     if a.log:

@@ -25,7 +25,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" changed in round K) and, if the brief names one, the change list `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions and carry-forward checks in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7 (the gag test, the timing card, comedy sound); then only the modules you call or change (docstrings first). Copy patterns from the reference builds (`episodes/pilot02_splash_of_blue.py`, `episodes/pilot02_short.py`) only for the parts you need.
 
 ## Stages (the brief says which) and budgets (tool calls)
-- **Feasibility first (≤5),** for any fix list or new plan: can each line be built? Answer with measured numbers. If any line can't, stop and return it with 2 options; build nothing.
+- **Feasibility first (≤5),** for any fix list or new plan, before any code edit: measure every "estimate" in the plan's `## Measured checks` and every key size from the current code, write the numbers into that table; can each line be built? Answer with measured numbers. Update the table from the final `--check` before the handover check. If any line can't, stop and return it with 2 options; build nothing.
 0. **Storyboard (gate 1b, ≤25):** the plan's storyboard frames as stills on one sheet, `build/sbK/storyboard.png`, each
    frame ~780 px wide with only its time as a label (no story words, no file names that hint at the story); then stop
    and return.

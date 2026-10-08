@@ -10,7 +10,8 @@ Full mode, in order (exit 1 on any failure):
   3. key sizes (M11): every row of the plan's key actions table needs `--check` lines `keysize <t> <pct>` (the key
      object's measured width as % of the frame width, from its mask) at ≥2 times inside its span, each at least the
      plan's Size. The plan is reviews/<epNN>_short_plan.md for a Short script, else reviews/<epNN>_plan.md.
-  4. writes build/handover/<script>.ok with a hash of every .py file in the repo and the plan.
+  4. the plan's measured checks table: no estimate left, no measured value under its Need (M26-M29).
+  5. writes build/handover/<script>.ok with a hash of every .py file in the repo and the plan.
 --verify fails if that file is missing or any code or the plan changed since, so nothing unchecked gets rendered.
 """
 import glob
@@ -24,7 +25,7 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 from check_video import audio_stats  # noqa: E402
-from plan_check import find, span, tables, num  # noqa: E402
+from plan_check import find, span, tables, num, measured, measure_fails  # noqa: E402
 
 
 def plan_for(script):
@@ -106,6 +107,11 @@ def main():
                 fails.append(f"{tag}: {len(got)} keysize line(s) from --check (needs ≥2)")
             elif min(got) < need:
                 fails.append(f"{tag}: measured {min(got):.1f}% < plan {need:g}%")
+    rows = measured(tables(open(plan, encoding="utf-8").read())) if plan else None
+    if rows is None:
+        fails.append("no measured checks table in the plan")
+    else:
+        fails += measure_fails(rows, allow_estimates=False)
     for f in fails:
         print("FAIL", f)
     if fails:

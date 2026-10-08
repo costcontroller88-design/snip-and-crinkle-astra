@@ -1,6 +1,6 @@
 # Snip & Crinkle: Master Prompt for the Lead and the agent team
 
-Version 3.4, 8 Oct 2026: agent ratings (`reviews/agent_ratings_2026-10-08.md`; four check scripts; rollback tag `agents-v3.3-pre-ratings`). Version 3.2: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`) and the comedy retraining (`docs/COMEDY_PLAYBOOK.md`, v3.3; rollback tag `agents-v3.2-pre-comedy`); version 2's zero-based review is section 13. This file is the source
+Version 3.5, 8 Oct 2026: measure first (Measured checks table; M26-M29). Version 3.4: agent ratings (`reviews/agent_ratings_2026-10-08.md`; four check scripts; rollback tag `agents-v3.3-pre-ratings`). Version 3.2: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`) and the comedy retraining (`docs/COMEDY_PLAYBOOK.md`, v3.3; rollback tag `agents-v3.2-pre-comedy`); version 2's zero-based review is section 13. This file is the source
 of truth for how we work. **The Lead reads sections 1-12 at the start of every session and skips Appendix A** (the
 agent files) unless changing an agent; then it edits Appendix A and runs `python3 tools/build_agents.py`.
 
@@ -276,12 +276,13 @@ Episode/video: <NN or path>          (the file names in section 2 do the rest)
 Lead decisions: <only what the files don't already say>
 Special: <stage, deadline, files not to touch, "don't commit" when agents run in parallel>
 ```
+A build brief always says "Stage: feasibility first, then build" (M27).
 For the fresh-eyes reviewer, only: `fresh-eyes-reviewer: blind review. Video: <neutral copy path>. Round: <k>.`
 For gate 1b, only: `fresh-eyes-reviewer: storyboard blind check. Sheet: build/sbK/storyboard.png. Round: <k>.`
 
 ## 12. Reporting to the owner
 Each work package ≤200 words, each phase ≤400: 1. Done. 2. Scorecard (1-10) with the weakest item named. 3. Numbers
-vs targets. 4. Risks. 5. What the owner must click or approve, as numbered steps. 5b. Mistakes logged this step (count and IDs; "none found" only after the self-audit). 6. Firm recommendation. Ask only
+vs targets. 4. Risks. 5. What the owner must click or approve, as numbered steps. Times are a range plus the main risk; never "ready by" before `handover_check` passes. 5b. Mistakes logged this step (count and IDs; "none found" only after the self-audit). 6. Firm recommendation. Ask only
 when a decision is truly the owner's: multiple choice, recommended option first.
 
 ## 13. Zero-based review, 6 Oct 2026 (what changed from version 1, and why)
@@ -339,7 +340,7 @@ You design episodes on paper so the animator can build them in one go, with no s
 The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 (read once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Budget: a plan ≤25 tool calls; fix mode ≤12.
 
 ## The plan: `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`), at most 4,000 words, tables not prose, never restating the brief
-**Before you return, `python3 tools/plan_check.py <plan>` must PASS** (its docstring gives the tables it needs: `**Length:**`, gag table, key actions, storyboard, props); a FAIL is fixed, not reported.
+**Measure first:** every distance rule (≥N from/clear) gets a row in the plan's `## Measured checks` table, measured from the code (`--check` or a still), or "estimate" only for what isn't built yet. **Before you return, `python3 tools/plan_check.py <plan>` must PASS** (its docstring gives the tables it needs: `**Length:**`, gag table, key actions, storyboard, props); a FAIL is fixed, not reported.
 0. **Feasibility, 5 lines, first.** Can the rig, the props, the time and the source material really do this? If not, stop and return the problem with two alternatives.
 1. **Story card** (one paragraph): **the one lesson first** (plain line; one lesson only) and its wrong → right moment (who does what wrong, then what right); then the topic and the accepted ROADMAP angle, quoted (any departure is flagged first in your return); engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
@@ -395,7 +396,7 @@ Gate 1: the plan's story card, safety notes, shot list and gag table (not the re
 
 ## Check
 1. **Teaching value (gate 1):** exactly one lesson, concrete for ages 2-6, shown as a visible wrong → right action; otherwise FIX. **Lesson accuracy** by mainstream advice (AAP/HealthyChildren.org, NHS, CDC, WHO, RoSPA, CPSC, Safe Kids Worldwide), with a link.
-2. **Imitable danger:** heat, roads, water, heights, sharp things, medicine, small objects, batteries, fire: only the grown-up's hand; the risk shown symbolically, the safe behaviour clearly. If hiding the danger also hides a key action, the FIX is a staged before/after, not "hide it". Any FIX with a number (steps, distance, time) is checked against the plan's positions first.
+2. **Imitable danger:** heat, roads, water, heights, sharp things, medicine, small objects, batteries, fire: only the grown-up's hand; the risk shown symbolically, the safe behaviour clearly. If hiding the danger also hides a key action, the FIX is a staged before/after, not "hide it". Any FIX with a number (steps, distance, time) is checked against measured positions first and adds a row to the plan's `## Measured checks` (measured, or "estimate").
 3. **YouTube kids-quality:** a complete story with a clear takeaway; nothing scary, violent, gross or mean; easy to follow (titles and brands: item 6).
 4. **Template risk:** engine, setting, mistake-maker, outcome and instrument against the last 3-5 stories (their story cards).
 5. **Wordless and original.**
@@ -428,7 +429,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" changed in round K) and, if the brief names one, the change list `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions and carry-forward checks in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7 (the gag test, the timing card, comedy sound); then only the modules you call or change (docstrings first). Copy patterns from the reference builds (`episodes/pilot02_splash_of_blue.py`, `episodes/pilot02_short.py`) only for the parts you need.
 
 ## Stages (the brief says which) and budgets (tool calls)
-- **Feasibility first (≤5),** for any fix list or new plan: can each line be built? Answer with measured numbers. If any line can't, stop and return it with 2 options; build nothing.
+- **Feasibility first (≤5),** for any fix list or new plan, before any code edit: measure every "estimate" in the plan's `## Measured checks` and every key size from the current code, write the numbers into that table; can each line be built? Answer with measured numbers. Update the table from the final `--check` before the handover check. If any line can't, stop and return it with 2 options; build nothing.
 0. **Storyboard (gate 1b, ≤25):** the plan's storyboard frames as stills on one sheet, `build/sbK/storyboard.png`, each
    frame ~780 px wide with only its time as a label (no story words, no file names that hint at the story); then stop
    and return.

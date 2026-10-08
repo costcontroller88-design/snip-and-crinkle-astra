@@ -145,6 +145,17 @@ Own timeline and close cameras (b4); holds ≥1 s (b5).
 | His turn, given by Pip | 16.8-17.8 | the marker | 17.7 (meas. 17.7-17.9 in A) | 1.0 (target; not measured) |
 | The wow's cause: the tea light goes in | 23.0-25.0 | the tea light | 11.1 r3 (meas. 14.8 at 2.0x; x 1.5/2.0 in B3) | 1.3 (estimate) |
 
+## Measured checks (the animator measures every estimate first and updates this table from the final `--check`)
+| Check | Need | Measured | Source |
+|---|---|---|---|
+| Hand and tea light to Crinkle's head 23.0-25.3 (at 1260, +6 lean) | 30 | estimate (5.5 without the lean) | estimate; `--check` r2 at 1260 |
+| Hand and tea light to Snip's head 23.0-25.3 (at 660) | 30 | 40.7 | `--check` (designer r3) |
+| Sleeve to every head mask, ears included, 23.0-25.3 | 10 | estimate | estimate |
+| Let-go: Crinkle's paw to the marker by 5.55 | 30 | 33.0 | `--check` r2 build, 5.55-5.80 |
+| Marker tip to every head mask 20.4-22.8 | 60 | 134.8 | `--check` r2 build |
+| Visible paws, wings, marker to the lantern mask (R4-1; Snip's drawing paw exempt 6.5-10.6) | 10 | estimate | estimate |
+| Paws, wings, markers to the lantern mask 21.2-22.8 | 1 | estimate | estimate |
+
 ## b11. Hidden key actions
 None: click, lowering and glow all shown (shot 12).
 
