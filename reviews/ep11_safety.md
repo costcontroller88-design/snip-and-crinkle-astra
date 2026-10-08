@@ -332,3 +332,31 @@ Evidence: `python3 episodes/ep11_short_transform.py --check` run 8 Oct on the r2
 
 Sources: no new topics (LED tea light and button cell already sourced under F3). No new library entries.
 Mistakes: my R2-2 and R3-5 set "every mask ≥10" from the plan's x positions (1100 vs edge 1080) without checking the masks' real widths (M29).
+
+## Re-check 8 Oct 2026, gate 1, scope R4-1 only (r3 build): PASS both FAILs as depth + 1 FIX (R4-1 r4 wording and `--check`)
+
+Evidence (scripts in the safety-checker scratchpad, r3 code, RES 2; lantern mask bbox y 2638-3011 px = 186 world, ring centre 20 world below its top):
+- Crinkle's left arm overlaps the lantern mask 6.80-7.13 (not only 6.80-6.93): up to 63.6% of the arm behind it, reaching its top edge (0% down). Rendered crops 6.80, 6.87, 6.93 (full-res `render_frame`): **no Crinkle arm or paw is seen on, over or above the lantern.** Snip's drawing arm, the marker and his own belly are all you see there. Unlit, no tea light. Right arm: no overlap.
+- Pip's right wing overlaps 19.8-29.47 (130 of 153 drawings), entering from her side only: highest hidden point 12.6% down = 23.5 world below the lantern top (at the left lobe, beside the ring, not over it); hidden share 56-58% at 20.87-21.93 (puff ball), 5-7% at 23.2-25.3 (hand window), 33.6% at 29.4. Crops 20.87, 21.93, 29.4 and still `build/ep11s/r3/s_24.80.png`: the wing tucked behind the lantern's left lobe reads as her standing behind it. Left wing: no overlap.
+- Only paws and wings could reach the button cell through the top opening. A paw or wing passing behind the side of a lantern drawn in front of it is depth, like the bodies (R4-1). So neither FAIL needs staging. Pip stays at 740; the 722 option is not needed.
+
+**Decision:** (1) Crinkle 6.80-7.13: PASS as depth (hidden in render, unlit, empty). (2) Pip 19.8-30.0: PASS as depth (side entry, below the ring height, never over the opening). Hard line kept: from 21.2 (F3) no paw, wing or marker goes over or down into the top ring.
+
+| ID | Where | Exact text |
+|---|---|---|
+| R4-1 r4 | plan shot 3 r3, shot 9 r3, shot 13 r3 (replace each R4-1 sentence) and `--check` item 5 | Shot 3: "The lantern is drawn in front of every body, paw and wing and never moves (no shift, tilt or wobble). A paw or wing may pass behind it (depth, gate 1 R4-1 r4) but is never drawn over it 6.5-30.0 (`--check`). Crinkle's left arm passes behind it 6.80-7.13 while hidden by Snip's arm and his belly (crops 6.80-7.13 at gate 3). Snip's drawing paw and marker are exempt (the lesson)." Shot 9: "Pip's ball and her right wing stand behind the lantern, which is drawn in front and does not move; her wing goes behind its side only, ≥20 below its top (`--check`)." Shot 13: "**F3:** from 21.2 no paw, wing, foot or marker touches the paper from in front or goes over or down into the top ring. The lantern is drawn in front of every body, paw and wing and never moves. Where a paw, wing or marker mask overlaps the lantern mask, its overlap starts ≥20 below the lantern mask's top (stem included), i.e. it is behind the side, not the ring (`--check`). Crinkle at 1260 from 22.8 (R4-2), Pip at 740." `--check` item 5 (replaces the four gap lines): (a) "drawn over the lantern 6.5-30.0: none" (paw, wing and marker pixels composited over the lantern mask; Snip's drawing paw and marker exempt 6.5-10.6); (b) "R4-1 r4 overlap top 21.2-30.0: (overlap of each paw, wing and marker mask with the lantern mask).top − lantern mask top ≥ 20 world (min, at)", masks as `_vis_arm` (own body removed only when behind the back); (c) keep "hand + tea light" (R4-2) as is. |
+
+Measured-checks rows (replace rows 156-157 of `reviews/ep11_short_plan.md`):
+| Paws, wings, marker drawn over the lantern 6.5-30.0 (R4-1 r4) | none | not checked (r2: none 21.2-30.0) | `--check` r4 |
+| Paw/wing/marker overlap top below the lantern top 21.2-30.0 (R4-1 r4) | ≥20 | 23.5 (Pip right wing; Crinkle no overlap reported) | safety script, r3 build |
+| Crinkle's left arm hidden while behind the lantern 6.80-7.13 | not seen | not seen at 6.80, 6.87, 6.93 (crops); 7.00-7.13 not checked | full frames, gate 3 |
+
+### Notes (optional)
+- N8. The brief said the tea light is in at 21.9; the plan has it entering at 23.0 and lowered 24.3-25.0. The hard line runs from 21.2 (F3), which covers either.
+- N9. A "column above the ring" zone does not work: Crinkle stands behind the lantern, so his arm is always above the ring in x (0.0 at 6.53 and 21.2). The overlap-top rule (b) is the measurable form.
+
+### Carry-forward for gate 3 (replaces item 5)
+5. Lantern: `--check` (a) none and (b) ≥20; full frames 6.80, 6.87, 6.93, 7.00, 7.07, 7.13 (no Crinkle arm seen above or on the lantern), 20.87, 21.93, 24.80, 29.40 (Pip's wing behind the side only); the lantern drawn in front and never moving.
+
+Sources: no new topics (button cell and LED tea light already sourced under F3). No new library entries.
+Mistakes: my R4-1 wording said "visible" paws, but the gap I specified measured the whole arm mask, including parts hidden behind the lantern. That produced both FAILs.

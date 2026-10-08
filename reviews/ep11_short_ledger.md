@@ -31,3 +31,4 @@
 | 8 Oct | after reset: audit H1-H8 → fresh general-purpose agent (Sonnet), scratch-tested | Lead | 0 | 81 | preflight: ANY AGENT: <60% |
 | 8 Oct | H1-H8 done (Sonnet 102k tok, 17 calls; 5h 0→4); animator r3 build (fresh, feasibility first) | Lead | 4 | 81 | preflight: ANY AGENT: <60% |
 | 8 Oct | animator r3 (fresh, 183k tok, 32 calls; 5h 4→13): built, NOT handed over: 4 R4-1 lantern-gap FAILs (Crinkle arm 6.80-6.93; Pip wing 19.9-30); B3/END cut faces (M33, M34) → safety-checker on R4-1 scope | Lead | 13 | 83 | preflight: ANY AGENT: <60% |
+| 8 Oct | safety R4-1 r4 (59k tok, 15 calls vs ≤14: overrun 1): both FAILs PASS as depth; Lead pasted, plan 4,029 words (M23 repeat) → designer fix r4 (framing + trim) | Lead | 17 | 83 | preflight: ANY AGENT: <60% |
