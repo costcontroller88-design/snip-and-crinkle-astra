@@ -1,6 +1,6 @@
-"""Episode 11 transformation Short (plan section 7(b), r2 + sb1): "Plain Pumpkin Becomes a Glowing Friend!"
+"""Episode 11 transformation Short (reviews/ep11_short_plan.md, r2): "Plain Pumpkin Becomes a Glowing Friend!"
 
-29.4 s, vertical 1080x1920, its own performances on the Episode 11 porch (early-evening light all through). Lesson:
+30.0 s, vertical 1080x1920, its own performances on the Episode 11 porch (early-evening light all through). Lesson:
 when it's a friend's turn, wait until they finish; then it's your turn. One marker (black ink, blue body) passes
 Snip -> Crinkle (the take) -> Snip (given back) -> Pip -> Crinkle; the grown-up's hand puts a battery tea light in the
 paper lantern (props_lantern) and the whole paper glows.
@@ -50,7 +50,8 @@ from hires import RCut  # noqa: E402
 from paperlib import ease_in_out, lerp, place, rot, seg  # noqa: E402
 
 RES = hires.RES
-DUR = 29.4
+DUR = 30.0
+SQUEAK_VEL = 1.0                        # R3-1: the big squeak's level (measured against the end chord)
 FLOOR = P.FLOOR_Y
 CAM = K.Cam("vert", P.WORLD_W, P.WORLD_H, P.LAND_Y0, P.VERT_X0, res=RES)
 WORLD = P.Porch(CAM)
@@ -95,17 +96,18 @@ def _lin(t, keys):
 MK_S = 1.1
 MK = RP.marker_sprite(body=(96, 170, 236), ink=PK.INK, scale=MK_S)
 TIP_L = RP.MARKER_TIP * MK_S            # grip point -> tip
-CAP = 40.0                              # a pinch near the top end: the paw this far behind the grip point
+CAP = 46.0                              # r1: a pinch at the very top end: the paw this far behind the grip point
 U_SN, U_PIP, U_CR = _unit(0.39, 0.92), _unit(-0.22, 0.98), _unit(-0.3, 0.95)
 U_GIVE = _unit(0.97, -0.24)             # Pip holds it up to Crinkle, pointing at his paw (tip away from every face)
 ANG = {k: RP.marker_angle(u) for k, u in (("sn", U_SN), ("pip", U_PIP), ("cr", U_CR), ("give", U_GIVE))}
 A_HANG, A_HOLD, A_FLAT, A_REST = 40.0, -12.0, 90.0, 80.0    # A_FLAT: lying flat, tip pointing right (away)
+A_BELLY = RP.marker_angle(_unit(-0.45, 0.89))    # r2 (R3-2): at belly height, tip down-left at the lantern
 C = PL.C_STOP
 
-STROKE_KEYS = {"eye_l": [(0.0, 0.30), (0.6, 0.50), (0.8, C), (8.6, C), (9.1, 1.0)],
-               "eye_r": [(10.2, 0.0), (10.8, 1.0)],
-               "heart_l": [(13.8, 0.0), (14.5, 1.0)], "heart_r": [(14.7, 0.0), (15.4, 1.0)],
-               "smile": [(18.4, 0.0), (20.6, 1.0)]}
+STROKE_KEYS = {"eye_l": [(0.0, 0.30), (0.6, 0.50), (0.9, C), (10.7, C), (11.2, 1.0)],
+               "eye_r": [(12.2, 0.0), (12.6, 1.0)],
+               "heart_l": [(14.4, 0.0), (15.0, 1.0)], "heart_r": [(15.1, 0.0), (15.7, 1.0)],
+               "smile": [(18.4, 0.0), (20.0, 1.0)]}
 
 
 def strokes_at(t):
@@ -139,163 +141,209 @@ CR = R.Perf2(RP.crinkle(1.2), seed=2, x=1080, y=FLOOR, turn=-0.5, eyes="sparkle"
 PIPA = RP.PipPuppet(0.9)
 PIP = RP.PipPerf(PIPA, seed=3, x=640, y=FLOOR, turn=0.3, eyes="normal", mouth="smile", look_x=6, look_y=6,
                  arm_l=25, arm_r=-25)
-BACK = {"pip": [(-1.0, 11.9)], "cr": [(5.9, 16.8)], "sn": []}       # paws / wings behind the back (T2)
-SN_X1, PIP_X1, CR_X1 = 700, 770, 1200                               # after the turns (and clear of the hand)
+BACK = {"pip": [(-1.0, 12.9)], "cr": [(6.9, 17.1)], "sn": []}       # paws / wings behind the back (T2)
+SN_X1, PIP_X1, CR_X1, CR_XW = 700, 740, 1200, 1100                  # after the turns; CR_XW: his waiting spot
+BELLY_D = (16, 1392)                                                # r2 (R3-2): the marker held at belly height
 
-# ---- shot 1 + 1b (0-2.0): Snip draws; Crinkle bounces, leans in and takes the marker (the take, camera T)
+# ---- shot 1 + 1b (0-2.8): Snip draws; Crinkle bounces, leans in and takes the marker (the take, camera T 2.6x)
 SN.reach(-0.3, 0.0, "r", (PL.tip_world("eye_l", 0.30)[0] - TIP_L * U_SN[0],
                           PL.tip_world("eye_l", 0.30)[1] - TIP_L * U_SN[1]))
 follow(SN, "r", "eye_l", 0.0, 0.6, 0.30, 0.50, U_SN)
-follow(SN, "r", "eye_l", 0.6, 0.8, 0.50, C, U_SN)
-W_SN = SN.paw(0.8, "r")[0]                                          # her paw stays exactly here until 5.4
-for _t in np.arange(0.8, 5.39, 0.2):                                # (re-aimed every 0.2 s: breathing never moves it)
-    SN.reach(float(_t), float(min(5.4, _t + 0.2)), "r", W_SN, "lin")
-CAP_P = (W_SN[0] - CAP * U_SN[0], W_SN[1] - CAP * U_SN[1])          # the marker's top end (where he pinches)
+follow(SN, "r", "eye_l", 0.6, 0.9, 0.50, C, U_SN)
+W_SN = SN.paw(0.9, "r")[0]                                          # her paw stays exactly here until 5.9
+for _t in np.arange(0.9, 5.89, 0.2):                                # (re-aimed every 0.2 s: breathing never moves it)
+    SN.reach(float(_t), float(min(5.9, _t + 0.2)), "r", W_SN, "lin")
+CAP_P = (W_SN[0] - CAP * U_SN[0], W_SN[1] - CAP * U_SN[1])          # the marker's very top end (where he pinches)
+SLID = (CAP_P[0] - 70 * U_SN[0], CAP_P[1] - 70 * U_SN[1])           # 1.2-1.9: slid up along its own axis
 LIFT = (1010, 1262)                                                 # tip stays above the paper
 CR.hop(0.0, 0.3, 1, 6)
 CR.to(0.3, 0.6, "io", lean=-10, sq=0.92)
-CR.reach(0.3, 0.8, "l", (CAP_P[0] + 40, CAP_P[1] - 24))
-CR.reach(0.8, 1.0, "l", CAP_P, "io")                                # slow pinch (no tug)
-CR.reach(1.1, 1.6, "l", LIFT, "io")                                 # tip leaves the paper at 1.1: the "C"
-SN.face(1.15, mouth="o", brows="up").to(1.6, 1.8, "io", look_x=8, look_y=9)   # eyes: the C, then her empty paw
-SN.ears(2.1, 2.5, "sad").to(2.2, 2.6, "io", head_dy=4, look_x=4, look_y=6)
-SN.face(2.3, eyes="glassy", brows="sad", mouth="frown").face(3.8, eyes="normal")
-# ---- shot 2 (2.0-5.4, B2): he crouches to draw; looks; understands; gives it back; bows
+CR.reach(0.3, 0.6, "l", (CAP_P[0] + 40, CAP_P[1] - 24))             # in from the upper right
+CR.reach(0.6, 0.9, "l", CAP_P, "io")                                # slow pinch at the top end (no tug)
+for _t in np.arange(0.9, 1.19, 0.1):                                # both paws on it, still (0.9-1.2)
+    CR.reach(float(_t), float(min(1.2, _t + 0.1)), "l", CAP_P, "lin")
+for _i in range(7):                                                 # slides up along its own axis out of her open
+    _k0, _k1 = ease_in_out(_i / 7), ease_in_out((_i + 1) / 7)       # fingers (re-aimed every 0.1 s: never sideways)
+    CR.reach(1.2 + 0.1 * _i, 1.3 + 0.1 * _i, "l", (lerp(CAP_P[0], SLID[0], _k1), lerp(CAP_P[1], SLID[1], _k1)), "lin")
+CR.reach(1.9, 2.3, "l", LIFT, "io")                                 # carried up and right, eyes on the lantern
+CR.face(0.85, eyes="normal", mouth="smile", brows="up").to(0.7, 0.9, "io", look_x=-10, look_y=8)   # R1
+SN.face(1.25, mouth="o", brows="up").to(1.9, 2.1, "io", look_x=8, look_y=9)   # eyes: the C, then her empty paw
+SN.ears(2.9, 3.3, "sad").to(3.0, 3.4, "io", head_dy=4, look_x=4, look_y=6)   # looks at the eye, not at him
+SN.face(3.1, eyes="glassy", brows="sad", mouth="frown").face(5.5, eyes="normal")
+# ---- shot 2 (2.8-6.5, B2): he crouches to draw; looks; understands; gives it back; bows
 TIP_CR = (1018, 1418)                                               # 20 short of the smile's end: no mark
 P_DRAW = (TIP_CR[0] - (TIP_L + CAP) * U_CR[0], TIP_CR[1] - (TIP_L + CAP) * U_CR[1])
-CR.to(2.0, 2.5, "io", lean=-8, sq=0.94).face(2.0, eyes="normal", mouth="yum_l", brows="think")
-CR.reach(2.0, 2.5, "l", P_DRAW)
-CR.to(2.5, 2.65, "io", look_x=-10, look_y=4).to(2.75, 2.9, "io", look_x=-13, look_y=9)
-CR.to(3.0, 3.15, "io", look_x=-10, look_y=-10)
-CR.face(3.2, mouth="o", brows="sorry").to(3.2, 3.5, "io", sq=0.97, head_dy=5, lean=-6)
-CR.reach(3.5, 4.0, "l", CAP_P, "io")                                # fits it into her open fingers, tip on the line
-CR.face(3.9, eyes="normal", mouth="smile", brows="sorry")
-CR_HP = CR.a.head_pivot(CR.state(3.95))
-CHEST = (CR_HP[0] + 4, CR_HP[1] + 110)
-CR.to(4.0, 4.15, "out", lean=-12)                                   # lets go and rocks back: well clear of it
-CR.reach(4.0, 4.3, "l", CHEST, "out")                               # open paw straight back to his chest
-CR.to(4.4, 4.75, "io", lean=-9, head_dy=14).to(4.75, 5.1, "io", lean=-11, head_dy=4)   # a small bow (head)
-SN.ears(4.8, 5.0, "happy", "back").face(4.8, eyes="happy", mouth="smile", brows="calm")
-SN.to(4.95, 5.1, "io", head_dy=10).to(5.1, 5.3, "io", head_dy=0)                        # nod
-# ---- shot 3 (5.4-7.2, A): he straightens, half step back, copies Pip's waiting pose; they sway together
-CR.to(5.4, 5.8, "io", lean=0, sq=1.0, head_dy=0, turn=-0.35).walk(5.4, 5.8, 1100, steps=1)
-CR.face(5.5, eyes="happy", mouth="smile", brows="calm").to(5.5, 5.7, "io", look_x=-12, look_y=2)
-CR.to(5.6, 5.9, "io", arm_l=28, elb_l=0, arm_r=-28, elb_r=0)
-for i, (a, b) in enumerate(((6.2, 6.7), (6.7, 7.2))):
-    CR.to(a, b, "io", lean=6 if i == 0 else -6)
-t = 7.2
-while t < 16.4:                                                       # keeps swaying gently while he waits
-    CR.to(t, t + 0.7, "io", lean=-3 if int((t - 7.2) / 0.7) % 2 == 0 else 3)
-    t += 0.7
-CR.to(7.0, 7.3, "io", look_x=-10, look_y=8)                          # eyes on Snip's drawing
+CR.to(2.8, 3.2, "io", lean=-8, sq=0.94).face(2.8, eyes="normal", mouth="smile", brows="up")   # no tongue (R1)
+CR.reach(2.8, 3.2, "l", P_DRAW)
+CR.to(2.8, 3.0, "io", look_x=-10, look_y=4)
+CR.to(3.2, 3.35, "io", look_x=-13, look_y=9)                         # the half eye (held 3.2-3.75)
+CR.to(3.75, 3.9, "io", look_x=-10, look_y=-10)                       # Snip's teary face (held to 4.25)
+CR.face(4.25, mouth="o", brows="sorry").to(4.25, 4.5, "io", sq=0.97, head_dy=5, lean=-6)
+CR.reach(4.5, 5.4, "l", CAP_P, "io")                                 # slowly back: tip onto the line's end
+CR.face(5.2, eyes="normal", mouth="smile", brows="sorry")
+CR_HP = CR.a.head_pivot(CR.state(5.3))
+CHEST = (CR_HP[0] + 22, CR_HP[1] + 110)                             # r2: >= 40 clear of the marker by 5.55
+CR.reach(5.4, 5.8, "l", CHEST, "out")                                # lets go at 5.4: open paw straight to his chest
+CR.to(5.8, 6.0, "io", lean=-9, head_dy=14).to(6.0, 6.2, "io", lean=-7, head_dy=4)   # a small bow
+SN.to(5.4, 5.6, "io", look_x=4, look_y=9)                            # the marker back in her paw
+SN.ears(6.0, 6.2, "happy", "back").face(6.0, eyes="happy", mouth="smile", brows="calm")
+SN.to(6.2, 6.3, "io", head_dy=10).to(6.3, 6.4, "io", head_dy=0)     # nod
+# ---- shot 3 (6.5-9.6, A): he copies Pip's waiting pose; gag 1 (G4): two sways, still, the third swings him round
+CR.to(6.5, 6.9, "io", lean=0, sq=1.0, head_dy=0, turn=-0.35).walk(6.5, 6.9, CR_XW, steps=1)
+CR.face(6.6, eyes="happy", mouth="smile", brows="calm").to(6.6, 6.8, "io", look_x=-12, look_y=2)
+CR.to(6.7, 6.9, "io", arm_l=28, elb_l=0, arm_r=-28, elb_r=0)
 t = 0.0
-while t < 11.6:                                                       # Pip's small waiting sway
+while t < 6.6:                                                        # Pip's small waiting sway
     PIP.to(t, t + 0.55, "io", lean=3 if int(t / 0.55) % 2 == 0 else -3)
     t += 0.55
-PIP.to(6.1, 6.3, "io", look_x=10, look_y=0, hturn=0.25).face(6.3, eyes="happy", mouth="smile_open", brows="calm")
-PIP.to(7.3, 7.5, "io", look_x=8, look_y=8, hturn=0.0).face(7.4, eyes="normal", mouth="smile")
-SN.reach(5.4, 5.7, "r", (W_SN[0] - 6, W_SN[1] - 16))                 # tip just off the paper while she watches
-SN.to(5.5, 5.7, "io", look_x=10, look_y=0).face(5.5, eyes="happy", mouth="smile", brows="calm")
-SN.to(6.3, 6.5, "io", hturn=-0.35, look_x=-10, look_y=2).to(6.95, 7.15, "io", hturn=0.0, look_x=4, look_y=6)
-SN.face(7.1, eyes="normal", brows="think")
-# ---- shot 5 (8.4-11.8, B): Snip closes the C, then the second eye
-follow(SN, "r", "eye_l", 8.6, 9.1, C, 1.0, U_SN, lead=0.2, n=8)
-SN.face(9.15, eyes="happy", mouth="smile", brows="calm")
-SN.reach(9.2, 9.5, "r", (SN.paw(9.1, "r")[0][0] - 4, SN.paw(9.1, "r")[0][1] - 14))
-SN.face(10.0, eyes="normal", brows="think")
-follow(SN, "r", "eye_r", 10.2, 10.8, 0.0, 1.0, U_SN, lead=0.35, n=10)
-SN.face(10.85, eyes="sparkle", mouth="smile_open", brows="up").reach(10.9, 11.3, "r", (860, 1305))
-# ---- shot 6 (11.8-13.6, A): Snip gives the marker to Pip, steps back, sweeps a paw; Pip waddles in
+PIP.to(6.6, 6.9, "io", lean=0)
+for a, b, k in ((6.9, 7.4, 1), (7.4, 7.9, -1), (7.9, 8.4, 0)):       # two sways side by side, in time
+    CR.to(a, b, "io", lean=6 * k)
+    PIP.to(a, b, "io", lean=4 * k)
+CR.to(8.8, 9.1, "io", turn=0.0, lean=10).wiggle(9.1, "tilt", 3, 5.0, 6.0)   # the third swings him a quarter round
+CR.to(9.4, 9.6, "io", turn=-0.35, lean=0)                            # ... and back, feet down
+PIP.to(8.8, 9.2, "io", lean=4).to(9.2, 9.6, "io", lean=0)            # Pip's third sway stays small
+PIP.to(6.6, 6.8, "io", look_x=10, look_y=0, hturn=0.25).face(6.8, eyes="happy", mouth="smile", brows="calm")
+PIP.to(8.3, 8.5, "io", look_x=8, look_y=8, hturn=0.0).face(8.4, eyes="normal", mouth="smile", brows="calm")
+SN.reach(6.5, 6.8, "r", (W_SN[0] - 6, W_SN[1] - 16))                 # tip just off the paper while she watches
+SN.to(6.5, 6.7, "io", look_x=10, look_y=0).face(8.6, eyes="normal", mouth="smile", brows="calm")   # R3-4
+# ---- shot 4 (9.6-10.6, K): his sheepish grin at once, blink, one belly bounce
+CR.face(9.6, eyes="happy", mouth="smile_open", brows="sorry").blink(9.85)
+CR.hop(9.8, 10.2, 1, 8)
+CR.face(10.3, eyes="normal", mouth="smile", brows="calm").to(10.3, 10.5, "io", look_x=-10, look_y=8)
+t = 10.6
+while t < 16.8:                                                       # keeps swaying gently while he waits
+    CR.to(t, t + 0.7, "io", lean=-3 if int((t - 10.6) / 0.7) % 2 == 0 else 3)
+    t += 0.7
+PIP.face(9.7, eyes="happy", mouth="smile", brows="calm")
+t = 9.6
+while t < 12.6:
+    PIP.to(t, t + 0.55, "io", lean=3 if int((t - 9.6) / 0.55) % 2 == 0 else -3)
+    t += 0.55
+SN.face(9.7, eyes="happy", mouth="smile", brows="calm").to(10.3, 10.5, "io", look_x=4, look_y=6)
+SN.face(10.4, eyes="normal", brows="think")
+# ---- shot 5 (10.6-12.8, B): Snip closes the C into an O, then the second eye, quicker
+follow(SN, "r", "eye_l", 10.7, 11.2, C, 1.0, U_SN, lead=0.2, n=8)
+SN.face(11.25, eyes="happy", mouth="smile", brows="calm")
+SN.reach(11.3, 11.6, "r", (SN.paw(11.2, "r")[0][0] - 4, SN.paw(11.2, "r")[0][1] - 14))
+SN.face(11.9, eyes="normal", brows="think")
+follow(SN, "r", "eye_r", 12.2, 12.6, 0.0, 1.0, U_SN, lead=0.3, n=8)
+SN.face(12.65, eyes="sparkle", mouth="smile_open", brows="up").reach(12.62, 12.85, "r", (860, 1305))
+# ---- shot 6 (12.8-14.3, A): Snip gives the marker to Pip, steps back, sweeps a paw; Pip waddles in
 M_GIVE = (755, 1404)                              # keys1 K2: low, >= 30 from Pip's face
-SN.to(11.8, 12.05, "io", turn=-0.3, look_x=-8, look_y=6).face(11.8, eyes="happy", mouth="smile_open", brows="up")
-SN.reach(11.85, 12.15, "r", M_GIVE)
-PIP.to(11.75, 11.9, "io", arm_l=-12, elb_l=16, arm_r=12, elb_r=-16).face(11.9, eyes="sparkle", mouth="smile_open")
+SN.to(12.8, 13.05, "io", turn=-0.3, look_x=-8, look_y=6).face(12.85, eyes="happy", mouth="smile_open", brows="up")
+SN.reach(12.85, 13.15, "r", M_GIVE)
+PIP.to(12.75, 12.9, "io", arm_l=-12, elb_l=16, arm_r=12, elb_r=-16).face(12.9, eyes="sparkle", mouth="smile_open")
 PIP_TAKE = (M_GIVE[0] + 18, M_GIVE[1])           # the marker is held flat for the give
-PIP.reach(11.95, 12.2, "r", PIP_TAKE)
-SN.reach(12.25, 12.45, "r", (770, 1360)).walk(12.3, 12.8, SN_X1, steps=2)
-SN.to(12.4, 12.7, "io", turn=0.35, look_x=8, look_y=6)
-SN.reach(12.55, 12.85, "r", (820, 1300), "back").reach(13.2, 13.5, "r", (760, 1395))
-PIP.walk(12.45, 13.5, 830, steps=4).to(13.5, 13.65, "io", turn=0.3, look_x=10, look_y=10)
-PIP.reach(12.3, 12.6, "r", (742, 1402))                             # carried flat, low in front of her tummy (K2)
+PIP.reach(12.95, 13.2, "r", PIP_TAKE)
+SN.reach(13.25, 13.45, "r", (770, 1360)).walk(13.3, 13.8, SN_X1, steps=2)
+SN.to(13.4, 13.7, "io", turn=0.35, look_x=8, look_y=6)
+SN.reach(13.55, 13.85, "r", (820, 1300), "back").reach(14.1, 14.4, "r", (760, 1395))
+PIP.walk(13.4, 14.2, 830, steps=4).to(14.2, 14.35, "io", turn=0.3, look_x=10, look_y=10)
+PIP.reach(13.3, 13.6, "r", (742, 1402))                             # carried flat, low in front of her tummy (K2)
 H_WAIT, H_PIP = (968, 1332), (975, 1322)
-# ---- shot 7 (13.6-16.6, B): Pip draws the heart nose (black), tongue tip out, copying Crinkle
-PIP.to(13.45, 13.75, "io", tilt=7).to(15.45, 15.8, "io", tilt=0)          # head tipped away from the marker
-follow(PIP, "r", "heart_l", 13.8, 14.5, 0.0, 1.0, U_PIP, lead=0.3, n=12)
-PIP.reach(14.5, 14.7, "r", (PL.tip_world("heart_r", 0)[0] - TIP_L * U_PIP[0],
+# ---- shot 7 (14.3-16.7, B): Pip draws the heart nose (black), her own tongue-tip concentration
+PIP.to(14.1, 14.4, "io", tilt=7).to(15.75, 16.1, "io", tilt=0)            # head tipped away from the marker
+follow(PIP, "r", "heart_l", 14.4, 15.0, 0.0, 1.0, U_PIP, lead=0.25, n=10)
+PIP.reach(15.0, 15.1, "r", (PL.tip_world("heart_r", 0)[0] - TIP_L * U_PIP[0],
                             PL.tip_world("heart_r", 0)[1] - TIP_L * U_PIP[1]))
-follow(PIP, "r", "heart_r", 14.7, 15.4, 0.0, 1.0, U_PIP, n=12)
-for tt, m in ((13.85, "yum"), (14.3, "yum_l"), (14.75, "yum"), (15.2, "yum_l")):
+follow(PIP, "r", "heart_r", 15.1, 15.7, 0.0, 1.0, U_PIP, n=10)
+for tt, m in ((14.45, "yum"), (14.8, "yum_l"), (15.15, "yum"), (15.5, "yum_l")):
     PIP.face(tt, mouth=m, brows="think")
-PIP.face(15.5, eyes="sparkle", mouth="smile_open", brows="up").reach(15.45, 15.9, "r", H_WAIT)   # off the face, ready
-PIP.to(15.45, 15.9, "io", turn=0.25)
-CR.face(14.0, eyes="happy", mouth="smile", brows="calm")
-# ---- shot 8 (16.6-18.2, A): Pip holds the marker up to Crinkle: his turn, given by her
-PIP.to(16.6, 16.9, "io", turn=0.25, look_x=10, look_y=-10).to(16.7, 17.1, "io", lean=6).to(17.4, 17.7, "io", lean=0).face(16.7, eyes="happy", mouth="smile_open", brows="up")
-PIP.reach(16.7, 17.1, "r", H_PIP)
+PIP.face(15.75, eyes="sparkle", mouth="smile_open", brows="up").reach(15.75, 15.9, "r", H_WAIT)   # off the face
+PIP.to(15.75, 15.9, "io", turn=0.25)
+CR.face(14.4, eyes="happy", mouth="smile", brows="calm")
+# ---- shot 8 (16.7-18.3, A): Pip holds the marker up to Crinkle: his turn, given by her
+PIP.to(16.7, 17.0, "io", turn=0.25, look_x=10, look_y=-10).to(16.8, 17.2, "io", lean=6).to(17.6, 17.9, "io", lean=0)
+PIP.face(16.8, eyes="happy", mouth="smile_open", brows="up").reach(16.8, 17.2, "r", H_PIP)
 G_GIVE = (H_PIP[0] + CAP * U_GIVE[0], H_PIP[1] + CAP * U_GIVE[1])  # the marker's grip point while she holds it up
 P_TAKE = (G_GIVE[0] + 5 * U_GIVE[0], G_GIVE[1] + 5 * U_GIVE[1])
-CR.to(16.75, 16.9, "io", arm_l=-10, elb_l=14, arm_r=10, elb_r=-14).to(16.8, 17.1, "io", sq=0.9, lean=-10)
-CR.face(16.8, eyes="sparkle", mouth="smile_open", brows="up").to(16.8, 17.0, "io", look_x=-8, look_y=6)
-CR.reach(16.95, 17.3, "l", P_TAKE)
-PIP.rest_wings(17.4, 17.7).walk(17.6, 18.1, PIP_X1, steps=2).to(17.9, 18.2, "io", turn=0.35, look_x=10, look_y=8)
-CR.reach(17.4, 17.8, "l", (1058, 1322)).wiggle(17.5, "lean", 4, 5, 3).to(17.8, 18.1, "io", sq=0.96, lean=-4)
-# ---- shot 9 (18.2-22.0, B): the big smile, slowly; his tongue slides with the marker; paw out; he holds it flat on his tummy
+CR.to(17.05, 17.2, "io", arm_l=-10, elb_l=14, arm_r=10, elb_r=-14).to(17.1, 17.4, "io", sq=0.9, lean=-10)
+CR.to(16.9, 17.1, "io", look_x=-8, look_y=6)
+CR.reach(17.2, 17.6, "l", P_TAKE)
+CR.face(17.6, eyes="sparkle", mouth="smile_open", brows="up")       # R1: first sparkle at 17.6
+PIP.rest_wings(17.65, 17.95).walk(17.65, 18.15, PIP_X1, steps=2).to(18.0, 18.3, "io", turn=0.35, look_x=10, look_y=8)
+CR.reach(17.65, 18.0, "l", (1058, 1322)).wiggle(17.7, "lean", 4, 5, 3).to(18.0, 18.2, "io", sq=0.96, lean=-4)
+# ---- shot 9 (18.3-21.2, B): gag 2 (G8): the slow smile, tongue sliding; still; the tip lifts with a big squeak
 CR.to(18.2, 18.4, "io", sq=0.88, lean=-12).face(18.3, eyes="normal", mouth="yum_l", brows="think")
 CR.to(18.3, 18.5, "io", look_x=-8, look_y=10)
-follow(CR, "l", "smile", 18.4, 20.6, 0.0, 1.0, U_CR, off=-5, lead=0.2, n=36)
-for tt, m in ((19.0, "yum_c"), (19.5, "yum"), (20.0, "yum_c"), (20.4, "yum_l")):
+follow(CR, "l", "smile", 18.4, 20.0, 0.0, 1.0, U_CR, off=-5, lead=0.2, n=26)
+for tt, m in ((18.8, "yum_c"), (19.2, "yum"), (19.6, "yum_c"), (19.95, "yum_l")):
     CR.face(tt, mouth=m)
-CR.face(20.65, eyes="happy", mouth="smile_open", brows="up")
-CR.to(20.6, 21.0, "io", sq=1.0, lean=0)
-CR.reach(20.6, 20.95, "l", (1104, 1336))                            # paw out to his chest, below his face
-CR.walk(20.95, 21.6, CR_X1, steps=2)                                # makes room for the hand (clearance check)
-CR.reach(21.6, 21.9, "l", (CR_X1 + 8, 1386))                        # ... then on his tummy, clear of the lantern
-PIP.face(18.6, mouth="yum").face(19.4, mouth="smile").to(18.4, 18.6, "io", look_x=10, look_y=10)
-SN.face(18.5, eyes="happy", mouth="smile", brows="calm")
-# ---- shots 10-11 (22.0-29.4): the hand and the tea light; the glow; the dance
+_se = PL.tip_world("smile", 1.0)
+G_END = (_se[0] - (TIP_L - 5) * U_CR[0], _se[1] - (TIP_L - 5) * U_CR[1])
+CR.reach(20.0, 20.4, "l", G_END, "lin")                              # the pause: tip still at the line's end
+CR.face(20.4, eyes="wide", brows="up", mouth="o")                    # the take: tongue in, eyes wide, head still
+CR.reach(20.4, 20.5, "l", (G_END[0] + 4, G_END[1] - 6), "out")        # the tip lifts (the squeak)
+BELLY = (CR_XW + BELLY_D[0], BELLY_D[1])
+CR.reach(20.5, 21.0, "l", BELLY, "io")                               # back and down to belly height (R3-2)
+CR.to(20.5, 21.0, "io", sq=0.96, lean=-5).to(20.5, 21.0, "io", look_x=-4, look_y=12)   # eyes on the marker
+PIP.face(18.7, mouth="yum").face(19.5, mouth="smile").to(18.4, 18.6, "io", look_x=10, look_y=10)
+PIP.puff_up(20.6, hold=1.46, out=0.3)                                # a ball 20.74-22.2, un-puffs 22.2-22.5
+PIP.face(21.0, eyes="normal", mouth="smile", brows="calm")           # R3-3: a closed smile while still round
+SN.face(18.5, eyes="happy", mouth="smile", brows="calm").face(20.4, eyes="normal", mouth="smile", brows="calm")
+# ---- shot 10 (21.2-22.2, K): he blinks at the marker and laughs at it (held at belly height)
+CR.blink(21.3)
+CR.face(21.4, eyes="happy", mouth="smile_open", brows="up").hop(21.4, 22.2, 2, 10)
+# ---- shot 11 (22.2-23.0, B): Pip un-puffs and giggles at her own feathers; Crinkle steps back to 1200
+PIP.to(22.2, 22.4, "io", look_x=4, look_y=16).face(22.5, eyes="happy", mouth="smile_open", brows="up")
+PIP.hop(22.5, 22.8, 1, 10)
+SN.ears(22.5, 22.7, "perk").ears(22.7, 22.9, "happy").face(22.5, eyes="happy", mouth="smile", brows="calm")
+CR.walk(22.2, 22.8, CR_X1, steps=2).to(22.2, 22.5, "io", sq=1.0, lean=0)
+BELLY2 = (CR_X1 + BELLY_D[0], BELLY_D[1])
+CR.reach(22.2, 22.8, "l", BELLY2, "io")
+CR.face(22.3, eyes="happy", mouth="smile", brows="calm")
+# ---- shot 12 (23.0-26.2, B): the hand and the tea light; the glow
 for perf, lx in ((SN, 6), (CR, -6), (PIP, 6)):
-    perf.to(22.05, 22.35, "io", look_x=lx, look_y=-12)
-    perf.face(22.1, eyes="normal", mouth="smile", brows="up")
-    perf.to(23.7, 24.4, "io", look_x=lx, look_y=10)
-    perf.face(24.6, eyes="sparkle", mouth="smile_open", brows="up")
-SN.ears(24.6, 24.9, "perk")
-CR.to(21.9, 22.3, "io", lean=-9).to(24.6, 25.0, "io", lean=0)                # leans out of the hand's way
-PIP.to(21.9, 22.3, "io", lean=6).to(24.6, 25.0, "io", lean=0)
-SN.to(21.9, 22.3, "io", lean=5).to(24.6, 25.0, "io", lean=0)
-SN.to(26.7, 26.9, "io", sq=0.92).hop(26.9, 27.3, 1, 26).to(27.3, 27.5, "io", sq=1.0)
-T_DANCE = (26.8, 28.0)
-TUMMY = (CR_X1 + 8, 1388)
-CR.reach(26.4, 26.8, "l", TUMMY).to(26.4, 26.8, "io", arm_r=150, elb_r=-20)
-for i in range(4):
-    a = T_DANCE[0] + i * 0.3
-    CR.to(a, a + 0.3, "io", lean=7 if i % 2 == 0 else -7, tilt=4 if i % 2 == 0 else -4)
-CR.to(28.0, 28.35, "io", lean=0, tilt=0, arm_r=10, elb_r=-14).hop(T_DANCE[0], T_DANCE[1], 4, 12)
-CR.face(26.8, eyes="happy", mouth="smile_open", brows="up")
-PIP.dance(27.2, 28.4, beats=4).face(27.2, eyes="happy", mouth="smile_open", brows="up")
-SN.face(27.4, eyes="happy", mouth="smile_open", brows="up")
+    perf.to(22.95, 23.25, "io", look_x=lx, look_y=-12)
+    perf.face(23.0, eyes="normal", mouth="smile", brows="up")
+    perf.to(24.5, 25.1, "io", look_x=lx, look_y=10)
+    perf.face(25.4, eyes="sparkle", mouth="smile_open", brows="up")
+SN.ears(25.4, 25.7, "perk")
+CR.to(22.9, 23.3, "io", lean=5).to(25.4, 25.8, "io", lean=0)                 # lean out of the hand's way
+PIP.to(22.9, 23.3, "io", lean=-5).to(25.4, 25.8, "io", lean=0)
+SN.to(22.9, 23.3, "io", lean=-5).to(25.4, 25.8, "io", lean=0)
+# ---- shot 13 (26.2-29.0, B -> END): Snip hops; gag 3 (G5): two wiggles, still, the third spins him round
+SN.to(26.4, 26.6, "io", sq=0.92).hop(26.6, 27.0, 1, 26).to(27.0, 27.2, "io", sq=1.0)
+TUMMY = BELLY2
+CR.to(26.2, 26.4, "io", arm_r=150, elb_r=-20)                       # right paw up: the side away from the lantern
+CR.face(26.4, eyes="happy", mouth="smile_open", brows="up")
+for i, (a, b) in enumerate(((26.4, 26.775), (26.775, 27.15), (27.15, 27.525), (27.525, 27.9))):
+    CR.to(a, b, "io", lean=7 if i % 2 == 0 else -7, tilt=4 if i % 2 == 0 else -4)
+CR.hop(26.4, 27.9, 4, 12)
+CR.to(27.9, 28.2, "io", sq=0.9, lean=0, tilt=0)                      # squashes down, still (the pause)
+CR.to(28.2, 28.5, "io", turn=0.55, sq=1.0, lean=7, tilt=4)          # wiggle 3 swings him right round, feet down
+CR.to(28.5, 28.75, "io", lean=-7, tilt=-4).to(28.75, 29.0, "io", lean=7, tilt=4)   # dances on, the wrong way
+# ---- shot 14 (29.0-30.0, K2): he looks back over his shoulder, blinks, laughs at himself
+CR.to(29.0, 29.2, "io", lean=0, tilt=0, hturn=-0.6, look_x=-10, look_y=2).blink(29.2)
+CR.to(29.05, 29.3, "io", arm_r=10, elb_r=-14)
+CR.face(29.3, eyes="happy", mouth="smile_open", brows="up").hop(29.3, 30.0, 3, 10)
+PIP.dance(26.8, 27.9, beats=3, amp=5.0, bounce=6.0).face(26.8, eyes="happy", mouth="smile", brows="up")
+PIP.face(27.9, eyes="normal", mouth="smile", brows="think")         # R3-4: a serious copy, beak closed
+PIP.to(28.6, 28.9, "io", turn=-0.45).dance(28.9, 29.5, beats=2, amp=4.0, bounce=4.0)
+PIP.face(29.35, eyes="happy", mouth="smile", brows="calm")
+SN.face(27.9, eyes="normal", mouth="smile", brows="calm").face(29.35, eyes="happy", mouth="smile", brows="calm")
 
 
 # ---------------------------------------------------------------- the marker's holder schedule
 def marker_pose(t):
     """(who, side, off, angle): the marker's grip point is the holder's paw + off along the marker."""
-    if t < 1.1:
+    if t < 1.2:
         return "sn", "r", 0.0, ANG["sn"]
-    if t < 4.0:
-        ang = _ease(t, [(1.1, ANG["sn"]), (1.7, A_HANG), (2.0, A_HANG), (2.5, ANG["cr"]), (3.5, ANG["cr"]),
-                        (4.0, ANG["sn"])])
+    if t < 5.4:
+        ang = _ease(t, [(1.9, ANG["sn"]), (2.3, A_HANG), (2.8, A_HANG), (3.2, ANG["cr"]), (4.5, ANG["cr"]),
+                        (5.4, ANG["sn"])])
         return "cr", "l", CAP, ang
-    if t < 12.2:
-        return "sn", "r", 0.0, _ease(t, [(10.9, ANG["sn"]), (11.3, A_REST), (11.85, A_REST), (12.15, A_FLAT)])
-    if t < 17.3:
-        off = _ease(t, [(12.2, -18.0), (12.6, 0.0), (15.45, 0.0), (15.9, CAP)])
-        ang = _ease(t, [(12.2, A_FLAT), (12.6, A_FLAT), (13.62, A_FLAT), (13.8, ANG["pip"]), (15.45, ANG["pip"]),
+    if t < 13.2:
+        return "sn", "r", 0.0, _ease(t, [(12.6, ANG["sn"]), (12.85, A_REST), (12.9, A_REST), (13.15, A_FLAT)])
+    if t < 17.6:
+        off = _ease(t, [(13.2, -18.0), (13.6, 0.0), (15.75, 0.0), (15.9, CAP)])
+        ang = _ease(t, [(13.2, A_FLAT), (13.6, A_FLAT), (14.2, A_FLAT), (14.4, ANG["pip"]), (15.75, ANG["pip"]),
                         (15.9, ANG["give"])])
         return "pip", "r", off, ang
-    if t < 20.95:
-        ang = _ease(t, [(17.3, ANG["give"]), (17.8, A_FLAT), (18.2, A_FLAT), (18.4, ANG["cr"]), (20.6, ANG["cr"]),
-                        (20.95, A_FLAT)])
-        return "cr", "l", -5.0, ang
-    return "cr", "l", -5.0, A_FLAT
+    ang = _ease(t, [(17.6, ANG["give"]), (18.0, A_FLAT), (18.2, A_FLAT), (18.4, ANG["cr"]), (20.5, ANG["cr"]),
+                    (21.0, A_BELLY)])
+    return "cr", "l", -5.0, ang
 
 
 PERFS = {"sn": SN, "cr": CR, "pip": PIP}
@@ -317,11 +365,11 @@ def marker_tip_world(t, sts):
 def arms_over(t):
     """Arms drawn again after the lantern (they reach over it), in this order; the marker goes over all of them."""
     out = []
-    if t < 11.9:
+    if t < 12.9:
         out.append(("sn", "r"))
-    if 0.3 <= t < 5.0 or 16.85 <= t < 21.0:
+    if 0.3 <= t < 5.8 or 17.15 <= t < 21.0:
         out.append(("cr", "l"))
-    if 13.4 <= t < 17.75:
+    if 14.1 <= t < 17.65:
         out.append(("pip", "r"))
     return out
 
@@ -349,29 +397,29 @@ def tea_light_round(on=False):
 TEA = {False: tea_light_round(False), True: tea_light_round(True)}
 TEA_S = 1.15                            # 69 wide: fits the 84-wide ring
 ARM = H.Arm(upper=720, fore=760)
-T_HAND = (22.0, 24.9)
-T_CLICK = 22.7
+T_HAND = (23.0, 25.3)
+T_CLICK = 23.7
 TEA_HOLD = (961, 1250)                  # the light's top, held above the ring
 TEA_IN = (961, 1356)                    # let go just inside the ring: only the narrow fingers go in (keys1 K1);
                                         # the light sits on the bottom inside, out of sight (the paper glows)
 TEA_GRIP = (0, -3)                      # pinched at its top rim, from straight above
-T_GLOW = (23.95, 24.75)
+T_GLOW = (24.55, 25.2)
 
 
 def tea_top(t):
-    return _ease(t, [(22.0, (961, 640)), (22.5, TEA_HOLD), (23.7, TEA_HOLD), (24.35, TEA_IN), (24.5, TEA_IN)])
+    return _ease(t, [(23.0, (961, 640)), (23.5, TEA_HOLD), (24.3, TEA_HOLD), (24.85, TEA_IN), (25.0, TEA_IN)])
 
 
 def hand_state(t):
     if not T_HAND[0] <= t < T_HAND[1]:
         return None
-    if t < 24.5:
+    if t < 25.0:
         top = tea_top(t)
         grip = (top[0] + TEA_GRIP[0], top[1] + TEA_GRIP[1])
         hand = "press" if T_CLICK - 0.08 <= t < T_CLICK + 0.14 else "pinch"
         return dict(grip=grip, hand=hand, top=top)
     g0 = (TEA_IN[0] + TEA_GRIP[0], TEA_IN[1] + TEA_GRIP[1])
-    return dict(grip=_ease(t, [(24.5, g0), (24.9, (961, 640))]), hand="pinch", top=None)
+    return dict(grip=_ease(t, [(25.0, g0), (25.3, (961, 640))]), hand="pinch", top=None)
 
 
 def glow_k(t):
@@ -462,7 +510,7 @@ def render_world(t, d=None, cam=None, bg=None):
     size = f.size
     L.floor_pool(f, CAM, WORLD.albedo, glow, 1.0)
     sts = states(t, d)
-    for who in (("sn", "cr", "pip") if 2.0 <= t < 5.4 else ("cr", "sn", "pip")):
+    for who in (("sn", "cr", "pip") if 2.8 <= t < 6.5 else ("cr", "sn", "pip")):
         perf, st = PERFS[who], sts[who]
         back = back_now(who, t)
         _char_layer(size, lambda im, perf=perf, st=st, back=back: _draw_puppet(perf, im, t, d, st, back),
@@ -496,13 +544,16 @@ def render_world(t, d=None, cam=None, bg=None):
 
 
 # ---------------------------------------------------------------- cameras (plan b4; vertical)
-CAMS = {"A": ((880, 1250), 1.7), "T": ((962, 1300), 2.4), "B2": ((920, 1270), 1.8), "K": ((1060, 1180), 1.9),
-        "B": ((950, 1320), 2.0)}       # keys1 K1: shot 10 stays on B (plan b4), lantern 44% of the width
-END_C, END_Z = (975, 1215), 1.4
-T_PULL = (26.0, 28.2)                  # 2.0x -> 1.4x, peak 0.32x per second (K1)
-SHOTS = [(0.0, "A"), (0.6, "T"), (2.0, "B2"), (5.4, "A"), (7.2, "K"), (8.4, "B"), (11.8, "A"), (13.6, "B"),
-         (16.6, "A"), (18.2, "B")]       # shots 9 + 10 on B (22.0 is not a cut)
-CUTS = [s[0] for s in SHOTS[1:]]        # 26.0 is not a cut (the pull back starts)
+CAMS = {"A": ((880, 1250), 1.7), "T": ((958, 1300), 2.6), "B2": ((920, 1270), 1.8), "K": ((1060, 1180), 1.9),
+        "B": ((950, 1320), 2.0)}       # keys1 K1: shot 12 stays on B (plan b4), lantern 44% of the width
+_hp = CR.a.head_pivot(CR.state(29.5))
+CAMS["K2"] = ((round(_hp[0]), round(_hp[1] - 42)), 1.9)   # r2: on his head at x 1200 (K's offset from the head)
+END_C, END_Z = (1000, 1215), 1.3      # r2: was (975, 1215) 1.4x, which cut Crinkle (now at 1200) and his raised paw
+T_PULL = (25.4, 27.8)                  # 2.0x -> 1.3x, peak 0.34x/s (rule <= 0.35); the plan's 26.2-27.8 would peak at
+                                       # 0.44x/s, so it starts in the glow hold and reaches the end framing at 27.8
+SHOTS = [(0.0, "A"), (0.6, "T"), (2.8, "B2"), (6.5, "A"), (9.6, "K"), (10.6, "B"), (12.8, "A"), (14.3, "B"),
+         (16.7, "A"), (18.3, "B"), (21.2, "K"), (22.2, "B"), (29.0, "K2")]
+CUTS = [s[0] for s in SHOTS[1:]]        # the pull back is not a cut
 
 
 def _trap(p, r=0.15):
@@ -523,7 +574,7 @@ def _trap(p, r=0.15):
 def shot_at(t):
     name = [s[1] for s in SHOTS if t >= s[0] - 1e-9][-1]
     c, z = CAMS[name]
-    if t >= T_PULL[0]:
+    if t >= T_PULL[0] and name != "K2":
         k = _trap(seg(t, *T_PULL))
         c = (lerp(c[0], END_C[0], k), lerp(c[1], END_C[1], k))
         z = lerp(z, END_Z, k)
@@ -547,7 +598,7 @@ def code_hash():
 
 
 def hi_range():
-    return [(0.6, 2.0)]
+    return [(0.6, 2.8)]                 # camera T (2.6x) at render scale 3
 
 
 def render_frame(t, view="vert", fresh=False):
@@ -606,62 +657,173 @@ def head_mask(who, st):
         lambda v: 255 if v > 40 else 0)
 
 
+def _arm_mask(who, side, sts):
+    return _mask_of(lambda im: PERFS[who].a._arm(im, CAM, sts[who], side))
+
+
+def _body_mask(who, t, sts):
+    return _mask_of(lambda im: _draw_puppet(PERFS[who], im, t, K.drawing_of(t), sts[who], back_now(who, t)))
+
+
+def _mk_only(t, sts):
+    g, ang, _, _ = marker_grip(t, sts)
+    return _mask_of(lambda im: place(im, MK, CAM.S(g), angle=ang))
+
+
+def _pct(mask, t):
+    """The object's mask width as % of the frame width, through the shot camera at time t."""
+    bb = mask.getbbox()
+    return 0.0 if bb is None else (bb[2] - bb[0]) / RES * shot_at(t)[2] / 1080 * 100
+
+
+def _frac_clear(mk, covers):
+    a = np.asarray(mk) > 0
+    c = np.zeros_like(a)
+    for m in covers:
+        c |= np.asarray(m) > 0
+    return float((a & ~c).sum()) / max(1, int(a.sum()))
+
+
+def drawings(a, b, step=1):
+    return [d / K.DPS for d in range(int(math.ceil(a * K.DPS - 1e-6)), int(math.ceil(b * K.DPS - 1e-6)), step)]
+
+
+def _moving(perf, ts, keys=("lean", "turn", "tilt", "sq", "hturn"), eps=(0.3, 0.01, 0.3, 0.004, 0.01)):
+    """Per drawing: True if any body key changed more than eps since the previous drawing."""
+    sv = [perf.state(t) for t in ts]
+    return [False] + [any(abs(sv[i].get(k, 0) - sv[i - 1].get(k, 0)) > e for k, e in zip(keys, eps))
+                      for i in range(1, len(ts))]
+
+
+def _still_spans(perf, a, b):
+    ts = drawings(a, b)
+    mv = _moving(perf, ts)
+    out, s = [], None
+    for t, m in zip(ts, mv):
+        if not m and s is None:
+            s = t
+        elif m and s is not None:
+            out.append((round(s, 2), round(t, 2)))
+            s = None
+    if s is not None:
+        out.append((round(s, 2), round(b, 2)))
+    return out
+
+
+def gag_timing():
+    """Measured from the performances (every drawing), against the plan's gag table."""
+    lines = []
+    st1 = [s for s in _still_spans(CR, 8.2, 9.0) if s[1] - s[0] >= 0.2]
+    turn = [(CR.state(t)["turn"], t) for t in drawings(8.8, 9.6)]
+    lines.append(f"gag 1 (plan: set-up 6.9-8.4, pause 8.4-8.8, break 8.8-9.6, reaction 9.6-10.6 in K): Crinkle still "
+                 f"{st1}; Pip still {[s for s in _still_spans(PIP, 8.2, 9.0) if s[1] - s[0] >= 0.2]}; turn peak "
+                 f"{max(turn)[0]:.2f} at {max(turn)[1]:.2f}; back to {CR.state(9.6)['turn']:.2f} at 9.6; grin face "
+                 f"at 9.6 '{CR.state(9.6).get('mouth')}' in camera {shot_at(9.6)[0]}")
+    tips = [(t, marker_tip_world(t, states(t))) for t in drawings(19.8, 20.6)]
+    still = [round(t, 2) for (t, p), (_, q) in zip(tips[1:], tips[:-1]) if math.hypot(p[0] - q[0], p[1] - q[1]) < 0.3]
+    puff = [t for t in drawings(20.4, 22.6) if PIP.state(t).get("puff", 0) > 0.95]
+    lines.append(f"gag 2 (plan: set-up 18.3-20.0, pause 20.0-20.4, break 20.4-21.2, reaction 21.2-22.2 in K): tip still "
+                 f"{still[0] if still else None}-{still[-1] if still else None}; take face at 20.4 "
+                 f"'{CR.state(20.45).get('eyes')}'; Pip a full ball {puff[0]:.2f}-{puff[-1]:.2f}; his laugh face at "
+                 f"21.4 '{CR.state(21.45).get('mouth')}' in camera {shot_at(21.4)[0]}")
+    st3 = [s for s in _still_spans(CR, 27.7, 28.4) if s[1] - s[0] >= 0.2]
+    wrong = [t for t in drawings(28.2, 29.0) if CR.state(t)["turn"] > 0.5]
+    lines.append(f"gag 3 (plan: set-up 26.4-27.9, pause 27.9-28.2, break 28.2-29.0, reaction 29.0-30.0 in K2): Crinkle "
+                 f"still {st3}; facing the wrong way (turn > 0.5) from {wrong[0]:.2f}; look back hturn "
+                 f"{CR.state(29.25)['hturn']:.2f} in camera {shot_at(29.25)[0]}; laugh face at 29.3 "
+                 f"'{CR.state(29.35).get('mouth')}'")
+    return lines
+
+
 def checks():
     lines = []
-    # 1. the give-back: his paw's gap from the marker (>= 40 by 4.15); the marker still from 4.0
-    for tt in (4.0, 4.1, 4.15, 4.2, 4.4):
+
+    def ok(v, need, txt, ge=True):
+        good = v >= need if ge else v <= need
+        lines.append(f"{'ok  ' if good else 'FAIL'} {txt}: {v:.1f} (need {'>=' if ge else '<='} {need:g})")
+    # 1. the take and the give-back: the marker in view (pixels clear of both arm masks), every drawing
+    for a, b, tag in ((0.9, 2.3, "the take"), (4.5, 5.9, "the give-back")):
+        worst = (2.0, None)
+        for tt in drawings(a, b):
+            sts = states(tt)
+            fr = _frac_clear(_mk_only(tt, sts), [_arm_mask("sn", "r", sts), _arm_mask("cr", "l", sts)])
+            worst = min(worst, (fr, round(tt, 2)))
+        ok(worst[0] * 100, 50, f"{tag} {a}-{b}: marker % clear of both arm masks (min, at {worst[1]})")
+    # 2. key sizes (handover_check): the key object's mask width as % of the frame width
+    for tt in (1.0, 1.6, 2.2, 4.6, 5.2, 5.8, 16.9, 17.3, 17.7):
+        lines.append(f"keysize {tt:.2f} {_pct(_mk_only(tt, states(tt)), tt):.1f}   (marker, camera {shot_at(tt)[0]})")
+    for tt in (23.3, 23.8, 24.3, 24.7):
+        hs = hand_state(tt)
+        m = _mask_of(lambda im: place(im, TEA[tt >= T_CLICK], CAM.S(hs["top"]), scale=TEA_S))
+        lines.append(f"keysize {tt:.2f} {_pct(m, tt):.1f}   (tea light, camera {shot_at(tt)[0]})")
+    # 3. the let-go: his paw clear of the marker (>= 40 by 5.55); the marker and her paw still
+    for tt in (5.4, 5.47, 5.55, 5.6, 5.8):
         sts = states(tt)
-        paw = _mask_of(lambda im: CR.a._arm(im, CAM, sts["cr"], "l"))
-        mk = _mask_of(lambda im: draw_marker(im, tt, sts))
-        lines.append(f"give-back {tt:.2f}: Crinkle's arm to marker gap {_gap(paw, mk):.1f}")
-    tips = [marker_tip_world(tt, states(tt)) for tt in np.arange(4.0, 5.36, 1 / 15)]
-    mv = max(math.hypot(p[0] - tips[0][0], p[1] - tips[0][1]) for p in tips)
-    lines.append(f"marker tip movement 4.0-5.35: max {mv:.2f} units; tip {tuple(round(v, 1) for v in tips[0])}, "
-                 f"C end {tuple(round(v, 1) for v in PL.tip_world('eye_l', C))}")
-    # 2. the take: Snip's paw does not move 0.8-2.0; marker's path
-    ps = [SN.paw(tt, "r")[0] for tt in np.arange(0.8, 2.01, 1 / 15)]
-    lines.append(f"Snip's paw movement 0.8-2.0: {max(math.hypot(p[0] - ps[0][0], p[1] - ps[0][1]) for p in ps):.2f}")
-    # 3. marker to Pip's face at the hand-up, and marker tip to every face over the whole Short
-    worst = {}
-    for tt in list(np.arange(16.6, 17.8, 1 / 15)) + [17.3]:
+        g = _gap(_arm_mask("cr", "l", sts), _mask_of(lambda im: draw_marker(im, tt, sts)))
+        if tt >= 5.55:
+            ok(g, 40, f"give-back {tt:.2f}: Crinkle's arm to the marker gap")
+        else:
+            lines.append(f"give-back {tt:.2f}: Crinkle's arm to the marker gap {g:.1f}")
+    tips = [marker_tip_world(tt, states(tt)) for tt in drawings(5.4, 5.9)]
+    ok(max(math.hypot(p[0] - tips[0][0], p[1] - tips[0][1]) for p in tips), 1.0, "marker tip movement 5.4-5.9",
+       ge=False)
+    lines.append(f"tip at 5.4 {tuple(round(v, 1) for v in tips[0])}; the C's end "
+                 f"{tuple(round(v, 1) for v in PL.tip_world('eye_l', C))}")
+    ps = [SN.paw(tt, "r")[0] for tt in drawings(0.9, 5.9)]
+    ok(max(math.hypot(p[0] - ps[0][0], p[1] - ps[0][1]) for p in ps), 1.0, "Snip's paw movement 0.9-5.9", ge=False)
+    gs = [marker_grip(tt, states(tt))[0] for tt in drawings(1.2, 1.9) + [1.9]]
+    side = max(abs((g[0] - gs[0][0]) * U_SN[1] - (g[1] - gs[0][1]) * U_SN[0]) for g in gs)
+    ok(side, 3.0, f"the slide 1.2-1.9 along its own axis: sideways units (slid {math.hypot(gs[-1][0] - gs[0][0], gs[-1][1] - gs[0][1]):.0f})",
+       ge=False)
+    # 4. the marker and faces
+    worst = (1e9, None)
+    for tt in drawings(16.7, 18.0):
         sts = states(tt)
-        mk = _mask_of(lambda im: draw_marker(im, tt, sts))
-        worst[round(tt, 2)] = _gap(mk, head_mask("pip", sts["pip"]))
-    lines.append(f"marker to Pip's head 17.3: {worst[17.3]:.1f}; min 16.6-17.8: {min(worst.values()):.1f} "
-                 f"at {min(worst, key=worst.get)}")
-    tipmin = (1e9, None)
-    body = {}
-    for tt in np.arange(0.0, DUR, 0.2):
+        worst = min(worst, (_gap(_mask_of(lambda im: draw_marker(im, tt, sts)), head_mask("pip", sts["pip"])),
+                            round(tt, 2)))
+    ok(worst[0], 30, f"marker to Pip's head 16.7-18.0 (min, at {worst[1]})")
+    tipmin, lowest = (1e9, None), (1e9, None)
+    for tt in [round(x, 2) for x in np.arange(0.0, DUR, 0.2)] + drawings(20.4, 22.8):
         sts = states(tt)
         tip = marker_tip_world(tt, sts)
         tm = Image.new("L", (int(1080 * RES), int(1920 * RES)), 0)
         x, y = CAM.S(tip)
         ImageDraw.Draw(tm).ellipse([x - 2, y - 2, x + 2, y + 2], fill=255)
-        mk = _mask_of(lambda im: draw_marker(im, tt, sts))
         for who in ("sn", "cr", "pip"):
-            hmk = head_mask(who, sts[who])
-            g = _gap(tm, hmk)
-            if g < tipmin[0]:
-                tipmin = (g, (round(float(tt), 1), who))
-            gb = _gap(mk, hmk)
-            if gb < body.get(who, (1e9,))[0]:
-                body[who] = (round(gb, 1), round(float(tt), 1))
-    lines.append(f"marker tip to nearest head (whole Short, every 0.2 s): {tipmin[0]:.1f} at {tipmin[1]}")
-    lines.append(f"whole marker to each head (min, at): {body}")
-    # 4. the hand and the tea light: gap to every head, 22.0-24.9
+            hm = head_mask(who, sts[who])
+            g = _gap(tm, hm)
+            tipmin = min(tipmin, (g, (round(float(tt), 2), who)))
+            if 20.4 <= tt <= 22.8:
+                lowest = min(lowest, (g, (round(float(tt), 2), who)))
+                if who == "cr":
+                    chin = hm.getbbox()[3] / RES + CAM.oy
+                    if tip[1] < chin:
+                        lines.append(f"FAIL marker tip above his chin at {tt:.2f}")
+    ok(tipmin[0], 30, f"marker tip to the nearest head, whole Short (min, at {tipmin[1]})")
+    ok(lowest[0], 60, f"R3-2: marker tip to every head 20.4-22.8, every drawing (min, at {lowest[1]})")
+    # 5. the lantern: gaps (R2-2 6.5-10.6; Pip's puff-up; nothing on it 21.2-22.8; N4/F3 >= 10 22.8-30.0)
+    lan = _mask_of(lambda im: place(im, LANTERN.paper({}), CAM.S(BASE)))
+    for a, b, whos, need, tag in ((6.5, 10.6, ("sn", "cr", "pip"), 10, "R2-2"), (20.6, 21.2, ("pip",), 10, "puff-up"),
+                                  (21.2, 22.8, ("sn", "cr", "pip", "mk"), 1, "R3-5 nothing on it"),
+                                  (22.8, DUR, ("sn", "cr", "pip", "mk"), 10, "N4/F3")):
+        worst = (1e9, None)
+        for tt in drawings(a, b):
+            sts = states(tt)
+            for who in whos:
+                m = _mk_only(tt, sts) if who == "mk" else _body_mask(who, tt, sts)
+                worst = min(worst, (_gap(m, lan), (round(tt, 2), who)))
+        ok(worst[0], need, f"{tag} {a}-{b:g}: every mask to the lantern (min, at {worst[1]})")
+    # 6. the hand and the tea light
     hm = (1e9, None)
-    for tt in np.arange(22.0, 24.9, 1 / 15):
+    for tt in drawings(23.0, 25.3):
         sts = states(tt)
         hs = hand_state(tt)
         hmask = _mask_of(lambda im: draw_hand(im, CAM, hs, tt))
         for who in ("sn", "cr", "pip"):
-            g = _gap(hmask, head_mask(who, sts[who]))
-            if g < hm[0]:
-                hm = (g, (round(float(tt), 2), who))
-    lines.append(f"hand + tea light to nearest head 22.0-24.9: {hm[0]:.1f} at {hm[1]}")
-    lan = _mask_of(lambda im: place(im, LANTERN.paper({}), CAM.S(BASE)))
-    worst = (0, None)
-    for tt in np.arange(23.7, 24.9, 1 / 15):
+            hm = min(hm, (_gap(hmask, head_mask(who, sts[who])), (round(float(tt), 2), who)))
+    ok(hm[0], 30, f"hand + tea light to the nearest head 23.0-25.3 (min, at {hm[1]})")
+    worst = (0, 0.0)
+    for tt in drawings(24.3, 25.3):
         hs = hand_state(tt)
         lay = L.Layer.of(lan.size, lambda im: draw_hand(im, CAM, hs, tt))
         PL.inside_clip(lay, CAM)
@@ -669,32 +831,25 @@ def checks():
         hmk.paste(lay.img.getchannel("A").point(lambda v: 255 if v > 40 else 0), lay.box[:2])
         a = np.asarray(ImageChops.multiply(hmk, lan)) > 0
         a[:int((PL.RING_WORLD[1] + PL.RING_R[1] - CAM.oy) * RES)] = False
-        n = int(a.sum())
-        if n > worst[0]:
-            worst = (n, round(float(tt), 2))
-    lines.append(f"hand pixels over the lantern paper below the ring rim 23.7-24.9: {worst[0]} (max, at {worst[1]})")
-    # 5. the lantern from 22.0: nobody's paw, wing or foot on it (arms over it, or anything over the ring)
-    for tt in np.arange(22.0, DUR, 0.25):
-        if arms_over(tt):
-            lines.append(f"!! arms drawn over the lantern at {tt:.2f}")
-            break
-    else:
-        lines.append("no arm drawn over the lantern 22.0-29.4 (arms_over empty)")
-    # 6. the camera: zoom and pan speed (per drawing), and every stretch between cuts
-    ts = np.arange(0.0, DUR, 1 / 15)
+        worst = max(worst, (int(a.sum()), round(float(tt), 2)))
+    lines.append(f"hand pixels over the lantern paper below the ring rim 24.3-25.3: {worst[0]} (max, at {worst[1]})")
+    bad = [round(tt, 2) for tt in drawings(21.2, DUR) if arms_over(tt)]
+    lines.append(f"{'FAIL' if bad else 'ok  '} arms drawn over the lantern 21.2-30.0: {bad[:3] or 'none'}")
+    # 7. the camera: zoom and pan speed, stretches without a change
+    ts = drawings(0.0, DUR)
     zr, pr = [], []
     for a, b in zip(ts[:-1], ts[1:]):
         (na, ca, za), (nb, cb, zb) = shot_at(a), shot_at(b)
         if na == nb:
             zr.append((abs(zb - za) * 15, round(float(a), 2)))
             pr.append((math.hypot(cb[0] - ca[0], cb[1] - ca[1]) * 15, round(float(a), 2)))
-    lines.append(f"camera: max zoom rate {max(zr)[0]:.3f}x/s at {max(zr)[1]}; max pan {max(pr)[0]:.1f} units/s at "
-                 f"{max(pr)[1]}")
-    edges = sorted(set([0.0] + CUTS + list(T_PULL) + [DUR]))          # cuts and camera moves
+    ok(max(zr)[0], 0.35, f"camera max zoom rate x/s (at {max(zr)[1]}; pan max {max(pr)[0]:.1f} units/s at "
+                         f"{max(pr)[1]})", ge=False)
+    edges = sorted(set([0.0] + CUTS + list(T_PULL) + [DUR]))
     long = [(a, b) for a, b in zip(edges[:-1], edges[1:]) if b - a > 6.0]
-    lines.append(f"stretches > 6 s without a cut or camera move: {long or 'none'}; "
+    lines.append(f"{'FAIL' if long else 'ok  '} stretches > 6 s without a cut or camera move: {long or 'none'}; "
                  f"longest {max(b - a for a, b in zip(edges[:-1], edges[1:])):.1f} s")
-    return lines
+    return lines + gag_timing()
 
 
 # ---------------------------------------------------------------- sound (no voices: effects and music only)
@@ -756,83 +911,138 @@ def bass_bars(music, t0, t1, prog=("F", "Bb", "C", "F"), vel=0.45):
         i += 1
 
 
+def toy_squeak(dur=0.3, vel=1.0):
+    """r2 gag 2: a rubber-toy squeak (synth): rising, soft attack (no click), 0.3 s (R3-1)."""
+    tt = A._t(dur)
+    f = 900 + 700 * np.clip(tt / (dur * 0.6), 0, 1) + 60 * np.sin(2 * np.pi * 18 * tt)
+    ph = 2 * np.pi * np.cumsum(f) / A.SR
+    y = np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.15 * np.sin(3 * ph)
+    env = np.clip(tt / 0.04, 0, 1) * np.clip((dur - tt) / 0.08, 0, 1)
+    return vel * 0.16 * y * env
+
+
+def fwump(vel=1.0):
+    """A soft feather 'fwump': low filtered air, no attack click."""
+    tt = A._t(0.28)
+    n = np.random.default_rng(7).normal(0, 1, len(tt))
+    k = np.ones(40) / 40
+    lo = np.convolve(n, k, "same")
+    env = np.clip(tt / 0.03, 0, 1) * np.exp(-tt * 12)
+    return vel * 0.9 * lo * env + vel * 0.05 * np.sin(2 * np.pi * 110 * tt) * env
+
+
+def glock_bend(m, dur=0.8, up=0.12, vel=0.3):
+    """Gag 1: a wobbly glock bend up and back (never below the start note)."""
+    tt = A._t(dur)
+    f = A.midi(m) * (1 + up * np.sin(np.pi * tt / dur) + 0.012 * np.sin(2 * np.pi * 7 * tt))
+    ph = 2 * np.pi * np.cumsum(f) / A.SR
+    return vel * 0.25 * (np.sin(ph) + 0.3 * np.sin(4 * ph)) * np.exp(-tt * 2.2) * np.clip(tt / 0.01, 0, 1)
+
+
+def giggle_run(music, t0, notes, gap=0.09, vel=0.4, glock=False):
+    """An instrument giggle (never a voice): quick bouncing notes."""
+    for i, m in enumerate(notes):
+        music.add(t0 + gap * i, A.glock(M(m), 0.3, vel) if glock else A.pluck(M(m), 0.22, vel))
+
+
 def make_buses():
     music, sfx = A.Mix(DUR), A.Mix(DUR)
     # a soft dusk bed under everything, so no gap falls silent (check_video, Lead)
-    for t0 in np.arange(0.8, 26.5, 2.0):
+    for t0 in np.arange(0.8, 28.0, 2.0):
         music.add(float(t0), A.pad([M(53), M(60)], 3.0, 0.1))
-    # 0-1.1: the bouncy glock tune, broken off at the tip's lift
-    tune(music, 0.0, upto=1.1, vel=0.5)
-    bass_bars(music, 0.0, 1.1)
+    # 0-1.2: the bouncy glock tune, broken off as the tip lifts
+    tune(music, 0.0, upto=1.2, vel=0.5)
+    bass_bars(music, 0.0, 1.2)
     sfx.add(0.0, A.boing(0.28, 300))
     sfx.add(0.27, A.boing(0.22, 320))
-    squeaks(sfx, 0.02, 0.8, 2100)
-    sfx.add(1.1, A.pop(0.35))                                            # the "plip" as the tip leaves the paper
-    # 1.1-5.4: near-silence, falling notes, a soft pad, the understanding, the sorry swell
-    music.add(2.2, A.glock(M(81), 1.0, 0.3))
-    music.add(2.5, A.glock(M(77), 1.4, 0.28))
-    music.add(2.6, A.pad([M(62), M(65), M(69)], 2.8, 0.18))
-    music.add(3.2, organ_bend(220.0, 174.6, 0.75, 0.9))
-    sfx.add(4.0, A.tap(0.45))                                            # the marker back in her paw
-    music.add(4.4, A.pad([M(58), M(62), M(65)], 1.2, 0.26))
-    music.add(4.9, A.pad([M(57), M(60), M(65)], 1.6, 0.26))
-    music.add(4.8, A.glock(M(84), 0.6, 0.25))
-    # 5.4-8.4: the patient tick-tock
-    for i, tt in enumerate(np.arange(5.4, 8.4, BEAT)):
+    squeaks(sfx, 0.02, 0.9, 2100)
+    sfx.add(0.9, click(0.18))                                            # the pinch: a tiny paper tick
+    sfx.add(1.2, A.pop(0.35))                                            # the "plip" as the tip leaves the paper
+    sfx.add(1.2, A.whoosh(0.7, 0.1))                                     # a soft paper slide (1.2-1.9)
+    # 1.9-6.5: near-silence, falling notes, a soft pad, the understanding, the sorry swell
+    music.add(2.95, A.glock(M(81), 1.0, 0.3))                            # ears droop
+    music.add(3.2, A.glock(M(77), 1.4, 0.28))
+    music.add(2.8, A.pad([M(62), M(65), M(69)], 3.6, 0.18))
+    music.add(4.25, organ_bend(196.0, 196.0, 1.3, 0.9))                  # one low held note, no bend (R2-1)
+    sfx.add(5.4, A.tap(0.45))                                            # the marker back in her paw
+    music.add(5.8, A.pad([M(58), M(62), M(65)], 1.2, 0.26))
+    music.add(6.2, A.pad([M(57), M(60), M(65)], 1.4, 0.26))
+    music.add(6.0, A.glock(M(84), 0.6, 0.25))                            # her ears spring up
+    # 6.5-10.6: gag 1: tick-tock, the rest, the wobbly bend, one low giggle note
+    for i, tt in enumerate(np.arange(6.5, 8.4, BEAT)):
         sfx.add(float(tt), A.woodblock(i % 2 == 0, 0.16))
-    for tt, m in ((5.4, 77), (6.55, 81), (7.7, 84)):
-        music.add(tt, A.glock(M(m), 1.4, 0.24))
-    bass_bars(music, 5.4, 8.4, vel=0.3)
-    sfx.add(5.6, A.tap(0.25))
-    # 8.4-22.0: the turns
-    bass_bars(music, 8.4, 22.0, vel=0.32)
-    tune(music, 8.6 - 2 * BEAT * 0.5, upto=9.05, vel=0.42, step=0.5)    # Snip's phrase again ...
-    music.add(9.1, A.glock(M(89), 1.6, 0.5))                             # ... resolved: the C closes into an O
-    music.add(9.1, A.pad([M(65), M(69), M(72)], 1.4, 0.18))
-    squeaks(sfx, 8.6, 9.1, 2100)
+    for tt, m in ((6.9, 77), (7.4, 81), (7.9, 84)):
+        music.add(tt, A.glock(M(m), 0.9, 0.24))
+    bass_bars(music, 6.5, 8.4, vel=0.3)
+    sfx.add(6.6, A.tap(0.25))
+    music.add(8.8, glock_bend(84, 0.8, 0.12, 0.34))
+    music.add(9.6, A.pluck(M(53), 0.35, 0.5))
+    sfx.add(9.8, A.boing(0.2, 260))
+    # 10.6-20.0: the turns
+    bass_bars(music, 10.6, 20.0, vel=0.32)
+    tune(music, 10.7 - 2 * BEAT * 0.5, upto=11.15, vel=0.42, step=0.5)  # Snip's phrase again ...
+    music.add(11.2, A.glock(M(89), 1.6, 0.5))                            # ... resolved: the C closes into an O
+    music.add(11.2, A.pad([M(65), M(69), M(72)], 1.4, 0.18))
+    squeaks(sfx, 10.7, 11.2, 2100)
     for i, m in enumerate((81, 84, 89)):
-        music.add(10.2 + 0.2 * i, A.glock(M(m), 0.9, 0.36))
-    squeaks(sfx, 10.2, 10.8, 2100)
-    sfx.add(12.2, A.tap(0.4))                                            # to Pip
+        music.add(12.2 + 0.13 * i, A.glock(M(m), 0.9, 0.36))
+    squeaks(sfx, 12.2, 12.6, 2100)
+    sfx.add(13.2, A.tap(0.4))                                            # to Pip
     for tt in PIP.footfalls():
         sfx.add(tt, A.woodblock(True, 0.09))
     for tt in SN.footfalls() + CR.footfalls():
         sfx.add(tt, A.tap(0.22))
     for i, m in enumerate((96, 93, 89)):                                 # Pip's phrase: an octave up, shorter
-        music.add(13.8 + 0.23 * i, A.glock(M(m), 0.6, 0.3))
-        music.add(14.7 + 0.23 * i, A.glock(M(m + 3 if i == 0 else m), 0.6, 0.3))
-    squeaks(sfx, 13.8, 14.5, 2600, gap=0.2, dur=0.16)
-    squeaks(sfx, 14.7, 15.4, 2600, gap=0.2, dur=0.16)
-    for tt in (13.9, 18.5):                                              # the tongue trills
+        music.add(14.4 + 0.2 * i, A.glock(M(m), 0.6, 0.3))
+        music.add(15.1 + 0.2 * i, A.glock(M(m + 3 if i == 0 else m), 0.6, 0.3))
+    squeaks(sfx, 14.4, 15.0, 2600, gap=0.2, dur=0.16)
+    squeaks(sfx, 15.1, 15.7, 2600, gap=0.2, dur=0.16)
+    for tt in (14.45, 18.45, 18.7):                                      # the tongue trills
         sfx.add(tt, A.glock(M(98), 0.25, 0.16))
         sfx.add(tt + 0.08, A.glock(M(101), 0.25, 0.16))
-    sfx.add(17.3, A.tap(0.4))                                            # to Crinkle
-    sfx.add(17.5, A.boing(0.2, 340))
+    sfx.add(17.6, A.tap(0.4))                                            # to Crinkle
+    sfx.add(17.75, A.boing(0.2, 340))
     for i, m in enumerate((53, 57, 60, 65)):                             # Crinkle's phrase: low organ, slow
-        music.add(18.4 + 0.55 * i, MX.organ(A.midi(m), 0.6, 0.45))
-    squeaks(sfx, 18.4, 20.6, 1700, gap=0.45, dur=0.4)
-    # 22.0-26.0: the hand, the click, the glow
-    sfx.add(21.95, A.whoosh(0.5, 0.3))
-    music.add(22.0, A.pad([M(53), M(60), M(65)], 2.6, 0.2))             # a held, careful chord
+        music.add(18.4 + 0.4 * i, MX.organ(A.midi(m), 0.45, 0.45))
+    squeaks(sfx, 18.4, 20.0, 1700, gap=0.45, dur=0.4)
+    # 20.0-23.0: gag 2: one held note, the big squeak, the fwump, giggles
+    music.add(20.0, MX.organ(A.midi(65), 0.5, 0.35))
+    sfx.add(20.4, toy_squeak(0.3, SQUEAK_VEL))
+    sfx.add(20.6, fwump(0.5))
+    giggle_run(music, 21.4, (53, 57, 55, 60, 57, 62), gap=0.1, vel=0.42)
+    sfx.add(21.45, A.boing(0.2, 240))
+    sfx.add(21.85, A.boing(0.2, 250))
+    sfx.add(22.2, fwump(0.25))
+    giggle_run(music, 22.5, (89, 93, 91, 96), gap=0.08, vel=0.3, glock=True)   # Pip's, two octaves up
+    # 23.0-26.2: the hand, the click, the glow
+    sfx.add(22.95, A.whoosh(0.5, 0.3))
+    music.add(23.0, A.pad([M(53), M(60), M(65)], 2.0, 0.2))             # a held, careful chord
     sfx.add(T_CLICK, click(0.5))
     sfx.add(T_CLICK + 0.05, A.twinkle(0.18))
     for i, m in enumerate((77, 81, 84, 89, 93, 96)):                     # the rising run as it goes in ...
-        music.add(23.95 + 0.11 * i, A.glock(M(m), 1.2, 0.26 + 0.02 * i))
-    music.add(24.65, A.pad([M(53), M(65), M(69), M(72), M(79)], 2.4, 0.3))   # ... into F add9
-    music.add(24.65, A.glock(M(91), 2.0, 0.26))
-    sfx.add(24.7, A.twinkle(0.14, notes=(103, 108, 101, 106, 110)))
-    sfx.add(24.5, A.whoosh(0.4, 0.22))
-    music.add(25.3, MX.organ(A.midi(53), 2.0, 0.22))
-    # 26.0-29.4: the bouncy reprise, the dance, the end chord
-    tune(music, 26.0, vel=0.46)
-    bass_bars(music, 26.0, 28.6, vel=0.4)
+        music.add(24.45 + 0.11 * i, A.glock(M(m), 1.2, 0.26 + 0.02 * i))
+    music.add(25.1, A.pad([M(53), M(65), M(69), M(72), M(79)], 1.6, 0.3))   # ... into F add9 (swell 25.0-26.2)
+    music.add(25.1, A.glock(M(91), 1.6, 0.26))
+    sfx.add(25.15, A.twinkle(0.14, notes=(103, 108, 101, 106, 110)))
+    sfx.add(24.85, A.whoosh(0.4, 0.22))
+    music.add(25.5, MX.organ(A.midi(53), 1.0, 0.22))
+    # 26.2-30.0: gag 3: the reprise, the rest, the swish, the look back, the giggle, the end chord
+    tune(music, 26.2, upto=27.9, vel=0.46)
+    bass_bars(music, 26.2, 27.9, vel=0.4)
     for i in range(4):
-        sfx.add(T_DANCE[0] + 0.3 * i, A.boing(0.22, 260))
-        sfx.add(27.2 + 0.3 * i, A.boing(0.14, 520))
-    sfx.add(26.95, A.boing(0.25, 300))
-    music.add(28.6, A.pad([M(53), M(65), M(69), M(72)], 1.0, 0.3))
+        sfx.add(26.4 + 0.375 * i, A.boing(0.22, 260))
+    for i in range(3):
+        sfx.add(26.8 + 0.37 * i, A.boing(0.14, 520))
+    sfx.add(26.6, A.boing(0.25, 300))
+    sfx.add(28.2, A.whoosh(0.3, 0.25))                                   # paper swish: the spin
+    sfx.add(28.5, A.boing(0.2, 280))
+    sfx.add(28.75, A.boing(0.2, 300))
+    music.add(29.05, A.glock(M(81), 0.5, 0.3))                           # two rising notes on the look back
+    music.add(29.2, A.glock(M(84), 0.5, 0.32))
+    giggle_run(music, 29.3, (53, 57, 55, 60), gap=0.1, vel=0.4)
+    music.add(29.7, A.pad([M(53), M(65), M(69), M(72)], 0.3, 0.3))     # the end chord
     for m in (77, 81, 84):
-        music.add(28.6, A.glock(M(m), 1.0, 0.3))
+        music.add(29.7, A.glock(M(m), 0.3, 0.3))
     return music, sfx
 
 
@@ -863,16 +1073,20 @@ def build_audio(path):
         y = 0.97 * np.tanh(y * g / 0.97)
         A.write_wav(path, y, fade_out=0.25)
     ts, ms, lufs = _momentary(path)
-    pre = ms[(ts > 22.5) & (ts <= 24.5)]
-    swell = ms[(ts > 24.5) & (ts <= 26.0)]
-    print(f"audio {lufs} LUFS; glow swell max {swell.max():.1f} vs previous 2 s max {pre.max():.1f} / "
+    pre = ms[(ts > 23.5) & (ts <= 25.0)]
+    swell = ms[(ts > 25.0) & (ts <= 26.2)]
+    sq = ms[(ts > 20.35) & (ts <= 20.9)].max()
+    chord = ms[(ts > 29.7) & (ts <= 30.0)].max()
+    print(f"audio {lufs} LUFS; glow swell max {swell.max():.1f} vs previous 1.5 s max {pre.max():.1f} / "
           f"min {pre.min():.1f} (rise over the max {swell.max() - pre.max():.1f} LU)")
+    print(f"{'ok  ' if sq - chord <= 3.0 else 'FAIL'} R3-1: big squeak momentary max {sq:.1f} vs end chord "
+          f"{chord:.1f} LUFS (difference {sq - chord:+.1f} LU, need <= +3)")
 
 
-# ---------------------------------------------------------------- key sheet
-KEYS = [0.7, 0.9, 1.0, 1.1, 1.3, 1.6, 1.9,                     # the take (camera T)
-        3.6, 3.9, 4.0, 4.15, 4.25, 4.4, 4.6,                   # the give-back (B2)
-        ] + [round(22.0 + 0.3 * i, 1) for i in range(15)] + [27.0, 28.2]   # the light in (B, 22.0-26.2), pull back
+# ---------------------------------------------------------------- key sheet (r2: every changed shot, its edges, beats)
+KEYS = [0.0, 0.6, 1.0, 1.5, 2.4, 2.8, 3.5, 4.0, 5.0, 5.6, 5.9, 6.4, 6.5, 8.6, 9.1, 9.6, 9.8, 10.6, 11.5, 12.8,
+        13.3, 14.3, 15.4, 16.7, 17.2, 17.6, 18.3, 19.2, 20.2, 20.7, 21.2, 21.6, 22.2, 22.6, 23.0, 24.0, 24.7, 25.8,
+        26.2, 27.5, 28.0, 28.4, 28.6, 29.0, 29.5, 29.9]
 
 
 def sheet(frames, path, w=480, cols=8):
