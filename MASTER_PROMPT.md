@@ -260,7 +260,7 @@ safety PASS.
     5. Every exception or "can't" an agent reports gets a still or a number before the Lead accepts it.
     6. Key sheet: every labelled beat must be visible at 1,600 px; a label the Lead can't see is a build miss.
     7. Briefs ≤6 lines; the agent's budget is in its file.
-    8. HANDOFF ≤500 words (`wc -w`); `git show --stat` before every push.
+    8. HANDOFF: `tools/handoff_check.py` (also a pre-commit hook: ≤500 words, no dead paths, no trimmed fact lost; move old facts to `docs/HISTORY.md`); `git show --stat` before every push.
     9. **Mistake log** (owner, 8 Oct): every mistake by any agent or the Lead goes into `reviews/mistake_log.md` the moment
        it is found (who, what, evidence, cost, the rule it should become). After every finished video, and at once for a
        repeat or a safety miss, turn the OPEN rows into rules in Appendix A (rule budget), tag the old version, run

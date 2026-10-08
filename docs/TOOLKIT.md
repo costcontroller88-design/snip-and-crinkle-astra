@@ -25,6 +25,7 @@ here and an API docstring at its top.
 | `episodes/pilot02_short.py` | Reference vertical Short: re-films an episode through a vertical camera, cuts its sound effects, own music bed |
 | `tools/check_video.py` | `--landscape --no-loop --cuts t1,t2,...`; vertical Shorts 12-180 s; prints RESULT: PASS |
 | `tools/build_agents.py` | Writes `.claude/agents/` from MASTER_PROMPT.md Appendix A |
+| `tools/handoff_check.py` | Checks HANDOFF.md: ≤500 words, paths exist, no trimmed fact lost; `--install` sets the pre-commit hook |
 
 ## Facts you'd otherwise dig for
 - Render speed: about 3.5 s of rendering per second of 2x landscape video on 8 cores (Episode 11's porch with light:
