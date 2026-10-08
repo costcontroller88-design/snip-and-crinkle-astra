@@ -308,3 +308,27 @@ re-checked. Evidence is the plan only: r2 is not built (`episodes/ep11_short_tra
 7. Nobody laughs at Crinkle or Pip: full frames 9.1, 9.4, 20.7, 21.6 (his eyes on the marker), 22.3, 28.4, 28.9 (faces as in R3-3, R3-4).
 
 Sources: no new topics (the startle level is a channel rule, "nothing scary"); no new library entries.
+
+## Re-check 8 Oct 2026 (measured r2 build numbers: lantern gap scope, arm/ear at 23.2): decision (b) + 2 FIX
+
+Evidence: `python3 episodes/ep11_short_transform.py --check` run 8 Oct on the r2 code (all four lantern-gap lines FAIL at 0.0 with whole-body masks; "hand + tea light to the nearest head 23.0-25.3: 0.0 at (23.2, 'cr'), need >= 30"; "arms drawn over the lantern 21.2-30.0: none"); stills `build/ep11s/s_09.10_r2.png`, `s_20.70_r2.png`, `s_23.20_r2.png`, `s_28.60_r2.png`. All feet stand on `FLOOR`; the lantern is drawn in front of every body in all four stills.
+
+**Decision: (b), re-scope the gap.** There is no mainstream safety reason for a whole-body gap. The tea light is LED (no heat or flame), and its one hazard, the button cell, can only be reached through the top opening with a paw or wing. A body standing *behind* a floor prop that is drawn in front of it reads as depth, not contact (stills 9.10, 20.70). R2-2's real concern was physics: a wobble that seems to push the lantern. That is covered by the lantern staying in front and never moving, plus lean +10 away. So moving Crinkle to ~1260 and Pip to ~660 for 6.5-22.8 is not needed for safety.
+
+**Arm/ear at 23.2: FIX (R4-2).** The hand comes straight down over the lantern (x about 960) while Crinkle's left ear sits at about x 960-1020 (estimate from `s_23.20_r2.png`, Crinkle at 1200, head turned left). The grown-up's arm drawn across a friend's ear reads as a bump, and it puts the battery light at his head. Keep ≥30 (it was 53.5 pre-r1). Fix it with staging only for 22.8-30.0.
+
+| ID | Where | Exact text |
+|---|---|---|
+| R4-1 | b4 shot 3 r2 (replace "Every mask ≥10 from the lantern 6.5-10.6..."), shot 9 r2 (replace "≥10 from the lantern (`--check`)" after `puff_up`), shot 13 r2 (replace the F3 sentence); the matching `--check` lines | Shot 3: "The lantern is drawn in front of every body and never moves (no shift, tilt or wobble). Crinkle's and Pip's visible paws and wings stay ≥10 from the lantern mask, ring included, 6.5-10.6 (`--check`). Snip's drawing paw and marker are exempt (the lesson). Bodies, heads, ears and feet may stand behind it (gate 1 R4-1)." Shot 9: "Pip's ball stands behind the lantern, which is drawn in front and does not move; her wings stay ≥10 from the lantern mask 20.6-21.2 (`--check`)." Shot 13: "**F3:** from 21.2 no paw, wing, foot or marker touches the paper or goes over the top ring: visible paws, wings and markers ≥1 from the lantern mask 21.2-22.8 and ≥10 22.8-30.0, incl. the spin and Pip's turn (`--check`); the lantern is drawn in front of every body and never moves; Crinkle at 1260 from 22.8 (R4-2), Pip at 740." Reason: measured 0.0 for whole-body masks of characters standing behind the lantern; only paws, wings and the marker could touch the paper or the opening (button cell). |
+| R4-2 | b4 shot 11 r2 ("Crinkle steps back to 1200") and shot 12 r2, add; cameras B (23.0-26.2) and K2 refit by the designer | Shot 11: "Crinkle steps back to 1260 (r3; was 1200) and faces front (turn 0) (22.2-22.8)." Shot 12: "23.0-25.3: the hand and tea light stay ≥30 and the sleeve ≥10 from every head mask, ears included (`--check`). The arm never crosses a face or an ear. Fix by staging (his x, turn, lean +6 away), never by drawing the arm behind him." Checked against: measured 0.0 at 23.2 with Crinkle at 1200; ear about 960-1020 vs the tea light at about 960 (estimate), so about +60 → 1260 (estimate; `--check` decides; if 1260 fails, step further right). Keep his face in camera B. |
+
+### Notes (optional)
+- N6. Out of this scope, but the same `--check` run FAILS gate-1 carry-forward 1 and the give-back: marker clear of arm masks 0.0% at 1.47 and at 5.47 (need ≥50), and the arm-to-marker gap 33.0-33.9 at 5.55-5.80 (need ≥40). These are lesson-visibility checks for the animator, not safety, but gate 3 will fail them as they stand.
+- N7. Crinkle holds the marker at belly height during the lit spin (`s_28.60_r2.png`). R4-1 covers it at ≥10.
+
+### Carry-forward for gate 3 (replaces item 5 of the r2 re-check and adds item 8)
+5. Lantern: visible paws, wings and marker ≥10 (Crinkle and Pip 6.5-10.6; Pip's wings 20.6-21.2; everyone 22.8-30.0), ≥1 21.2-22.8; the lantern drawn in front and never moving; stills 9.1, 20.7, 28.6.
+8. 23.0-25.3: hand and tea light ≥30, sleeve ≥10 from every head mask incl. ears (`--check`); full frames 23.1, 23.2, 23.4.
+
+Sources: no new topics (LED tea light and button cell already sourced under F3). No new library entries.
+Mistakes: my R2-2 and R3-5 set "every mask ≥10" from the plan's x positions (1100 vs edge 1080) without checking the masks' real widths (M29).
