@@ -12,7 +12,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **Never:** words on screen except numerals, "?" and ✓/✗ (drawn as icons); voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag; never at the one who is sad or wrong. Standard: `docs/COMEDY_PLAYBOOK.md` (your section is named in your file).
-- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
+- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`); safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
 - **Know the toolkit from `docs/TOOLKIT.md`** and module docstrings (`sed -n 1,45p <file>`), not by reading source you aren't changing. Never re-read a file you already read.
 - **Scope:** only your job; shared modules only if the brief says so; commit only if the brief says so; never touch YouTube.
 - **Pictures:** view sheets and stills at about 1,600 px wide; full-size frames only for a specific check.
@@ -32,7 +32,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 1. **Prototype (≤15):** the plan's riskiest movement as full-size stills and a contact sheet; then stop and return, so the Lead can look before anything else is built.
 2. **Toolkit (≤25):** new modules, each with an API docstring and a line in `docs/TOOLKIT.md`. Shared modules only if the brief says so, and then the pilot's `--keys` sheet must re-render unchanged.
 3. **Build (≤60; a Short ≤30; a code fix ≤20):** the whole episode (or Short, or compilation), checked with stills.
-4. **Render:** you code and check stills; the Lead renders. Return the exact chain (hires pass, render, `python3 tools/check_video.py output/<file>.mp4 --landscape --no-loop --cuts <cuts>`, keys; vertical: drop `--landscape`; `--no-loop` unless it truly loops) and the estimate. Render yourself only if the brief says so. Never copy to `Videos/`.
+4. **Render:** you code and check stills; the Lead renders. Return the exact chain (`python3 tools/handover_check.py <script> --verify &&`, hires pass, render, `python3 tools/check_video.py output/<file>.mp4 --landscape --no-loop --cuts <cuts>`, keys; vertical: drop `--landscape`; `--no-loop` unless it truly loops) and the estimate. Render yourself only if the brief says so. Never copy to `Videos/`.
 
 ## The standard
 - One 1920x1920 world filmed by cameras; landscape 1920x1080 at 30 fps, 15 drawings a second on twos; `hires.set_res(2)`; zoom ≤2x (a closer shot only with a raised render scale for that shot, never in shared code); `render_video(..., workers=8)`.
@@ -41,6 +41,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 - Compilations: ffmpeg concat of rendered episodes plus a new intro and outro; never re-render 30 minutes in one go.
 
 ## Self-checks before the full render
+- **Your last command is `python3 tools/handover_check.py <script>`** on the final code, and it must PASS: audio loudness and silent gaps, the whole `--check`, key sizes (`--check` prints `keysize <t> <pct>` per key action of the plan, ≥2 times in its span, measured from the object's mask). A key miss you can see is fixed (≤3 code steps), never just listed. A camera change from the plan keeps every key object at the plan's size, or you ask the Lead. View ≤12 images per stage (images cost most).
 - **Fix by fix:** a `--still` at every time a change touches (not one), listed per fix with its path; a fix with no still is "not checked".
 - **Key sheet times from the changes:** every shot changed this round, its boundaries, and the fixed story beats (the cause, the lesson, the wow).
 - **No reuse of rendered frames across rounds** unless the shot's code is unchanged, checked (e.g. a hash of its inputs).

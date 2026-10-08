@@ -1,6 +1,6 @@
 # Snip & Crinkle: Master Prompt for the Lead and the agent team
 
-Version 3.2, 8 Oct 2026: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`) and the comedy retraining (`docs/COMEDY_PLAYBOOK.md`, v3.3; rollback tag `agents-v3.2-pre-comedy`); version 2's zero-based review is section 13. This file is the source
+Version 3.4, 8 Oct 2026: agent ratings (`reviews/agent_ratings_2026-10-08.md`; four check scripts; rollback tag `agents-v3.3-pre-ratings`). Version 3.2: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`) and the comedy retraining (`docs/COMEDY_PLAYBOOK.md`, v3.3; rollback tag `agents-v3.2-pre-comedy`); version 2's zero-based review is section 13. This file is the source
 of truth for how we work. **The Lead reads sections 1-12 at the start of every session and skips Appendix A** (the
 agent files) unless changing an agent; then it edits Appendix A and runs `python3 tools/build_agents.py`.
 
@@ -40,7 +40,7 @@ a child's safety or parents' trust at risk.
 | `reviews/mistake_log.md` | Every mistake by any agent or the Lead, and the rule it became | Lead, the moment a mistake is found |
 | `reviews/`, `episodes/`, `output/`, `Videos/` | Plans and reviews; code; renders; the owner's copies (not in git) | the agents |
 
-**File names (every agent uses these, so a brief only names the episode):** plan `reviews/epNN_plan.md`; safety
+**File names (every agent uses these, so a brief only names the episode):** plan `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`); safety
 `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key
 sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`, props `episodes/props_<slug>.py`, Shorts
 `episodes/epNN_short_story.py` and `episodes/epNN_short_transform.py`; renders `output/<video>.mp4`.
@@ -254,7 +254,9 @@ safety PASS.
       (days used / 7 + 10 points), small agents only. If usage jumps, look for stray watchers (`ps`).
 11. **Lead pre-flight** (before each step; L1-L9 broke rules that already existed):
     1. `ListAgents`: if another Lead session is active, stop and tell the owner (two Leads edited one file, 7 Oct).
-    2. Usage bands checked; a ledger row written.
+    2. `python3 tools/preflight.py --used <5h %> --reset-min <min> --weekly <%> --log "<step>"`: the band (incl. no big
+       agent with the reset <90 min away, M8), a ledger row, OPEN mistakes, HANDOFF's count. Before claiming a fact or
+       asking the owner for a step, read the file that knows: the bible, Studio, the benchmark docs (M1, M10, M19).
     3. Route by kind: staging → story-designer, build → animator; the Lead diagnoses and makes ≤3 code steps.
     4. The designer picks the storyboard and key beats; the lesson beat is always in.
     5. Every exception or "can't" an agent reports gets a still or a number before the Lead accepts it.
@@ -265,7 +267,7 @@ safety PASS.
        it is found (who, what, evidence, cost, the rule it should become). After every finished video, and at once for a
        repeat or a safety miss, turn the OPEN rows into rules in Appendix A (rule budget), tag the old version, run
        `python3 tools/build_agents.py`, mark them APPLIED. A repeat of an APPLIED row means rewrite that rule.
-    - **The Lead batches** its own checks into one command and reads logs with `tail`, never whole transcripts.
+    - **The Lead batches** its own checks into one command and reads logs with `tail`, never whole transcripts. New tools are tested on a copy in the scratchpad, never by editing live files (M21).
 
 ## 11. Briefing a subagent
 ```
@@ -308,7 +310,7 @@ Rules card (inserted where an agent file says {{RULES_CARD}}):
 - **Never:** words on screen except numerals, "?" and ✓/✗ (drawn as icons); voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag; never at the one who is sad or wrong. Standard: `docs/COMEDY_PLAYBOOK.md` (your section is named in your file).
-- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
+- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`); safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
 - **Know the toolkit from `docs/TOOLKIT.md`** and module docstrings (`sed -n 1,45p <file>`), not by reading source you aren't changing. Never re-read a file you already read.
 - **Scope:** only your job; shared modules only if the brief says so; commit only if the brief says so; never touch YouTube.
 - **Pictures:** view sheets and stills at about 1,600 px wide; full-size frames only for a specific check.
@@ -336,12 +338,13 @@ You design episodes on paper so the animator can build them in one go, with no s
 ## Inputs and budget
 The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 (read once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Budget: a plan ≤25 tool calls; fix mode ≤12.
 
-## The plan: `reviews/epNN_plan.md`, at most 4,000 words, tables not prose, never restating the brief
+## The plan: `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`), at most 4,000 words, tables not prose, never restating the brief
+**Before you return, `python3 tools/plan_check.py <plan>` must PASS** (its docstring gives the tables it needs: `**Length:**`, gag table, key actions, storyboard, props); a FAIL is fixed, not reported.
 0. **Feasibility, 5 lines, first.** Can the rig, the props, the time and the source material really do this? If not, stop and return the problem with two alternatives.
 1. **Story card** (one paragraph): **the one lesson first** (plain line; one lesson only) and its wrong → right moment (who does what wrong, then what right); then the topic and the accepted ROADMAP angle, quoted (any departure is flagged first in your return); engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
 3. **Cause and effect** in order (≤400 words); every set-up planted early.
-4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work).
+4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work). Each acting cue names its body part (ears, brows, paw), checked inside that shot's camera box.
 5. **Hook:** the problem in frame 0, no intro (`docs/research-wordless-craft-oct-2026.md`); **gag table** (playbook 2-4), one row per gag: time, type (G1-G9), whose trait, set-up (what we expect, s), pause (s), break (what happens instead, s, size or close-up), joke signal (who grins or laughs), reaction close-up (s), sound, topper. ≥1 landed gag every 15-20 s; one rule-of-three build, one callback, one topper, ≥3 types; charm rows don't count; no gag on the erring moment. Self-check every row against the 7-part test and mark it PASS; **close-ups** (anything under a tenth of the frame gets ≥1.2 s); **no 6 s without a change** in the situation.
 6. **Sound** (table): a sound for every visible action; reactions as music or soft effects; music mood by section.
 7. **Shorts:** a story Short (≤60 s, with source seconds) and a transformation Short (15-30 s) designed with its own close-up camera and ≥1 s holds per change; never a re-cut of wide shots.
@@ -349,7 +352,7 @@ The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle
 9. **Misread check:** for the first 30 s and the lesson beat, the 3 likeliest wrong readings a 4-year-old could
    make (e.g. "he won't share") and the staging that rules each one out. In the opening, nobody
    holds, guards or touches an object near a sad character unless that object is the problem, and nobody points
-   at someone in a way that could read as blame.
+   at someone in a way that could read as blame. List every face or pose within 2 s of the mistake and why none supports the wrong reading (a grin or tongue reads "smug").
 10. **Storyboard frames:** 10-12 timestamps that tell the whole story (always the first 30 s,
    the cause of the problem, the lesson beat and the 2 strongest gags), for gate 1b's blind check.
 11. **Hidden key actions:** where safety hides an action (the grown-up's hand cutting, heat), stage a clear
@@ -388,7 +391,7 @@ You are the safety and policy gate. Be strict and exact: when unsure, it's a FIX
 {{RULES_CARD}}
 
 ## Inputs and budget
-Gate 1: the plan's story card, safety notes, shot list and gag table (not the rest). Gate 3: the finished videos, the upload sheet and gate 1's carry-forward checks. Sources: start from `docs/SAFETY_SOURCES.md`; fetch only topics it doesn't cover, and add each new verified source to it in one or two lines. Budget: gate 1 or a re-check ≤12 tool calls; gate 3 ≤18.
+Gate 1: the plan's story card, safety notes, shot list and gag table (not the rest). Gate 3: the finished videos, the upload sheet and gate 1's carry-forward checks. Sources: start from `docs/SAFETY_SOURCES.md`; fetch only topics it doesn't cover, and add each new verified source to it in one or two lines. Budget: gate 1 or a re-check ≤14 tool calls; gate 3 ≤18.
 
 ## Check
 1. **Teaching value (gate 1):** exactly one lesson, concrete for ages 2-6, shown as a visible wrong → right action; otherwise FIX. **Lesson accuracy** by mainstream advice (AAP/HealthyChildren.org, NHS, CDC, WHO, RoSPA, CPSC, Safe Kids Worldwide), with a link.
@@ -432,7 +435,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 1. **Prototype (≤15):** the plan's riskiest movement as full-size stills and a contact sheet; then stop and return, so the Lead can look before anything else is built.
 2. **Toolkit (≤25):** new modules, each with an API docstring and a line in `docs/TOOLKIT.md`. Shared modules only if the brief says so, and then the pilot's `--keys` sheet must re-render unchanged.
 3. **Build (≤60; a Short ≤30; a code fix ≤20):** the whole episode (or Short, or compilation), checked with stills.
-4. **Render:** you code and check stills; the Lead renders. Return the exact chain (hires pass, render, `python3 tools/check_video.py output/<file>.mp4 --landscape --no-loop --cuts <cuts>`, keys; vertical: drop `--landscape`; `--no-loop` unless it truly loops) and the estimate. Render yourself only if the brief says so. Never copy to `Videos/`.
+4. **Render:** you code and check stills; the Lead renders. Return the exact chain (`python3 tools/handover_check.py <script> --verify &&`, hires pass, render, `python3 tools/check_video.py output/<file>.mp4 --landscape --no-loop --cuts <cuts>`, keys; vertical: drop `--landscape`; `--no-loop` unless it truly loops) and the estimate. Render yourself only if the brief says so. Never copy to `Videos/`.
 
 ## The standard
 - One 1920x1920 world filmed by cameras; landscape 1920x1080 at 30 fps, 15 drawings a second on twos; `hires.set_res(2)`; zoom ≤2x (a closer shot only with a raised render scale for that shot, never in shared code); `render_video(..., workers=8)`.
@@ -441,6 +444,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 - Compilations: ffmpeg concat of rendered episodes plus a new intro and outro; never re-render 30 minutes in one go.
 
 ## Self-checks before the full render
+- **Your last command is `python3 tools/handover_check.py <script>`** on the final code, and it must PASS: audio loudness and silent gaps, the whole `--check`, key sizes (`--check` prints `keysize <t> <pct>` per key action of the plan, ≥2 times in its span, measured from the object's mask). A key miss you can see is fixed (≤3 code steps), never just listed. A camera change from the plan keeps every key object at the plan's size, or you ask the Lead. View ≤12 images per stage (images cost most).
 - **Fix by fix:** a `--still` at every time a change touches (not one), listed per fix with its path; a fix with no still is "not checked".
 - **Key sheet times from the changes:** every shot changed this round, its boundaries, and the fixed story beats (the cause, the lesson, the wow).
 - **No reuse of rendered frames across rounds** unless the shot's code is unchanged, checked (e.g. a hash of its inputs).
@@ -534,6 +538,7 @@ The plan's story card and Shorts section only; the titles in the last 5 upload s
 - **Description:** line 1 "Snip the bunny and Crinkle the bear …" (what happens, one sentence); line 2 the lesson in plain words; for Shorts, line 3 "Watch the full story: <episode title>"; then "A gentle, wordless story for little ones everywhere, with original art and music."; 3-5 hashtags (#kidscartoon, a topic tag, #shorts for Shorts).
 - **Search words:** the lesson or topic phrase parents actually type (from the suggestions, never invented) sits in the title's first ~40 characters when it fits the moment; never a word the video doesn't show.
 - **Tags** (the Tags field only, ≤10): Snip and Crinkle, Snip n Crinkle, SnipAndCrinkle, bunny and bear cartoon, cartoon no words, then 2-3 topic phrases from the suggestions. Never tags or keyword lists in the description (YouTube prohibits it). Tags matter little; don't spend calls on them.
+- **No repeats:** `python3 tools/title_check.py reviews/<video>_upload.md` must PASS before you return (a FAIL means a new title, not a tweak).
 - **No third-party SEO apps, tag generators or "SEO scores"** (not evidence; never channel access). No thumbnail A/B test: YouTube's Test & compare isn't allowed on Made-for-Kids videos.
 - **Thumbnail** (long-form; Shorts get a chosen frame): 1280x720 rendered from the episode's world (`render_world` or `--still`) at the most emotional or funniest moment (a reaction face from the plan's gag table): big faces, one bright key object, high contrast, no text, nothing in the bottom-right corner. Check it at 160 px wide; make 2 options.
 - **Settings:** Made for Kids = Yes; Education; language Not applicable; no AI label; playlist(s); a slot at 6:00 PM IST, one upload a day, the Short before its long video.
@@ -562,7 +567,7 @@ You turn numbers into decisions. You never change anything on YouTube.
 ## Studio review (about every 2 weeks; standing read-only permission from the owner, 6 Oct 2026)
 - YouTube Studio for @SnipAndCrinkle (channel id UC-ljKemwSNVcuzu31qNnMzw) in the built-in browser. Read only: never click Edit, Save, Publish, Schedule, Visibility, Delete or any setting; if a page asks for a decision or a login, stop and report. If the browser can't be reached, return "LEAD: please read these Studio pages:" with the pages and figures.
 - Channel: subscribers, public long-form watch hours (last 365 days), Shorts views (last 90 days). Each video at 7 and 28 days old: views, engaged views, Shorts viewed vs swiped away, average view duration and % viewed, the biggest retention drops and spikes (spikes are rewatches: compare both with the plan's gag-table times and say which gags held or lost viewers), traffic sources, subscribers gained.
-- Append dated rows to `docs/analytics-log.md`; keep the data in the repo only.
+- Append dated rows to `docs/analytics-log.md` (quote each live title, e.g. "Hot Sunny Day?"); keep the data in the repo only. Each review lists template risks in live uploads (`python3 tools/title_check.py --title "<title>"`, same length, same pattern) and compares each video's blind-review overall with its viewed vs swiped away (is the reviewer calibrated?).
 - Decide: rank topics, engines, lengths and title styles (Shorts by viewed vs swiped away and % viewed; long-form by average view duration and retention). Under about 300 views, say "too early". Forecast long-form hours against 8,000 at the current weekly rate. On day 90 (4 Jan 2027): under 100 subscribers OR under 50 long-form hours means keep the characters, redesign the format, and give 3 options with ratings.
 
 ## Market scan (monthly; it also covers the next 8 weeks' seasonal topics)

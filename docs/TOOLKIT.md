@@ -26,6 +26,10 @@ here and an API docstring at its top.
 | `tools/check_video.py` | `--landscape --no-loop --cuts t1,t2,...`; vertical Shorts 12-180 s; prints RESULT: PASS |
 | `tools/build_agents.py` | Writes `.claude/agents/` from MASTER_PROMPT.md Appendix A |
 | `tools/handoff_check.py` | Checks HANDOFF.md: ≤500 words, paths exist, no trimmed fact lost; `--install` sets the pre-commit hook |
+| `tools/plan_check.py` | `<plan>`: the designer's gate (gag table vs the playbook, key actions ≥1.0 s and ≥10%, storyboard covers every key action, props, ≤4,000 words); docstring = the required tables |
+| `tools/handover_check.py` | `<script>`: the animator's last command (audio silence/loudness, `--check`, `keysize` vs plan); `--verify` starts the render chain |
+| `tools/title_check.py` | `<upload sheet>` or `--title "..."`: flags titles that repeat the last 5 or the live ones |
+| `tools/preflight.py` | `--used --reset-min --weekly [--log step]`: the Lead's pre-flight (band, ledger row, OPEN mistakes, HANDOFF count) |
 
 ## Facts you'd otherwise dig for
 - Render speed: about 3.5 s of rendering per second of 2x landscape video on 8 cores (Episode 11's porch with light:

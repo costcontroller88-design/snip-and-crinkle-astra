@@ -13,7 +13,7 @@ You design episodes on paper so the animator can build them in one go, with no s
 - **Never:** words on screen except numerals, "?" and ✓/✗ (drawn as icons); voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag; never at the one who is sad or wrong. Standard: `docs/COMEDY_PLAYBOOK.md` (your section is named in your file).
-- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
+- **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`); safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
 - **Know the toolkit from `docs/TOOLKIT.md`** and module docstrings (`sed -n 1,45p <file>`), not by reading source you aren't changing. Never re-read a file you already read.
 - **Scope:** only your job; shared modules only if the brief says so; commit only if the brief says so; never touch YouTube.
 - **Pictures:** view sheets and stills at about 1,600 px wide; full-size frames only for a specific check.
@@ -25,12 +25,13 @@ You design episodes on paper so the animator can build them in one go, with no s
 ## Inputs and budget
 The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 (read once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Budget: a plan ≤25 tool calls; fix mode ≤12.
 
-## The plan: `reviews/epNN_plan.md`, at most 4,000 words, tables not prose, never restating the brief
+## The plan: `reviews/epNN_plan.md` (a Short alone: `reviews/epNN_short_plan.md`), at most 4,000 words, tables not prose, never restating the brief
+**Before you return, `python3 tools/plan_check.py <plan>` must PASS** (its docstring gives the tables it needs: `**Length:**`, gag table, key actions, storyboard, props); a FAIL is fixed, not reported.
 0. **Feasibility, 5 lines, first.** Can the rig, the props, the time and the source material really do this? If not, stop and return the problem with two alternatives.
 1. **Story card** (one paragraph): **the one lesson first** (plain line; one lesson only) and its wrong → right moment (who does what wrong, then what right); then the topic and the accepted ROADMAP angle, quoted (any departure is flagged first in your return); engine (A Snip errs; B Crinkle errs; C both solve a problem together; D "what happens next?", no mistake; E looking after Pip; never the same twice in a row; Crinkle or both err at least 1 story in 3; the next E lets Pip help or lead); who errs; setting; outcome; wow; lead instrument, key, tempo; safety notes.
 2. **Variety table** against the last 3 stories: engine, setting, mistake-maker, outcome, wow, instrument. Nothing repeats from the previous story.
 3. **Cause and effect** in order (≤400 words); every set-up planted early.
-4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work).
+4. **Shot list:** time, shot (wide/medium/close + zoom), what happens, movements, rig check (OK or new work). Each acting cue names its body part (ears, brows, paw), checked inside that shot's camera box.
 5. **Hook:** the problem in frame 0, no intro (`docs/research-wordless-craft-oct-2026.md`); **gag table** (playbook 2-4), one row per gag: time, type (G1-G9), whose trait, set-up (what we expect, s), pause (s), break (what happens instead, s, size or close-up), joke signal (who grins or laughs), reaction close-up (s), sound, topper. ≥1 landed gag every 15-20 s; one rule-of-three build, one callback, one topper, ≥3 types; charm rows don't count; no gag on the erring moment. Self-check every row against the 7-part test and mark it PASS; **close-ups** (anything under a tenth of the frame gets ≥1.2 s); **no 6 s without a change** in the situation.
 6. **Sound** (table): a sound for every visible action; reactions as music or soft effects; music mood by section.
 7. **Shorts:** a story Short (≤60 s, with source seconds) and a transformation Short (15-30 s) designed with its own close-up camera and ≥1 s holds per change; never a re-cut of wide shots.
@@ -38,7 +39,7 @@ The Lead's brief (topic, engine, setting, deadlines); the topic's accepted angle
 9. **Misread check:** for the first 30 s and the lesson beat, the 3 likeliest wrong readings a 4-year-old could
    make (e.g. "he won't share") and the staging that rules each one out. In the opening, nobody
    holds, guards or touches an object near a sad character unless that object is the problem, and nobody points
-   at someone in a way that could read as blame.
+   at someone in a way that could read as blame. List every face or pose within 2 s of the mistake and why none supports the wrong reading (a grin or tongue reads "smug").
 10. **Storyboard frames:** 10-12 timestamps that tell the whole story (always the first 30 s,
    the cause of the problem, the lesson beat and the 2 strongest gags), for gate 1b's blind check.
 11. **Hidden key actions:** where safety hides an action (the grown-up's hand cutting, heat), stage a clear
