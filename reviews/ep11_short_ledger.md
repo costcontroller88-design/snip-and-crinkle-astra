@@ -43,3 +43,5 @@
 | 9 Oct | packaging done (Sonnet 36k tok, 9 calls; 5h 78→80): title_check PASS (Lead re-ran); cover 25.9 s kept (every lit frame has the tummy marker, owner judged it fine) → gate 3 safety-checker | Lead | 80 | 91 | owner override (continue) |
 | 9 Oct | gate 3 safety (Opus 67k tok, 19 calls vs ≤18: M45): PASS, no FIX; files to Videos/; M45-M48 logged; HANDOFF → retrain next | Lead | 83 | 92 | NO AGENT: 75-85%, save and commit |
 | 9 Oct | Studio: details filled by the Lead (owner picked video + cover files, clicked Schedule); verified Scheduled Oct 18; M49 | Lead | — | — | browser only |
+| 9 Oct | rule diet v3.7 → fresh general-purpose (Sonnet) from reviews/diet_spec_2026-10-09.md; tag agents-v3.6-pre-diet | Lead | 5 | 93 | preflight: ANY AGENT: <60% |
+| 9 Oct | diet agent stopped at owner's 'wait' before any edit; owner: start in a fresh session | Lead | 5 | 93 | — |
