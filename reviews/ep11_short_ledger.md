@@ -21,3 +21,5 @@
 | — | Render chain: `EP11S_RES=3 python3 episodes/ep11_short_transform.py --hires && python3 episodes/ep11_short_transform.py --render && python3 tools/check_video.py output/ep11_short_transform.mp4 --no-loop --cuts <cuts>` | | | | |
 | 8 Oct | Ratings + v3.4 tools done (~5% of 5-hour); 7(b) moved to ep11_short_plan.md; comedy fix mode → story-designer | Lead | 23 | 73 | preflight: ANY AGENT: <60% |
 | 8 Oct | Comedy fix r2 (story-designer 102k tok, 12 calls): 3 gags G4 6.9, G8 18.3 (new), G5 26.2 callback; plan_check PASS (Lead ran it), 3,997 words → safety re-check | Lead | 31 | 74 | preflight: ANY AGENT: <60% |
+| 8 Oct | Safety re-check r2 (safety-checker 44k tok, 9 calls): FIX R3-1..5 pasted by Lead; plan 4,187 words → fresh designer trim (M23) | Lead | 33 | 74 | preflight: ANY AGENT: <60% |
+| 8 Oct | Trim (story-designer, fresh, 30k tok, 5 calls): 3,896 words, plan_check PASS, numbers in b4-b6/b10/keys/props unchanged (Lead diff) → fresh animator build r2 | Lead | 35 | 74 | preflight: ANY AGENT: <60% |

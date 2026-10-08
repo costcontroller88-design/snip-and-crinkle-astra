@@ -270,3 +270,41 @@ evidence only for beats r1 did not restage; every r1 beat is plan-only until reb
 7. Nobody laughs at Crinkle: full frames 7.9, 8.1, 28.0, 28.4 (faces as in R2-3).
 
 Sources: no new topics; Zero to Three and Dartmouth Health Children's (above) cover turn-taking. No new library entries.
+
+## Re-check 8 Oct 2026 (gate 1, transformation Short r2, gags G4, G8, G5 and moved windows only): FIX (5 text edits)
+
+Scope: plan `reviews/ep11_short_plan.md` rows marked r2 and `reviews/ep11_short_fixes_r2.md`; lesson beats 0-6.5 not
+re-checked. Evidence is the plan only: r2 is not built (`episodes/ep11_short_transform.py` still has `DUR` 29.4,
+`T_CLICK` 22.7). Every number below is a plan position or a gate-3 check, not a measurement.
+
+| Item | Result |
+|---|---|
+| G4 sway (6.9-9.6) | PASS. He copies Pip's pose by choice; quarter turn, lean +10 away from the lantern, feet down, back by himself, his own grin at once (9.6). No fall, no climb, no pain. R2-2 holds: the window 6.5-10.6 now covers set-up and reaction. R2-3 holds in principle (shot 4), but the face spec was dropped (R3-4). |
+| G8 startle squeak (18.3-23.0) | PASS with R3-1 to R3-3. A squeak from the tip lifting is a safe, visible-cause surprise; nobody falls; Pip's puff-up is a duckling reflex, then her own giggle. Open points: "big" squeak has no level; the uncapped marker after a startle has no measured path near his face; Crinkle laughs (21.4) before Pip recovers (22.5). |
+| Pip's puff near the lantern | PASS (plan). Pip at 740 is 100 from the lantern's left edge (840); shot 9 asks for ≥10 by `--check`. Gate 3 measures it. |
+| G5 spin (26.2-30.0) | PASS except R3-4. Spinning in place at 1200 with paws up, feet down, is ordinary toddler play; he looks back and laughs at himself (29.3); Pip copies, serious. |
+| R2-3 (9.6 / 29.3) | Times match the gags. The current code keys Snip `happy`/`smile_open` at 27.4 and Pip `happy`/`smile_open` at 27.2 (lines 274-275); after the retime these cover his spin at 28.2: a friend's open laugh at his slip (R3-4). |
+| N4 (22.8) | PASS. Pip at 740 from 18.1, Snip at 700, Crinkle at 1200 by 22.8; the hand enters 23.0 (0.2 s margin). |
+| F3 (21.2-30.0) | FIX R3-5: shot 13 asks for a ≥10 gap from 21.2, shot 11 from 22.8, and Crinkle is still beside the lantern until 22.8. One window, plus the no-touch rule from 21.2. |
+
+### FIX items (paste as written)
+
+| ID | Where | Exact text |
+|---|---|---|
+| R3-1 | b5 gag table, G8 row, sound cell; b6 row "Gags 1-3 (r2)" | "The big squeak is no louder than the end chord at 29.7 (momentary loudness within 3 LU of it, `ebur128`), soft attack with no click, 0.3 s; no sting, crash or drum hit with it." Reason: a sudden loud sound is the one part of a startle gag that can frighten a 2-year-old, and "big" has no level. |
+| R3-2 | b4 shot 9 r2, replace "paw eases straight back, tip away from every face, no jerk"; and shot 10 r2, add at the end | Shot 9: "his paw eases back and down to belly height (20.5-21.0), tip pointing at the lantern, away from him; the tip never rises above his chin and stays ≥60 from every head mask 20.4-22.8 (`--check`)." Shot 10: "He looks down at the marker held at belly height; it is never raised to his face; the belly bounces go straight up and down." Reason: a startle with an uncapped marker raised near the face is a copyable "pen by the eye" moment; "blink at the marker" in a face close-up invites lifting it to eye level. |
+| R3-3 | b4 shots 9-11 r2, add to shot 9 | "Pip's ball face: eyes `wide`, beak small `o` (20.6-20.9), then a closed smile from 21.0 while still round; no shaking, no shrinking back, no wing over her eyes. Crinkle's eyes stay on the marker 21.2-22.2, never on Pip. Snip keeps a soft closed smile 20.4-22.5. Nobody laughs or giggles at Pip before her own giggle (22.5)." Reason: Pip is the one surprised, and his laugh comes before hers, so it must be aimed at the marker and her face must already be fine when B returns at 22.2. |
+| R3-4 | b4 shot 4 r2, after the bold sentence | "8.8-9.6 and 28.2-29.3: Snip's eyes `normal`, mouth `smile` (soft, closed); Pip a calm sway (8.8-9.6) and a serious copy with a closed beak (28.2-29.3); no `smile_open`, `happy` eyes or giggle from either until his grin (9.6) or laugh (29.3)." Reason: r2 dropped R2-3's face spec, and the code's dance faces (27.2, 27.4) would show both friends laughing through his spin. |
+| R3-5 | b4 shot 13 r2, the F3 sentence | "**F3:** Crinkle at 1200, Pip at 740; every mask ≥10 from the lantern mask 22.8-30.0 (`--check`, N4); from 21.2 no paw, wing, foot or marker on the paper or over the top ring." Reason: two different window starts for one check; 21.2-22.8 he still stands beside the unlit lantern, so the measured window starts once all three are clear, before the hand (23.0). |
+
+### Notes (optional)
+- N5. Change list says the hand-up is 16.8-17.6 and Crinkle takes the marker "over the lantern's top": his paw is over the ring then, before F3 starts. That is fine (unlit, no tea light yet).
+
+### Carry-forward checks for gate 3 (replace items 3-7 of the r1 re-check)
+3. Marker tip ≥60 from every mouth, beak and head mask for the whole Short, incl. 14.4-15.7, 16.8-17.6, 18.4-22.8 (`--check`); full frames 20.5, 20.8, 21.6.
+4. 23.0-25.3: only the hand touches the tea light; lit dome seen 23.7-24.3; never opened; steady glow; the hand leaves upward.
+5. Lantern gap ≥10: all masks 6.5-10.6; Pip 20.6-22.8; all masks 22.8-30.0 incl. the spin (28.2-29.0) and Pip's turn (28.6); stills 9.1, 20.7, 28.6.
+6. Squeak level vs the end chord (`ebur128`, R3-1); 4.25 organ note with no bend; giggle runs instrument-only.
+7. Nobody laughs at Crinkle or Pip: full frames 9.1, 9.4, 20.7, 21.6 (his eyes on the marker), 22.3, 28.4, 28.9 (faces as in R3-3, R3-4).
+
+Sources: no new topics (the startle level is a channel rule, "nothing scary"); no new library entries.
