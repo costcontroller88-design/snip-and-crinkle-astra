@@ -4,7 +4,7 @@ How we work: `MASTER_PROMPT.md` (**v3.6**, 8 Oct: audit H1-H8; rollback tag `age
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`. Limits and fixes:
 `docs/LIMITATIONS.md`. Audit: `reviews/checkpoint_audit_2026-10-08.md`.
 
-**Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct; build by 15 Oct) is at the PLATEAU: blind round 2 scored overall 7, the same as round 1 (`reviews/ep11_short_blind_r2.md`; render `output/ep11_short_transform.mp4`, check_video PASS). Next work package: the owner's decision (plateau rule); Lead's recommendation: after the weekly reset (Tue 13 Oct), one targeted fix round, then blind round 3, packaging (`title_check`), gate 3, upload Sun 18 Oct.**
+**Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct; build by 15 Oct) is at the PLATEAU: blind round 2 scored overall 7, the same as round 1 (`reviews/ep11_short_blind_r2.md`; render `output/ep11_short_transform.mp4`, check_video PASS). Next work package (owner: no preference, so the Lead's plan, 8 Oct): after the weekly reset (Tue 13 Oct), one targeted fix round, then blind round 3, packaging (`title_check`), gate 3, upload Sun 18 Oct.**
 Round 2 blocking issues (staging and cameras → story-designer, then animator):
 1. 21-30 s: the marker held at Crinkle's belly (R3-2) reads as "Bear draws on his tummy" for 9 s. Misread rule: he puts it away on screen (M43; safety re-check of that beat).
 2. 23.5-24.5 s: the tea light reads ~6% wide with no close-up; `--check` measured 13.3% in D. Measure the light alone first (10.11.5).
