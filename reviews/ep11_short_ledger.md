@@ -23,3 +23,4 @@
 | 8 Oct | Comedy fix r2 (story-designer 102k tok, 12 calls): 3 gags G4 6.9, G8 18.3 (new), G5 26.2 callback; plan_check PASS (Lead ran it), 3,997 words → safety re-check | Lead | 31 | 74 | preflight: ANY AGENT: <60% |
 | 8 Oct | Safety re-check r2 (safety-checker 44k tok, 9 calls): FIX R3-1..5 pasted by Lead; plan 4,187 words → fresh designer trim (M23) | Lead | 33 | 74 | preflight: ANY AGENT: <60% |
 | 8 Oct | Trim (story-designer, fresh, 30k tok, 5 calls): 3,896 words, plan_check PASS, numbers in b4-b6/b10/keys/props unchanged (Lead diff) → fresh animator build r2 | Lead | 35 | 74 | preflight: ANY AGENT: <60% |
+| 8 Oct | Build r2 (animator, fresh, 200k tok, 30 calls): built r1+r2, gags, keysize; NOT handed over: lantern gap, give-back 9.3%, let-go 33, arm-mask metric; M26-M29 → safety re-scope, then designer | Lead | 56 | 77 | preflight: ANY AGENT: <60% |
