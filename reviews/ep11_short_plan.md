@@ -148,13 +148,13 @@ Own timeline and close cameras (b4); holds ≥1 s (b5).
 ## Measured checks (the animator measures every estimate first and updates this table from the final `--check`)
 | Check | Need | Measured | Source |
 |---|---|---|---|
-| Hand and tea light to Crinkle's head 23.0-25.3 (at 1260, +6 lean) | 30 | estimate (5.5 without the lean) | estimate; `--check` r2 at 1260 |
+| Hand and tea light to Crinkle's head 23.0-25.3 (at 1260, +6 lean) | 30 | 63.2 (sleeve 59.7); lean is -6 in code (+ leans toward the lantern: +6 meas. 13.6, sleeve 0.0) | `--check` r3 build |
 | Hand and tea light to Snip's head 23.0-25.3 (at 660) | 30 | 40.7 | `--check` (designer r3) |
-| Sleeve to every head mask, ears included, 23.0-25.3 | 10 | estimate | estimate |
+| Sleeve to every head mask, ears included, 23.0-25.3 | 10 | 40.7 (Snip; Pip 48.6, Crinkle 59.7) | `--check` r3 build |
 | Let-go: Crinkle's paw to the marker by 5.55 | 30 | 33.0 | `--check` r2 build, 5.55-5.80 |
 | Marker tip to every head mask 20.4-22.8 | 60 | 134.8 | `--check` r2 build |
-| Visible paws, wings, marker to the lantern mask (R4-1; Snip's drawing paw exempt 6.5-10.6) | 10 | estimate | estimate |
-| Paws, wings, markers to the lantern mask 21.2-22.8 | 1 | estimate | estimate |
+| Visible paws, wings, marker to the lantern mask (R4-1; Snip's drawing paw exempt 6.5-10.6) | 10 | 0.0 (Crinkle's left arm 6.80-6.93, arms going behind his back) | `--check` r3 build |
+| Paws, wings, markers to the lantern mask 21.2-22.8 | 1 | 0.0 (Pip's right wing at 740, 19.9-30.0, also behind her back; 0.0 at 22.8-30.0 too) | `--check` r3 build |
 
 ## b11. Hidden key actions
 None: click, lowering and glow all shown (shot 12).
