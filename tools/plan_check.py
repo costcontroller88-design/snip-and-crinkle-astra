@@ -91,7 +91,10 @@ def measured(tabs):
     for r in t[1]:
         r = r + [""] * (4 - len(r))
         est = "estimate" in (r[2] + r[3]).lower()
-        out.append((r[0], num(r[1]), None if est else num(r[2]), r[3]))
+        need = num(r[1])
+        if need is not None and r[1].strip().startswith(("≤", "<=")):
+            need = -need  # an upper limit: compared as -val >= -need
+        out.append((r[0], need, None if est else num(r[2]), r[3]))
     return out
 
 
@@ -104,7 +107,9 @@ def measure_fails(rows, allow_estimates):
         elif val is None:
             if not allow_estimates:
                 fails.append(f"{tag}: still an estimate: measure it from the code before building")
-        elif val < need:
+        elif need < 0 and val > -need:
+            fails.append(f"{tag}: measured {val:g} > limit {-need:g}")
+        elif need >= 0 and val < need:
             fails.append(f"{tag}: measured {val:g} < need {need:g}")
         if not src.strip():
             fails.append(f"{tag}: no Source (`--check` or a still path)")
