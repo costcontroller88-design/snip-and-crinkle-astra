@@ -1,0 +1,41 @@
+# Agent reliability research, 9 Oct 2026 (second pass)
+
+Builds on `docs/research-agent-craft-oct-2026.md`; none of its 10 findings are repeated.
+
+## Decision
+
+Today every check depends on the Lead remembering to run it. There is no `.claude/settings.json`, only one agent (the reviewer) has a hook, and there is no regression test for old mistakes. The five changes below move checks from "a rule the model follows" to "a script the harness runs". Ranked by reliability gained per token spent (all five cost zero model tokens at run time):
+
+1. **Run `return_check.py` automatically when any subagent stops.** The current hooks docs say a `SubagentStop` hook can return `decision: "block"` with a `reason`, which keeps the subagent working and hands it the reason as its next instruction. Your own script already does the checking; the hook just stops it being skipped.
+2. **Prove the files exist and changed.** A subagent's "DONE" is a claim. Compare it to disk state taken at agent start, not to the agent's own words.
+3. **Make roles real with tool lists and hooks, not prose.** A 2026 study found prompt-only role separation had 3.6 times more role violations than enforced separation, with the same pass rate, so a good score hides the breaches.
+4. **Turn every mistake-log row into a saved failing case** and re-run them all after any edit to an agent file or `MASTER_PROMPT.md`.
+5. **Keep gate status in one small JSON file** that agents may only flip, so a new session starts from facts, not from a summary.
+
+Honest limits: I read the official docs through a summarising fetch tool (not verbatim) and the hooks page only up to character 200,000 of 258,000, so the `agent` and `prompt` hook types are not checked. Hook behaviour below was not run on this machine. The two 2026 papers were read as abstracts only. I found no YouTube videos; the practitioner evidence is blog posts and one open-source project.
+
+## Findings
+
+| # | Finding | Which agent or tool | Exact change (≤25 words) | Source |
+|---|---|---|---|---|
+| 1 | `SubagentStop` input includes `last_assistant_message` and `stop_hook_active`; `decision:"block"` keeps the agent running. Claude Code stops after 8 straight blocks. | New `settings.json` + `return_check.py` | SubagentStop hook pipes `last_assistant_message` into `return_check.py -`; on FAIL print `{"decision":"block","reason":<fix text>}`; allow if `stop_hook_active`. | [Hooks reference](https://code.claude.com/docs/en/hooks) |
+| 2 | Attest snapshots changed files at `SubagentStart`, recomputes at `SubagentStop`, and blocks a "DONE" whose listed files never landed. No model calls; it allows the stop on any doubt. | `return_check.py` | At SubagentStart save file hashes; at stop, every `files` entry must be new or changed, else block. Fail open on errors. | [Attest](https://github.com/ek33450505/attest) |
+| 3 | Verifiers accepted 49% of submissions that failed a deterministic grader. Prompt-only teams had 3.6x more role violations at equal pass rate. | safety-checker, packaging, growth-analyst | Replace "never edits episodes / never touches YouTube" with `PreToolUse` hooks denying Write/Edit outside `reviews/`, `docs/`, upload sheet; exit 2. | [TeamBench](https://arxiv.org/abs/2605.07073) |
+| 4 | Omitting `tools` grants every tool. `growth-analyst` has no `tools` line, so it holds all tools, including Edit and Write on episodes. | growth-analyst | Add `tools: Read, Write, Bash, WebSearch, WebFetch` and `disallowedTools: Edit`; list browser tools only if Studio reads need them. | [Subagent docs](https://code.claude.com/docs/en/sub-agents) |
+| 5 | A hook that blocks a call "cannot be reasoned around"; behaviour rules in prompts or CLAUDE.md drift. One author moved a CLAUDE.md rule into a hook and saw those failures stop (anecdote). | All; repeat mistakes | When the mistake log shows a second hit on one rule, write the hook the same day; do not reword the rule. | [Production Gap](https://boringbot.substack.com/p/claude-code-skills-subagents-hooks); [Towards AI](https://pub.towardsai.net/claude-code-skills-vs-subagents-vs-hooks-vs-workflows-which-to-use-in-2026-120db6ae5b3c) |
+| 6 | Self-counted "calls n/budget" depends on the model counting. A hook sees every call. (Inferred: PostToolUse stderr on exit 2 reaches the model, per the docs.) | animator (hook in frontmatter) | PostToolUse counter per `agent_id`; at 80% of budget exit 2 with "budget 80%: finish, write return". Replaces the self-tally. | [Hooks reference](https://code.claude.com/docs/en/hooks) |
+| 7 | Anthropic's long-run harness kept a JSON feature list where agents may change only `passes`, plus a progress file and a start-of-session routine; models corrupt JSON less than Markdown. | Lead, `HANDOFF.md` | Add `state/gates.json` (episode, gate, passes, date). `SessionStart` hook prints it; only `return_check` pass flips a flag. | [Effective harnesses](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) |
+| 8 | Handoff notes should be short structured files, passing paths not contents; sub-agent summaries of about 1,000 to 2,000 tokens. | All six returns | `return_check.py` fails any return over 700 words outside the JSON block and any inlined file contents; names the cut. | [Context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) |
+| 9 | Practitioner guides: turn every fixed bug into a permanent test; run the whole set on every prompt change; start with about 20 cases, add about 5 a week. | New `tools/regress.py` | Store each past bad return or plan in `tests/fail/`; `regress.py` asserts the matching checker still FAILS it; run on edits to agent files. | [Prompt regression testing](https://fast.io/resources/ai-agent-prompt-regression-testing/); [Agent testing](https://agentic-ai.readthedocs.io/en/latest/ProductionBestPractices/testing-evaluations/) |
+| 10 | Checking handoffs matters: a format change in one agent can break the next in ways unlike the edit. Test each agent's output contract, then the boundary. | `regress.py` | Add one case per boundary (story-designer plan to `plan_check`, animator return to `return_check`, reviewer return to `blind_guard`). | [Agent testing](https://agentic-ai.readthedocs.io/en/latest/ProductionBestPractices/testing-evaluations/) |
+| 11 | Frontmatter `model` is ignored if `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1`; mode set in the main session can override `permissionMode`. | `preflight.py` | Fail preflight if `CLAUDE_CODE_SUBAGENT_MODEL` or `_FORCE` is set, because pinned agent models would silently change. | [Subagent docs](https://code.claude.com/docs/en/sub-agents) |
+| 12 | `omitClaudeMd: true` skips CLAUDE.md for a subagent. Blindness is currently kept by a note in CLAUDE.md plus `blind_guard.py`. | fresh-eyes-reviewer | Add `omitClaudeMd: true` to its frontmatter so no project text can reach it; keep `blind_guard.py`. | [Subagent docs](https://code.claude.com/docs/en/sub-agents) |
+| 13 | A verifier that shares the producer's blind spots adds little; independence mattered most (replacing a separate verifier with the generating model removed most rescues). | Reviewer, safety-checker | Keep verifiers as separate instances with their own brief; do not add an LLM "verifier hook". | [Leni, arXiv 2607.17044](https://arxiv.org/abs/2607.17044) |
+
+## Don't change
+
+- **Do not add an `agent`-type or `prompt`-type hook that asks a model to judge "is this done".** The hooks page marks `agent` hooks experimental, and TeamBench found model verifiers accept about half of failing work. Use scripts that open files.
+- **Keep the blind, fresh-instance reviewer.** It is the independent check the 2026 papers say matters; row 12 only hardens it.
+- **Keep `maxTurns` on every agent.** The docs say a run that hits it returns as partial and can be resumed; row 6 only adds an earlier warning.
+- **Do not turn on agent teams or parallel agents.** The one team write-up found said teammates miss each other's constraints; sequential hand-offs remain safer.
+- **Do not trust Attest-style blocking as guaranteed.** Its author says self-correction after a block is not reproducible; keep the mistake log as the backstop, and cap blocks (the harness already stops at 8).
