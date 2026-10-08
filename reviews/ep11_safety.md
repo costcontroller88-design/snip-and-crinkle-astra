@@ -393,3 +393,29 @@ Measured-checks rows (add to `reviews/ep11_short_plan.md`):
 
 Sources: no new topics (LED tea light and button cell sourced under F3). No new library entries.
 Mistakes: my R4-1 r4 (a) exemption (Snip's paw and marker 6.5-10.6) was wrong against the plan's own hand-overs; I did not test it against measured runs (M35).
+
+## Gate 3, 9 Oct 2026: transformation Short (`output/ep11_short_transform.mp4`, 30.0 s) and its upload text: **PASS, no FIX**
+
+Scope (Lead): safety, policy, kids-quality, text; clarity not reopened (M44). Long-video carry-forwards (original items 1-7) wait for the parked episode. Evidence: 1-fps sheets and labelled full-frame grids in the safety scratchpad (`g3/sheet_1-2.png`, `g3/grid_1-3.png`: 36 frames, 6.80-29.4 plus the 25.9 cover); `build/ep11s/r5_check.txt` (run 23:22 on the code saved 23:16; the mp4 was rendered 23:43 from that code); `ebur128` and `signalstats` on the mp4.
+
+| Carry-forward | Result |
+|---|---|
+| 3 Marker tip vs heads | PASS. `--check` r5: 72.3 for the whole Short (17.6), 131.2 for 20.4-22.8 (need 60). Frames 20.5-21.93: the marker stays at the lantern or at belly height, never lifted to his face. |
+| 4 Tea light 23.0-25.3 | PASS. Frames 23.1-24.8: only the grown-up's paper hand holds it (white body, dome), it comes down from above and goes in through the top; never open, no battery seen; lit dome seen at 24.3; no friend touches it. Glow steady: lantern crop luma 163.8-167.6, largest frame-to-frame step 2.2 of 255 over 26.3-28.9 (78 frames). No flame, smoke or beam on a face (25.3-29.4). |
+| 5 / 5b Lantern | PASS. `--check` (a) none outside the exemption; (b) 23.5 (need 20); A1 10.3 (need 10), body overlap 70.5 (≤71). Frames 6.80-7.13: no Crinkle arm seen on or over the lantern. 17.20 / 17.60: the hand-over paws over the unlit face (exempt). 20.67-20.93: his paw is finishing the smile, then leaves. From 21.2 nothing is on the lantern. 27.53 / 28.5: his paw is beside the lit lantern, not on it. The lantern is drawn in front in every frame; "never moves" checked on stills only. |
+| 6 Squeak level | PASS. Squeak peak M -13.1 LUFS (20.7) vs end chord -12.8 (29.8): no louder. Organ note and giggle were not listened to (not checked). |
+| 7 Nobody laughs at the one who erred | PASS. 9.1 / 9.4: Snip has normal eyes and a closed smile, Pip is calm. 20.7: Pip is a ball with wide eyes; Crinkle's eyes are on the marker. 21.6 / 21.93: Crinkle laughs at the marker. 28.4-28.9: Snip calm (eyes shut or a soft smile), Pip serious; only Crinkle grins. |
+| 8 Hand vs heads | PASS. `--check` r5: hand and tea light 63.2 / 44.6 / 48.5 (need 30), sleeve 59.7 / 40.7 / 48.6 (need 10). Frames 23.1-23.7: the arm never crosses a face or an ear. |
+
+Kids-quality and policy: a complete story (take → sad Snip → give-back → turns → lit pumpkin) with a clear takeaway. Nothing scary: the dusk is dim, but every face reads (sheets). No words except drawn shapes; no brands, logos or third-party characters seen; no climbing, falls or hitting. The spin is in place on a flat floor.
+
+Upload text: PASS. Made for Kids Yes. Both titles are honest and moment-first: every claim (turns, drawing, the glow) is in the video, there is no "Safety", and the ending is "Kids Cartoon". Description line 1 starts "Snip the bunny and Crinkle the bear". Its claims, including "a grown-up's hand switches on a little light", are shown at 23.4-24.3. 4 hashtags. No "scary" or "afraid" wording; no carving promise. Tags are original names and generic terms only. Cover 25.9 (`reviews/ep11_short_transform_cover_25.9.png` = grid frame 25.9): all three smiling beside the lit pumpkin; nothing near a face.
+
+### FIX items
+None.
+
+### Notes (optional)
+- N11. The loudest moment is M -8.1 at 10.8, a gradual swell (-13.9 at 10.0 → -8.1 at 10.8) under the turn phrase. That is no startle, but it is 4.7 LU above the end chord; a mixer may want to even it out.
+- N12. The 160 px cover check is still "not done" on the upload sheet (packaging, not safety).
+
+Sources: no new topics (button cell and LED tea light already sourced under F3). No new library entries.
