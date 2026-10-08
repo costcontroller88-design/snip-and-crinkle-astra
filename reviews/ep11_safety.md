@@ -232,3 +232,41 @@ battery light goes in by the grown-up's hand, the lesson is taking turns.
 - Zero to Three, "Helping Young Children with Sharing" (library, 8 Oct): https://www.zerotothree.org/resource/helping-young-children-with-sharing/
 - Dartmouth Health Children's, "Teaching Children How to Share" (read 8 Oct 2026): https://childrens.dartmouth-health.org/kids-health/teaching-children-how-share
 - AAP HealthyChildren.org, button and coin batteries (library): https://www.healthychildren.org/English/safety-prevention/at-home/Pages/what-parents-need-to-know-about-button-and-lithium-coin-batteries.aspx
+
+## Re-check 8 Oct 2026 (gate 1, transformation Short r1, shots 1b, 2, 3, 4, 9, 10, 11 only): FIX (3 small text edits)
+
+Scope: plan 7(b) rows marked r1 and `reviews/ep11_short_fixes_r1_plan.md`. F1-F3 of 8 Oct stay in force. Built numbers
+below come from `python3 episodes/ep11_short_transform.py --check`, run 8 Oct on the **pre-r1 build** (`DUR` 29.4), so they are
+evidence only for beats r1 did not restage; every r1 beat is plan-only until rebuilt.
+
+| Shot | Result |
+|---|---|
+| 1b take (hand/paws, marker) | PASS. Slow pinch at the top end, her paw fixed, slide along the axis, no tug; her `o` mouth at 1.25 keeps it from reading as a hand-over. Marker nowhere near a mouth: CAP_P (888, 1291) is about 117 from Snip's head pivot, LIFT (1010, 1262) about 123 from Crinkle's (plan positions). Pre-r1 build: Snip's paw moved 0.08 (0.8-2.0); marker tip to nearest head 78.6 minimum. No cap, no white marker, no cutting. |
+| 2 realisation, give-back | PASS except FIX R2-1 (the sound). No tongue near the marker; tip stops 20 short (no mark); Snip sad, not angry; give-back in full view, he lets go first. |
+| 3-4 sway gag set-up | FIX R2-2 (lean toward the lantern) and R2-3 (Pip's smile). Quarter turn, both feet down, sheepish grin: fine for 2-6. |
+| 9 smile stroke, tongues | PASS. His tongue moves with the marker about 200 units below his mouth (draw spot vs head pivot); Pip copies with an empty wing. |
+| 10 hand, light | PASS. Only the hand touches the tea light; the lit dome is seen 1.6 s; the hand leaves upward. The code steps Crinkle back to x 1200 at 20.95-21.6 (paw on tummy 21.6-21.9) and Pip to 770 at 17.6-18.1 before the hand: the plan rows don't say so (Note N4). Pre-r1 build: hand + tea light to nearest head 53.5; no hand pixels over the paper below the rim; no arm drawn over the lantern. |
+| 11 spin gag, laughing at himself | PASS except R2-3. He laughs only after looking back, so he is laughing at himself; Pip joins in; Snip smiles. Spinning in place with paws up is ordinary toddler play, not an imitable danger. The lantern gap for the spin and Pip's turn is a gate-3 measurement (the plan already gives the fallback Pip → 740). |
+| Light, faces | PASS (plan). The warm wash stays, with no beam on a face; Snip's teary face is held 0.5 s, wet shine only (N2). |
+
+### FIX items (paste as written)
+
+| ID | Where | Exact text |
+|---|---|---|
+| R2-1 | b6 row "Crinkle understands (r1)" | Replace with: "one soft low organ note, held and fading at 4.25 (no pitch bend, no falling 'wah-wah' or sad-trombone figure; not a voice)". Reason: a falling bend on the moment he sees his mistake is the stock comic "fail" sound, which laughs at whoever is wrong. |
+| R2-2 | b4 shot 3 r1, the gag sentence | "**Gag set-up:** sway 2 goes too big: his body swings a quarter round (turn -0.35 → 0.0) with lean +10 (away from the lantern) and a tiny wobble, both feet on the deck, then swings back (turn -0.35) (7.75-8.3); every mask stays ≥10 from the lantern mask 6.5-9.3 (`--check`)." Reason: at x 1100 he is 20 from the lantern's right edge (1080); lean -10 tips him toward it. If he wobbled into it without moving it, the physics would be wrong, and it reads as "he'll fall on it". |
+| R2-3 | b9, add a row "7.75-8.7 and 27.6-28.6 (r1)" | "Before Crinkle smiles at himself, nobody reacts to his slip: Pip keeps her calm sway or serious copy and Snip a soft closed mouth; no bigger smile, no giggle note, no pointing, no paw or wing over a mouth, no look at the camera. Friends smile only after his own grin (8.7) or laugh (28.6)." Reason: shot 3 has Pip smiling at him through the wobble, and Snip's face for 27.6-28.6 is not given; a smile at someone's slip before they laugh reads as laughing at them. |
+
+### Notes (optional)
+- N4. Rows 9-10: write down the step-back the code already does: "Pip at 770 from 18.1; Crinkle steps back to 1200 (20.95-21.6), paw on tummy (21.6-21.9); all three clear before the hand enters at 21.9." The `--check` lantern-gap window has to start at 21.6, not 20.9 (at 20.9 he still stands at 1080 by the paper); keep "no paw on the paper" from 20.9.
+
+### Carry-forward checks for gate 3 (replaces items 1, 4, 5 and 7 of 8 Oct with the r1 times)
+1. 0.6-2.3: Snip's paw moves ≤1 unit; the marker is ≥50% uncovered (`--check`); Crinkle's eyes never on Snip (full frames 1.0, 1.5, 2.4).
+2. 3.2: the tip is 20 short of the paper, with no mark (full frame).
+3. Marker tip ≥60 from any mouth or beak for the whole Short, including 14.2, 18.6-20.6 and 18.8 (`--check`; pre-r1 build 78.6).
+4. 21.9-24.6: hand checks as before (only the hand, lit dome seen, never opened, steady glow, the hand leaves upward).
+5. Lantern gap ≥10 for every mask during 6.5-9.3 and 21.6-30.0, including the spin (27.1-29.6) and Pip's turn (27.9); stills 8.0, 27.9, 28.4.
+6. 4.25 organ note: no bend; giggle runs are instrument-only, with no voice-like sound (listen plus `ebur128` as before).
+7. Nobody laughs at Crinkle: full frames 7.9, 8.1, 28.0, 28.4 (faces as in R2-3).
+
+Sources: no new topics; Zero to Three and Dartmouth Health Children's (above) cover turn-taking. No new library entries.

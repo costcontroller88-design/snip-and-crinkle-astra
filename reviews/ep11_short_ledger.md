@@ -15,4 +15,7 @@
 | 8 Oct | Fix K1-K3 (light-in close-up back on B 2.0x, lantern 44.6%; marker ≥30 from heads; --check re-run) | animator, fresh (129k tok, 27 calls) | ~20 | 66 | Lead key check OK; render chain started (Mac CPU, no tokens) |
 | 8 Oct | Render 1 FAIL (5 silent gaps) → Lead added a soft bed (1 code step) → render 2 check_video PASS (-14.0 LUFS) | Lead | ~22 | 66 | renders on Mac CPU |
 | 8 Oct | Blind round 1: overall 7, comedy 4; blocking B1 take, B2 give-back; misread 'smug' | fresh-eyes-reviewer (62k tok, 19 calls) | 23 | 68 | → designer fix file r1 (next session) |
+| 8 Oct | New Lead session: pre-flight (other session "Halloween short" idle, last work = handoff commit); fix mode r1 → story-designer | Lead | 26 | 68 | reset in 1h46m (>90 min, M8 OK); weekly ignored (owner) |
+| 8 Oct | Fix mode r1 (B1 2.6x take 1.0 s, R1 no tongue, B2 1.3 s + 0.9 s, C1 spin gag); 30.0 s; Lead accepts the marker-box reading of ≥10%; M17 logged | story-designer (100k tok, 19 calls) | 32 | 69 | → safety re-check shots 1b,2,3,4,9,10,11 |
+| 8 Oct | Safety re-check r1: FIX x3 (no bending organ note; sway leans away from lantern; nobody reacts to his slip) + N4, pasted by Lead | safety-checker (44k tok, 11 calls) | — | — | → fresh animator build |
 | — | Render chain: `EP11S_RES=3 python3 episodes/ep11_short_transform.py --hires && python3 episodes/ep11_short_transform.py --render && python3 tools/check_video.py output/ep11_short_transform.mp4 --no-loop --cuts <cuts>` | | | | |
