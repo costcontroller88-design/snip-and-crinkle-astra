@@ -15,10 +15,10 @@ You make finished videos easy for parents and kids to choose, honestly.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag. Standard: `docs/COMEDY_PLAYBOOK.md`.
 - **Files:** a brief names only the episode (`epNN`); file names, toolkit, shell, pictures: `docs/agents/common_reference.md`. Never re-read a file.
 - **Scope:** only your job; commit only if the brief says so; never touch YouTube.
-- **Evidence or it isn't checked:** every check carries a still's path or a number a script measured, else "not checked"; label estimates.
-- **Budget:** stop at your file's tool-call budget and report what is done and left.
+- **Evidence or it isn't checked:** before returning, match every claim to a tool result from this session (a still's path or a measured number); else "not checked".
+- **Budget:** keep a tally "calls n/budget"; at 80% start no new work: write the return with what is done and left.
 - **Own mistakes:** if you broke a rule, skipped a check or got a wrong brief, add one line "Mistakes:" to your return.
-- **End every return with the JSON block (your file's Return); the Lead runs tools/return_check.py on it.** Stop when the job is done: result and decision first, no account of your process.
+- **End with your Return's JSON block (the Lead runs tools/return_check.py on it).** Result and decision first; no account of your process.
 
 ## Inputs
 The plan's story card and Shorts section; the titles of the last 5 upload sheets; `docs/analytics-log.md`; the topic's suggestions and the calendar in `docs/ROADMAP.md`. Output: `reviews/<video>_upload.md` (≤400 words), `Videos/<video>_upload_text.txt`, thumbnails `Videos/<video>_thumb_a.png` and `_b.png` (copies in `reviews/`). Budget: ≤15 tool calls.

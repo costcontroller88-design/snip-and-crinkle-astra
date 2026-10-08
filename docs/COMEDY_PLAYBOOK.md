@@ -98,6 +98,21 @@ with a rule-of-three build and a topper, and reactions held. 8 = every ≤20 s, 
 weak gag. 7 = every ~20 s, but one key gag lands weakly (set-up unclear, too fast, or no reaction). 6 = fewer than one
 per 20 s, or mostly charm. ≤5 = no landed gag.
 
+## 9. Acting the face and body (research 9 Oct 2026, `docs/research-comedy-acting-oct-2026.md`)
+For the animator (A = the rig must support it first: the A2 rig job) and the story-designer (D).
+1. Eyes-only test: every emotion reads from eyes, lids, ears, head tilt and shoulders with the mouth hidden (Aardman's Shaun). A
+2. Mood lives in the upper-lid angle: down-in = cross, down-out = sad. A
+3. Blink only on a new thought, look or head turn: close 3-5 frames, brief hold, open 2-4 (teaching notes; test at 30 fps). A
+4. Eye darts take 1-2 frames, lids follow the pupils, a big dart gets a blink; a dart shows "noticing" before the take. A
+5. Moving hold: any hold over 0.5 s breathes (chest or shoulders) and drifts on from the last move; no frozen pose. A
+6. Key expressions are asymmetric (one ear or lid different); eyes stay on one eyeline in a squash; mirror-check each take. A
+7. One action verb per shot ("hides", "tests"); the verb changes only on a trigger the plan names (Ed Hooks). D
+8. Write a gag as a body or face predicament first (stuck, tangled), then its cause; if it can't be drawn, drop it (Larva). D
+9. Three sound points per gag: a cue before, silence during the action, a punctuation sound on the payoff (Tom & Jerry). D
+10. Each character has a fixed noise vocabulary, one short non-speech sound per emotion, kept in the character bible (Pingu, Simon's Cat). D
+Rig features for A2, ranked: eye states + pupil offset; upper-lid angle; ears with overlap; head tilt + breath loop; blink presets;
+volume-keeping squash on an eyeline; 4-5 non-speech mouth shapes; sound-marker slots. Findings 3, 4 and 8 rest on search summaries only.
+
 ## Sources (read 8 Oct 2026)
 McGhee's stages, via [Frontiers in Cognition 2024](https://frontiersin.org/journals/cognition/articles/10.3389/fcogn.2024.1369638/full) and [Laughter Remedy](https://www.laughterremedy.com/2010/12/children%e2%80%99s-humor-infancy-to-age-three/);
 Hoicka & Akhtar 2012, via [BPS Research Digest](https://bps.org.uk/research-digest/jokes-toddlers-make); Hoicka & Gattis, [ORCA Cardiff](https://orca.cardiff.ac.uk/id/eprint/5600/);

@@ -48,3 +48,5 @@
 | 9 Oct | rule diet v3.7 -> fresh general-purpose (Sonnet) from reviews/diet_spec_2026-10-09.md (new session, owner) | Lead | 9 | 93 | preflight: ANY AGENT: <60% |
 | 9 Oct | diet v3.7 done (Sonnet 153k tok, 32 calls vs 30: M50; 5h 9→16, weekly 93→94): diet_check PASS (Lead re-ran), return_check FAILs the overrun correctly, reviewer files story-free (grep); brief_check M46/M52 fixed as a script | Lead | 16 | 94 | owner: weekly use OK |
 | 9 Oct | zero-based review (Lead, no agents; 5h 16→?) → owner no preference → v3.8 findings 1+3 applied (designer/animator/safety + plan_check cap 2,500); diet_check PASS | Lead | — | 94 | owner: weekly use OK |
+| 9 Oct | research x2 (agent craft, comedy+acting), general-purpose Sonnet, parallel; owner asked | Lead | 20 | 95 | preflight: ANY AGENT: <60% |
+| 9 Oct | research x2 (Sonnet, parallel: agent craft 93k/25 calls, comedy+acting 89k/25 calls vs ≤20 searches each) → v3.9: card evidence + 80% tally, return_check needs number/path + cited files exist, designer 6-gag drafts + predicament + sound points, playbook section 9, growth comedy vs view duration; diet_check PASS | Lead | — | — | owner: weekly use OK |

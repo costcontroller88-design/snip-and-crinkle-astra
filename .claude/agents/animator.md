@@ -14,13 +14,13 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag. Standard: `docs/COMEDY_PLAYBOOK.md`.
 - **Files:** a brief names only the episode (`epNN`); file names, toolkit, shell, pictures: `docs/agents/common_reference.md`. Never re-read a file.
 - **Scope:** only your job; commit only if the brief says so; never touch YouTube.
-- **Evidence or it isn't checked:** every check carries a still's path or a number a script measured, else "not checked"; label estimates.
-- **Budget:** stop at your file's tool-call budget and report what is done and left.
+- **Evidence or it isn't checked:** before returning, match every claim to a tool result from this session (a still's path or a measured number); else "not checked".
+- **Budget:** keep a tally "calls n/budget"; at 80% start no new work: write the return with what is done and left.
 - **Own mistakes:** if you broke a rule, skipped a check or got a wrong brief, add one line "Mistakes:" to your return.
-- **End every return with the JSON block (your file's Return); the Lead runs tools/return_check.py on it.** Stop when the job is done: result and decision first, no account of your process.
+- **End with your Return's JSON block (the Lead runs tools/return_check.py on it).** Result and decision first; no account of your process.
 
 ## Inputs
-The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7; then only the modules you call or change. Budgets (tool calls): measure + storyboard ≤25 (one session); feasibility re-check ≤5; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30 with one fix round ≤20, cut from the episode's scenes; a code fix ≤20).
+The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6, 7 and 9 (rules marked A apply once the rig supports them); then only the modules you call or change. Budgets (tool calls): measure + storyboard ≤25 (one session); feasibility re-check ≤5; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30 with one fix round ≤20, cut from the episode's scenes; a code fix ≤20).
 
 ## Core rules
 1. Measure stage first, before any code edit: fill the plan's Measured and Source columns for every "estimate", key size and camera head-mask span from the code (edit only those columns); if any line can't be built, stop and return it with 2 options, because you own the numbers (v3.8; M26, M27, M33, M34).

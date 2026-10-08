@@ -5,7 +5,8 @@
 
 FAIL (exit 1) if: no ```json block or invalid JSON; a key of the return schema is missing; verdict not one of
 PASS|FAIL|DONE|PARTIAL; tool_calls or budget not a number; tool_calls > budget; a check without a name or with
-empty evidence, or evidence that says "estimate" or "looks"; a listed file that doesn't exist (relative paths are
+empty evidence, evidence that says "estimate" or "looks", evidence with no number or file path, a cited path that
+doesn't exist; a listed file that doesn't exist (relative paths are
 tried from the current folder, then from the project root); files, checks or not_done not lists.
 A FAIL is a mistake-log row (MASTER_PROMPT 10.11 item 10).
 """
@@ -19,6 +20,8 @@ KEYS = ("agent", "verdict", "tool_calls", "budget", "checks", "files", "not_done
 VERDICTS = ("PASS", "FAIL", "DONE", "PARTIAL")
 BLOCK = re.compile(r"```json[ \t]*\n(.*?)\n[ \t]*```", re.S)
 SOFT = re.compile(r"\b(estimates?|estimated|looks?)\b", re.I)
+# Research 9 Oct (docs/research-agent-craft-oct-2026.md rows 1-2): evidence must be a number or a path, and a cited path must exist.
+PATH = re.compile(r"[\w./-]*/[\w.-]+\.(?:png|jpe?g|md|mp4|wav|py|txt|json|csv)\b")
 
 
 def num(v):
@@ -58,7 +61,14 @@ def check(text):
         if not isinstance(ev, str) or not ev.strip():
             bad.append(f"check {i} ({c['name']}): empty evidence")
         elif SOFT.search(ev):
-            bad.append(f"check {i} ({c['name']}): evidence says estimate/looks: {ev!r}")
+            bad.append(f"check {i} ({c['name']}): evidence says estimate/looks: {ev!r}; fix: measure it or write 'not checked'")
+        else:
+            paths = PATH.findall(ev)
+            if not paths and not re.search(r"\d", ev):
+                bad.append(f"check {i} ({c['name']}): evidence has no number or file path: {ev!r}; fix: cite the still or the measured number")
+            for f in paths:
+                if not (os.path.exists(f) or os.path.exists(os.path.join(ROOT, f))):
+                    bad.append(f"check {i} ({c['name']}): cited file does not exist: {f}; fix: cite a file this session wrote")
     for f in d["files"]:
         if not isinstance(f, str) or not f.strip():
             bad.append(f"bad file entry: {f!r}")

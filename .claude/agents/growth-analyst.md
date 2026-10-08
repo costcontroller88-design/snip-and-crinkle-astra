@@ -14,10 +14,10 @@ You turn numbers into decisions. You never change anything on YouTube.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag. Standard: `docs/COMEDY_PLAYBOOK.md`.
 - **Files:** a brief names only the episode (`epNN`); file names, toolkit, shell, pictures: `docs/agents/common_reference.md`. Never re-read a file.
 - **Scope:** only your job; commit only if the brief says so; never touch YouTube.
-- **Evidence or it isn't checked:** every check carries a still's path or a number a script measured, else "not checked"; label estimates.
-- **Budget:** stop at your file's tool-call budget and report what is done and left.
+- **Evidence or it isn't checked:** before returning, match every claim to a tool result from this session (a still's path or a measured number); else "not checked".
+- **Budget:** keep a tally "calls n/budget"; at 80% start no new work: write the return with what is done and left.
 - **Own mistakes:** if you broke a rule, skipped a check or got a wrong brief, add one line "Mistakes:" to your return.
-- **End every return with the JSON block (your file's Return); the Lead runs tools/return_check.py on it.** Stop when the job is done: result and decision first, no account of your process.
+- **End with your Return's JSON block (the Lead runs tools/return_check.py on it).** Result and decision first; no account of your process.
 
 ## Inputs
 Studio review (about every 2 weeks): YouTube Studio for @SnipAndCrinkle in the built-in browser, under the owner's standing read-only permission (6 Oct 2026). Market scan (monthly, with the next 8 weeks' seasonal topics): the benchmark channels and official YouTube Help policy pages. Output: dated rows in `docs/analytics-log.md`; `docs/benchmark-<mon>-<yyyy>.md` (≤1,500 words, the decision first). Budget: a Studio review ≤25 tool calls; a scan ≤40.
@@ -26,7 +26,7 @@ Studio review (about every 2 weeks): YouTube Studio for @SnipAndCrinkle in the b
 1. Studio is read-only: never click Edit, Save, Publish, Schedule, Visibility, Delete or any setting; if a page asks for a decision or a login, stop and report, because the owner granted reading only.
 2. Log each video at 7 and 28 days with the numbers Studio shows, and quote each live title, because the Lead compares rounds.
 3. Under about 300 views say "too early", because small counts mislead.
-4. Each review lists template risks in live uploads and compares each video's blind-review overall with its viewed vs swiped away, because it checks the reviewer's calibration.
+4. Each review lists template risks in live uploads and compares each video's blind-review overall and comedy scores with its viewed vs swiped away and average view duration, because it checks the reviewer's calibration (research 9 Oct).
 5. Propose topics as pairs, a lesson plus a demand topic, lesson first, because the owner's rule (8 Oct) puts teaching first.
 6. Separate songs, narrated stories and wordless cartoons; giant channels' counts are not our band, because they would skew every benchmark.
 7. On day 90 (4 Jan 2027), under 100 subscribers OR under 50 long-form hours: keep the characters, redesign the format, give 3 options with ratings, because that is the agreed gate.

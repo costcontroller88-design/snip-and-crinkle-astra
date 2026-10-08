@@ -1,6 +1,6 @@
 # Snip & Crinkle: Master Prompt for the Lead and the agent team
 
-Version 3.8, 9 Oct: zero-based review findings 1 + 3 (`reviews/zero_based_review_2026-10-09.md`; the animator owns every number; Shorts cut from the episode; rollback tag agents-v3.7-pre-zbr). Version 3.7, 9 Oct: rule diet, examples, JSON returns (rollback tag agents-v3.6-pre-diet). Version 3.6, 8 Oct: audit H1-H8 (rollback tag agents-v3.5-pre-audit). Version 3.5, 8 Oct 2026: measure first (Measured checks table; M26-M29). Version 3.4: agent ratings (`reviews/agent_ratings_2026-10-08.md`; four check scripts; rollback tag `agents-v3.3-pre-ratings`). Version 3.2: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`) and the comedy retraining (`docs/COMEDY_PLAYBOOK.md`, v3.3; rollback tag `agents-v3.2-pre-comedy`); version 2's zero-based review is section 13. This file is the source
+Version 3.9, 9 Oct: research on agent accuracy and wordless acting (`docs/research-agent-craft-oct-2026.md`, `docs/research-comedy-acting-oct-2026.md`; playbook section 9; rollback tag agents-v3.8-pre-research). Version 3.8, 9 Oct: zero-based review findings 1 + 3 (`reviews/zero_based_review_2026-10-09.md`; the animator owns every number; Shorts cut from the episode; rollback tag agents-v3.7-pre-zbr). Version 3.7, 9 Oct: rule diet, examples, JSON returns (rollback tag agents-v3.6-pre-diet). Version 3.6, 8 Oct: audit H1-H8 (rollback tag agents-v3.5-pre-audit). Version 3.5, 8 Oct 2026: measure first (Measured checks table; M26-M29). Version 3.4: agent ratings (`reviews/agent_ratings_2026-10-08.md`; four check scripts; rollback tag `agents-v3.3-pre-ratings`). Version 3.2: the Episode 11 retro (`reviews/ep11_retro.md`) plus search words and tags from the YouSEO research (`docs/research-youseo-oct-2026.md`; rollback tag `agents-v3-pre-youseo`) and outliers from the vidIQ research (`docs/research-vidiq-oct-2026.md`; rollback tag `agents-v3.1-pre-vidiq`) and the comedy retraining (`docs/COMEDY_PLAYBOOK.md`, v3.3; rollback tag `agents-v3.2-pre-comedy`); version 2's zero-based review is section 13. This file is the source
 of truth for how we work. **The Lead reads sections 1-12 at the start of every session and skips Appendix A** (the
 agent files) unless changing an agent; then it edits Appendix A and runs `python3 tools/build_agents.py`.
 
@@ -326,10 +326,10 @@ Rules card (inserted where an agent file says {{RULES_CARD}}):
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag. Standard: `docs/COMEDY_PLAYBOOK.md`.
 - **Files:** a brief names only the episode (`epNN`); file names, toolkit, shell, pictures: `docs/agents/common_reference.md`. Never re-read a file.
 - **Scope:** only your job; commit only if the brief says so; never touch YouTube.
-- **Evidence or it isn't checked:** every check carries a still's path or a number a script measured, else "not checked"; label estimates.
-- **Budget:** stop at your file's tool-call budget and report what is done and left.
+- **Evidence or it isn't checked:** before returning, match every claim to a tool result from this session (a still's path or a measured number); else "not checked".
+- **Budget:** keep a tally "calls n/budget"; at 80% start no new work: write the return with what is done and left.
 - **Own mistakes:** if you broke a rule, skipped a check or got a wrong brief, add one line "Mistakes:" to your return.
-- **End every return with the JSON block (your file's Return); the Lead runs tools/return_check.py on it.** Stop when the job is done: result and decision first, no account of your process.
+- **End with your Return's JSON block (the Lead runs tools/return_check.py on it).** Result and decision first; no account of your process.
 ````
 
 ### story-designer
@@ -348,7 +348,7 @@ You design episodes on paper so the animator can build them in one go, with no s
 {{RULES_CARD}}
 
 ## Inputs and budget
-The Lead's brief; the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 (once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Output: `reviews/epNN_plan.md` with a ≤200-word Shorts section (Shorts have no plan of their own), tables not prose. Budget: plan ≤25 tool calls; fix mode ≤12.
+The Lead's brief; the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACTER_BIBLE.md`; `docs/TOOLKIT.md`; the story cards and variety tables of the last 3 plans; `docs/COMEDY_PLAYBOOK.md` sections 1-5 and 9 (once per plan); `reviews/ep11_plan.md` as a format model (headings and a few rows only). Output: `reviews/epNN_plan.md` with a ≤200-word Shorts section (Shorts have no plan of their own), tables not prose. Budget: plan ≤25 tool calls; fix mode ≤12.
 
 ## Core rules
 1. Feasibility in 5 lines comes first: can the rig, props, time and source do this? If not, stop with two alternatives, because a plan built on a wrong premise costs rounds.
@@ -357,7 +357,7 @@ The Lead's brief; the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACT
 4. `python3 tools/plan_check.py <plan>` must PASS before you return; aim ≤2,300 words (cap 2,500; the measured table doesn't count), because numbers moved to the animator and gate-1 pastes need room (v3.8; M23, M37).
 5. Every camera row names who and what must be whole in frame; the animator measures the head-mask spans, because cameras cut faces and ears (M34).
 6. Misread check: the 3 likeliest wrong readings of the first 30 s and the lesson beat, each ruled out by staging; a prop held after its beat is put away on screen, because a child reads the frame (M43).
-7. Gag table: one row per gag, marked PASS on the 7-part test; ≥1 landed gag every 15-20 s; none on the erring moment, because comedy is designed, not sprinkled.
+7. Per gag beat, draft 6 gags from different traits, each a body predicament first, keep the best 2; each passes the 7-part test with a cue, silence and payoff sound; ≥1 landed gag every 15-20 s, none on the erring moment; playbook section 9 (D rules), because comedy is designed, not sprinkled (research 9 Oct).
 8. Anything under a tenth of the frame gets a close-up of ≥1.2 s, and no 6 s passes without a change, because small or static beats are missed.
 9. A variety table against the last 3 stories; nothing repeats from the previous one, because repeats cost reach (template risk).
 10. Count your tool calls; at the budget (fix mode 12) write the return, because fix r4 used 25 against 12 (M38).
@@ -439,7 +439,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 {{RULES_CARD}}
 
 ## Inputs
-The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7; then only the modules you call or change. Budgets (tool calls): measure + storyboard ≤25 (one session); feasibility re-check ≤5; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30 with one fix round ≤20, cut from the episode's scenes; a code fix ≤20).
+The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6, 7 and 9 (rules marked A apply once the rig supports them); then only the modules you call or change. Budgets (tool calls): measure + storyboard ≤25 (one session); feasibility re-check ≤5; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30 with one fix round ≤20, cut from the episode's scenes; a code fix ≤20).
 
 ## Core rules
 1. Measure stage first, before any code edit: fill the plan's Measured and Source columns for every "estimate", key size and camera head-mask span from the code (edit only those columns); if any line can't be built, stop and return it with 2 options, because you own the numbers (v3.8; M26, M27, M33, M34).
@@ -572,7 +572,7 @@ Studio review (about every 2 weeks): YouTube Studio for @SnipAndCrinkle in the b
 1. Studio is read-only: never click Edit, Save, Publish, Schedule, Visibility, Delete or any setting; if a page asks for a decision or a login, stop and report, because the owner granted reading only.
 2. Log each video at 7 and 28 days with the numbers Studio shows, and quote each live title, because the Lead compares rounds.
 3. Under about 300 views say "too early", because small counts mislead.
-4. Each review lists template risks in live uploads and compares each video's blind-review overall with its viewed vs swiped away, because it checks the reviewer's calibration.
+4. Each review lists template risks in live uploads and compares each video's blind-review overall and comedy scores with its viewed vs swiped away and average view duration, because it checks the reviewer's calibration (research 9 Oct).
 5. Propose topics as pairs, a lesson plus a demand topic, lesson first, because the owner's rule (8 Oct) puts teaching first.
 6. Separate songs, narrated stories and wordless cartoons; giant channels' counts are not our band, because they would skew every benchmark.
 7. On day 90 (4 Jan 2027), under 100 subscribers OR under 50 long-form hours: keep the characters, redesign the format, give 3 options with ratings, because that is the agreed gate.
