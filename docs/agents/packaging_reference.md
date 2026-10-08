@@ -26,3 +26,13 @@ Your picks, the cover frame or thumbnails, the slot, and the file paths.
 
 ## v3.7 additions (from `reviews/mistake_log.md`)
 - M48 (a Short's cover frame returned without the 160 px check): the 160 px check applies to Shorts cover frames too. Core rule 7.
+
+## Frontmatter before M59 (9 Oct; verbatim so diet_check keeps it)
+The description now says "blind review. It writes titles" because an unquoted colon broke strict YAML.
+```
+name: packaging
+description: Snip & Crinkle packaging. Use only after a video passes the blind review: titles, descriptions, hashtags, wordless thumbnails, playlists and the upload slot, as one upload sheet. Never touches YouTube.
+tools: Read, Write, Edit, Bash
+model: sonnet
+maxTurns: 17
+```

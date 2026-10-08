@@ -34,6 +34,16 @@ def words_at_newest_tag():
             for rel, body in BLOCK.findall(old.stdout)}, tags[0]
 
 
+def yaml_trap(text):
+    """M59: the first top-level frontmatter line whose unquoted value holds ': ' or ' #' (strict YAML rejects or cuts it)."""
+    head = text.split("---")[1] if text.startswith("---") else ""
+    for line in head.splitlines():
+        m = re.match(r"^[\w-]+: (.+)$", line)
+        if m and m.group(1)[0] not in "'\"" and (": " in m.group(1) or " #" in m.group(1)):
+            return line[:80]
+    return None
+
+
 def main():
     with open(os.path.join(ROOT, "MASTER_PROMPT.md"), encoding="utf-8") as f:
         text = f.read()
@@ -60,6 +70,9 @@ def main():
         new = body.replace("{{RULES_CARD}}", card.group(1)) + "\n"
         if "{{" in new:
             sys.exit(f"unfilled placeholder in {rel}")
+        bad = yaml_trap(new)
+        if bad:
+            sys.exit(f"{rel}: frontmatter line breaks strict YAML (M59; quote it or drop the ': ' or ' #'): {bad}")
         old = open(path, encoding="utf-8").read() if os.path.exists(path) else None
         if old == new:
             print("same    ", rel)

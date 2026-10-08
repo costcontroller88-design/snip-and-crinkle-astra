@@ -280,7 +280,7 @@ File: `.claude/agents/packaging.md`
 ````markdown
 ---
 name: packaging
-description: Snip & Crinkle packaging. Use only after a video passes the blind review: titles, descriptions, hashtags, wordless thumbnails, playlists and the upload slot, as one upload sheet. Never touches YouTube.
+description: Snip & Crinkle packaging. Use only after a video passes the blind review. It writes titles, descriptions, hashtags, wordless thumbnails, playlists and the upload slot, as one upload sheet. Never touches YouTube.
 tools: Read, Write, Edit, Bash
 model: sonnet
 maxTurns: 17
