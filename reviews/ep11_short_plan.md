@@ -43,7 +43,7 @@ Frame 0: plain lantern (BASE 960, 1505), wire ring, stem. 1. Crinkle pinches the
 8. His smile stroke ends in a big squeak (gag 2). 9. The hand clicks the tea light on, lowers it in; the paper glows. 10. Gag 3 in the glow (callback of 5).
 
 ## b4. Shot list
-Cameras (x span): A 1.7x (880, 1250), x 562-1198; B 2.0x (950, 1320); B2 1.8x (920, 1270), x 620-1220; G 2.5x (990, 1180), x 774-1206; K 1.9x (1060, 1180); T 2.6x (958, 1300); K2 1.9x (1260, 1138). **W r4** 1.05x (975, 1006), x 461-1489, y 91-1920: heads meas. Snip 486-868, Pip 645-858, Crinkle 926-1459 (22.2-23.0), 1040-1461 (25.7-26.2). **D r4** 1.79x (789, 1186), x 488-1092 (Lead r4: the whole lantern, ≥10 margin, while it lights up): Snip 498-862, Pip 645-858 in; Crinkle 1061-1514: a sliver ≤31 of his head side at the right edge is accepted, never his eye; tea light ≈13.2%. B3, END, pull dropped. World strip x 420-1500; bottom 19% deck; lantern x 840-1080, y 1319-1505; marker 46-76 wide (2.9-6.4).
+Cameras (x span): A 1.7x (880, 1250), x 562-1198; B 2.0x (950, 1320); B2 1.8x (920, 1270), x 620-1220; G 2.5x (990, 1180), x 774-1206; K 1.9x (1060, 1180); T 2.6x (958, 1300); K2 1.9x (1260, 1138). **W r4** 1.05x (975, 1006), x 461-1489, y 91-1920: heads meas. Snip 486-868, Pip 645-858, Crinkle 926-1459 (22.2-23.0), 1040-1461 (25.7-26.2). **D r4** 1.79x (789, 1186), x 488-1092 (Lead r4: the whole lantern, ≥10 margin, while it lights up): Snip 498-862, Pip 645-858 in; Crinkle 1061-1514: a sliver ≤31 of his head side at the right edge is accepted, never his eye; tea light 13.3% (meas. r4). B3, END, pull dropped. World strip x 420-1500; bottom 19% deck; lantern x 840-1080, y 1319-1505; marker 46-76 wide (2.9-6.4).
 
 | # | Time (s) | Cam | What happens | Movements | Rig check |
 |---|---|---|---|---|---|
@@ -139,7 +139,7 @@ Own timeline and cameras (b4); holds ≥1 s (b5).
 | The mistake: the take | 0.9-2.3 | the marker | 15.9 (meas. 15.9-20.3 in T) | 1.4 (meas. min 100% visible, `--check` r3 build) |
 | The fix: the give-back | 4.5-5.9 | the marker | 10.6 r3 (meas. 10.6-15.3 in G) | 1.4 (meas. min 100% visible, `--check` r3 build) |
 | His turn, given by Pip | 16.8-17.8 | the marker | 17.7 (meas. 17.7-17.9 in A) | 1.0 (not measured) |
-| The wow's cause: the tea light goes in | 23.0-25.0 | the tea light | 14.1 r4 (mask 80 wide: meas. 11.1% at 1.5x; x 1.9/1.5 in D) | 1.3 (estimate) |
+| The wow's cause: the tea light goes in | 23.0-25.0 | the tea light | 13.3 r4 (meas. in D 1.79x, animator r4) | 1.3 (estimate) |
 
 ## Measured checks (the animator measures every estimate first and updates this table from the final `--check`)
 | Check | Need | Measured | Source |
