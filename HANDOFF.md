@@ -3,9 +3,10 @@
 How we work: `MASTER_PROMPT.md` (**v3.3**, 8 Oct: Ep 11 retro + YouSEO, vidIQ and comedy retraining). Plan, dates and the upload
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`.
 
+**FIRST (owner, 8 Oct): rate the 6 agents + the Lead 1-10, harshly, from evidence (ledgers, mistake log, blind scores), with fixes; the owner approves changes.**
+
 **Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct). Blind round 1 = overall 7, comedy 4. Fix mode r1 DONE (plan 7(b) rows "r1", change list `reviews/ep11_short_fixes_r1_plan.md`, 30.0 s) and its safety re-check DONE (R2-1..3 + N4 pasted into the plan). Next work package: (1) story-designer fix mode, comedy only: run every 7(b) gag through `docs/COMEDY_PLAYBOOK.md` (7-part test, gag table) and fix the failing parts (≤30 s); this is the test of the comedy retraining; safety-checker only if a gag changed; (2) a FRESH animator builds; Lead renders; blind round 2 is the last. Then packaging, gate 3.** Owner (8 Oct): ignore the weekly limit; 5-hour bands apply, but start no big agent with the reset <90 min away (M8). Plan `reviews/ep11_plan.md` 7(b); ledger `reviews/ep11_short_ledger.md`. **Mistake log habit (owner rule):** `reviews/mistake_log.md` (M16 APPLIED; M1-M15, M17-M19 OPEN); retrain after this Short (MASTER_PROMPT 10.11.9).
-After it: **Episode 12 "Tidy up together" + colour sorting** (Lead go, 8 Oct; ROADMAP topic 2; evidence
-`docs/research-synthesis-oct-2026.md`, confirmed by the 4-way research of 8 Oct); its Short dressed for Diwali, Tue 3 Nov.
+After it: **Episode 12 "Tidy up together" + colour sorting** (ROADMAP topic 2); its Short dressed for Diwali, Tue 3 Nov.
 Then 13 potty, 14 bedtime, 15 dressed warm, 16 teeth (ROADMAP). Owner ruled (8 Oct): ✓/✗ icons allowed; never a wet bed on screen.
 
 **Episode 11 (Pip and the Friendly Glow): the episode is parked; the transformation Short is queued (owner, 8 Oct).** Round 3 scored 6 (`reviews/ep11_blind_r3.md`); render `output/ep11_friendly_glow.mp4`.
