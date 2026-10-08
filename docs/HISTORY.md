@@ -82,3 +82,10 @@ misread), r3 6 (misread gone; blocking: no visible light source for the hearts 0
 hand 88-90 s; comedy 5). Storyboard checks sb2 (cause guessed), sb3 MATCH. Final render `output/ep11_friendly_glow.mp4`
 (commit d6b2959, check_video PASS -14.2 LUFS). Files: `reviews/ep11_*`. The owner paused it on 8 Oct and asked for
 the retro first: `reviews/ep11_retro.md` (MASTER_PROMPT version 3; rollback tag `agents-v2-pre-retro`).
+
+**8 Oct 2026, evening (Lead session 2):** audit H1-H8 applied by a fresh Sonnet agent (MASTER_PROMPT v3.6, rollback tag
+`agents-v3.5-pre-audit`; M24, M25, M30-M32 APPLIED). Ep 11 transformation Short built in three passes: r3 (stopped: R4-1
+lantern gap measured whole masks, M35; B3/END cut faces, M34), r4 (cameras W 1.05x + D 1.79x; stopped: gag 3 had no room
+at 1260, R4-1 (a) hit the drawing paw, M40), r5 (Option A: Crinkle walks to 1180 in W 25.7-26.2; R4-1 r5 exemption
+6.5-21.2; handover_check PASS). New script checks: brief_check `--plan` (feasibility only while estimates are open, M39),
+plan_check reads ≤ limits. Render check_video PASS -13.5 LUFS. Blind r2: overall 7 (r1 7), comedy 5.

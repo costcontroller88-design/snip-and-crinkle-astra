@@ -1,15 +1,19 @@
-# Handoff: read this first (updated 2026-10-08, evening)
+# Handoff: read this first (updated 2026-10-08, night)
 
-How we work: `MASTER_PROMPT.md` (**v3.5**, 8 Oct: agent ratings, check scripts, measure first). Plan, dates and the upload
+How we work: `MASTER_PROMPT.md` (**v3.6**, 8 Oct: audit H1-H8; rollback tag `agents-v3.5-pre-audit`). Plan, dates and the upload
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`. Limits and fixes:
-`docs/LIMITATIONS.md`. Ratings: `reviews/agent_ratings_2026-10-08.md`.
+`docs/LIMITATIONS.md`. Audit: `reviews/checkpoint_audit_2026-10-08.md`.
 
-**Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct; build by 15 Oct). Next work package (owner, 8 Oct): (1) apply audit H1-H8 from `reviews/checkpoint_audit_2026-10-08.md` (a fresh agent with the report as spec, tested on scratch copies; the Lead verifies; M1-M11, L1-L3 after the Short); (2) a FRESH animator: stage "feasibility first": measure the 4 estimates in the plan's `## Measured checks` (M26-M29), then build the r3 rows of `reviews/ep11_short_plan.md` (checklist `reviews/ep11_short_fixes_r3.md`; R4-1, R4-2 pasted; the WIP code is committed); last command `tools/handover_check.py` must PASS; `--keys`. Lead: key sheet look, render chain (starts `--verify`), then blind round 2 (the last; plateau rule). Then packaging (`title_check`), gate 3.**
-Open for the animator: hand-to-Crinkle gap 5.5 at 24.8 (need ≥30; else Crinkle at 1290); the gate post over Crinkle at the end (stills END 28.6, K2 29.5); camera G needs hires like T. No safety re-check for Snip's step to 660.
-Usage: weekly 81% at 8:10 PM IST, likely out by Sat 10 Oct (reset Tue 13 Oct): finish the Short, then small jobs (`docs/LIMITATIONS.md` C1). Ledger `reviews/ep11_short_ledger.md`.
+**Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct; build by 15 Oct) is at the PLATEAU: blind round 2 scored overall 7, the same as round 1 (`reviews/ep11_short_blind_r2.md`; render `output/ep11_short_transform.mp4`, check_video PASS). Next work package: the owner's decision (plateau rule); Lead's recommendation: after the weekly reset (Tue 13 Oct), one targeted fix round, then blind round 3, packaging (`title_check`), gate 3, upload Sun 18 Oct.**
+Round 2 blocking issues (staging and cameras → story-designer, then animator):
+1. 21-30 s: the marker held at Crinkle's belly (R3-2) reads as "Bear draws on his tummy" for 9 s. Misread rule: he puts it away on screen (M43; safety re-check of that beat).
+2. 23.5-24.5 s: the tea light reads ~6% wide with no close-up; `--check` measured 13.3% in D. Measure the light alone first (10.11.5).
+3. 24-25.5 s: the lit pumpkin's right eye is in the right-12% Shorts zone (Lead's D 1.79x, M42). Do audit M5 (safe-zone `--check`) first.
+Comedy 5 (sense 6), so the yardstick is missed: per `docs/LIMITATIONS.md` A2, a rig acting job before Ep 12.
+Usage: 5-hour 72%, weekly 91% (reset Tue 13 Oct ~12:30 PM IST): small jobs only until then (C1). Ledger `reviews/ep11_short_ledger.md`.
 
-**Mistake log habit (owner rule):** `reviews/mistake_log.md`: M16 and 19 rows APPLIED on 8 Oct (v3.4); M22-M25, M30-M32 OPEN; M26-M29 APPLIED (v3.5). Retrain after this Short (MASTER_PROMPT 10.11.9). Priorities: M32 (Lead codes nothing above ~200k context); M24/M25 → rules card; M30/M31 → `maxTurns`.
-Rollback tags: agents-v2-pre-retro, agents-v3-pre-youseo, agents-v3.1-pre-vidiq, agents-v3.2-pre-comedy, agents-v3.3-pre-ratings, agents-v3.4-pre-measure (`git checkout <tag> -- MASTER_PROMPT.md && python3 tools/build_agents.py`). Comedy yardstick: comedy ≥7 in the Short's round 2 and ≥8 at Ep 12 gate 2; if <7, switch to a rig acting job before Ep 12 (`docs/LIMITATIONS.md` A2).
+**Mistake log habit (owner rule):** `reviews/mistake_log.md`: OPEN M22, M23, M33-M38, M40-M43 (M39 APPLIED as a script). Retrain after this Short (MASTER_PROMPT 10.11.9); then audit M1-M11, L1-L3. Priorities: M42 + audit M5 (safe zones), M43 (misread at plan time), M35/M40 (safety rules tested on measured runs), M33/M38 (overruns).
+Rollback tags: agents-v2-pre-retro, agents-v3-pre-youseo, agents-v3.1-pre-vidiq, agents-v3.2-pre-comedy, agents-v3.3-pre-ratings, agents-v3.4-pre-measure, agents-v3.5-pre-audit (`git checkout <tag> -- MASTER_PROMPT.md && python3 tools/build_agents.py`).
 
 After it: **Episode 12 "Tidy up together" + colour sorting** (ROADMAP topic 2); its Short dressed for Diwali, Tue 3 Nov.
 Then 13 potty, 14 bedtime, 15 dressed warm, 16 teeth (ROADMAP). Owner ruled (8 Oct): ✓/✗ icons allowed; never a wet bed on screen.
