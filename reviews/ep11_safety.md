@@ -360,3 +360,36 @@ Measured-checks rows (replace rows 156-157 of `reviews/ep11_short_plan.md`):
 
 Sources: no new topics (button cell and LED tea light already sourced under F3). No new library entries.
 Mistakes: my R4-1 wording said "visible" paws, but the gap I specified measured the whole arm mask, including parts hidden behind the lantern. That produced both FAILs.
+
+## Re-check 8 Oct 2026, gate 1, two items (r4 build): (1) Option A PASS with limits; (2) R4-1 r4 (a) exemption, FIX (wording + `--check`)
+
+Evidence: safety scripts on the r4 code (RES 2; lantern mask x 839.5-1080.5, y 1319.0-1505.5), `build/ep11s/r4_check.txt`, sheet `build/ep11s/r4_fix_sheet.png`. Option A is not built: its numbers are r4 masks 25.3-30.0 moved 80 left (**estimate**, at the final spot for the whole window, so the step itself is covered).
+
+**(1) Option A (Crinkle to 1180 after 25.3, paws-up dance 25.7-29.0 beside the lit lantern): PASS with limits.**
+- Left arm min gap to the lantern mask 11.0 at 27.53, no overlap in 70 of 70 drawings; right arm 160.0; marker 57.5; head 123.6 (estimates). So Crinkle's paws and marker never reach the paper or the ring; R4-1 r4 (b) gets no Crinkle rows (Pip's 23.5 unchanged).
+- His body stands behind the lantern's right side in every drawing (overlap up to 70.5 wide; r4 at 1260: gap 21.0). That is depth, as already passed for Pip's ball behind the lit lantern: the lantern is drawn in front and never moves, the light is the LED tea light the grown-up put in, no flame or heat.
+- The 11.0 margin is thin: if the re-acted dance fails ≥10, raise or tuck the left paw (or stand at ≥1190); never lower the limit.
+- Not safety: the step must not bring his eyes into D before 25.7 (eye gap 64.8 at 25.67 < 80), and K2 must follow him to 1180.
+
+**(2) The (a) fail.** Every pixel drawn over the lantern 6.5-30.0 in r4 is in 6.53-20.93, all the lesson: Snip's paw 6.53-12.80 and marker to 13.13; Pip's paw 14.13-17.53 and marker 13.73-17.53; Crinkle's taking paw 17.20-17.53 (35,929 at 17.2); **Pip's giving paw at 17.60 (15,317; the current code also fails this, hidden behind the max)**; Crinkle's paw 17.60-20.93 (34,669 at 19.73; 34,518 at 20.67) and marker to 20.93. Unlit, no tea light (enters 23.0); sheet 21.40 shows the paw back at his belly. 20.93-30.0: none. Full frame 20.67: not checked (gate 3).
+
+| ID | Where | Exact text |
+|---|---|---|
+| R4-1 r5 | plan shot 3 r3: replace "never drawn over it 6.5-30.0 (R4-1 r4, `--check`)." and "Snip's drawing paw and marker exempt." | "never drawn over it 6.5-30.0 (R4-1 r5, `--check`), except 6.5-21.2 (the lesson; unlit, no tea light): the marker, the paw holding it, and Pip's giving and Crinkle's taking paws at the hand-over 17.15-17.65. From 21.2 nothing is drawn over it (F3)." |
+| R4-1 r5 `--check` | `checks()` item 5 (a), the exemption test | Exempt when `tt < 21.2 and (tag == "mk" or tag == who_mk + side_mk or (17.15 <= tt < 17.65 and tag in ("crl", "pipr")))`; report lines: "R4-1 r5 (a) paw, wing and marker pixels drawn over the lantern 6.5-30.0, exemptions excluded: none (max, at)" and "exempt 6.5-21.2 (marker, holder's paw, hand-over paws 17.15-17.65): max px at". Tested on the r4 numbers: all 8 non-zero runs fall inside it, so it prints none. |
+| A1 | plan shot 13 r4 (add after "Crinkle 1260 (R4-2)"), if the Lead picks Option A | "Option A: Crinkle steps left to 1180 only after the hand has gone (from 25.3) and stays at ≥1180 to 30.0; he dances behind the lantern's right side (depth; the lantern drawn in front, never moves). His paws, arms and the marker stay ≥10 from the lantern mask, ring and stem included, 25.3-30.0 (`--check`); no paw, wing or marker mask overlaps it. Paws go up over his head, not out toward the lantern." |
+| A1 `--check` | new line after item 5 (b), Option A only | "A1 Crinkle's arm masks (`_arm_mask`, both sides) and the marker when he holds it, gap to the lantern mask 25.3-30.0: ≥10 (min, at)" and "A1 Crinkle's x 25.3-30.0: ≥1180 (min, at)". Tested on r4 masks moved 80 left: 11.0 at 27.53 (passes; estimate). |
+
+Measured-checks rows (add to `reviews/ep11_short_plan.md`):
+| Paws/wings/marker drawn over the lantern outside the lesson exemption 6.5-30.0 (R4-1 r5) | none | none (r4 runs end 20.93, all exempt) | safety script, r4 build |
+| Crinkle's arms + marker to the lantern mask 25.3-30.0 (Option A, A1) | ≥10 | 11.0 at 27.53 (estimate: r4 masks moved 80 left) | safety script, r4 build |
+| Crinkle's body behind the lantern 25.3-30.0 (Option A) | depth, lantern in front, never moves | overlap ≤70.5 wide (estimate) | safety script; frames at gate 3 |
+
+### Notes (optional)
+- N10. R4-1 r4 (a) as I wrote it named only Snip's paw 6.5-10.6; the code's own exemption missed Pip's giving paw at 17.60. R5 replaces both.
+
+### Carry-forward for gate 3 (adds to item 5)
+5b. Full frames 17.20, 17.60, 20.67, 20.93 (the paw on the face is drawing or leaving the smile, unlit) and 21.2 (nothing over the lantern). Option A: frames 25.3-26.0 (the hand gone before he steps), 27.53 and 28.5 (left paw beside, not on or over the lantern; body reads as behind it); `--check` A1 ≥10.
+
+Sources: no new topics (LED tea light and button cell sourced under F3). No new library entries.
+Mistakes: my R4-1 r4 (a) exemption (Snip's paw and marker 6.5-10.6) was wrong against the plan's own hand-overs; I did not test it against measured runs (M35).
