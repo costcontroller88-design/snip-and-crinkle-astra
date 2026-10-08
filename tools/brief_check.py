@@ -1,4 +1,4 @@
-"""Check a build brief before it goes to the animator (MASTER_PROMPT 10.11; M26, M27, M30: briefs overrode the file).
+"""Check a build brief before it goes to the animator (docs/agents/lead_reference.md 10.11; M26, M27, M30: briefs overrode the file).
 
     python3 tools/brief_check.py brief.txt        (or:  echo "<brief>" | python3 tools/brief_check.py -)
 

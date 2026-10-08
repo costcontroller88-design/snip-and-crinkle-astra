@@ -51,3 +51,4 @@
 | 9 Oct | research x2 (agent craft, comedy+acting), general-purpose Sonnet, parallel; owner asked | Lead | 20 | 95 | preflight: ANY AGENT: <60% |
 | 9 Oct | research x2 (Sonnet, parallel: agent craft 93k/25 calls, comedy+acting 89k/25 calls vs ≤20 searches each) → v3.9: card evidence + 80% tally, return_check needs number/path + cited files exist, designer 6-gag drafts + predicament + sound points, playbook section 9, growth comedy vs view duration; diet_check PASS | Lead | — | — | owner: weekly use OK |
 | 9 Oct | safe-zone check script (M42 + audit M5) | Lead | 28 | 96 | preflight: ANY AGENT: <60% |
+| 9 Oct | Lead rule diet (finding 4) + audit items | Lead | 31 | 96 | preflight: ANY AGENT: <60% |

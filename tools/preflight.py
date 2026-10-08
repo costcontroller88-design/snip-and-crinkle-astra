@@ -1,4 +1,4 @@
-"""The Lead's pre-flight before each step (MASTER_PROMPT 10.11; agent ratings 8 Oct: L9, M1, M8, M10, M19).
+"""The Lead's pre-flight before each step (docs/agents/lead_reference.md 10.11; agent ratings 8 Oct: L9, M1, M8, M10, M19).
 
     python3 tools/preflight.py --used 18 --reset-min 264 --weekly 72
     python3 tools/preflight.py --used 18 --reset-min 264 --weekly 72 --log "Gate 1 → safety-checker" --ledger reviews/ep12_ledger.md

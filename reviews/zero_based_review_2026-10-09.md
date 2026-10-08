@@ -58,4 +58,4 @@ untested comedy, which more agents would make worse.
 3. **Finding 4** as its own small job.
 **Test:** Episode 12: gate-2 pass in ≤2 rounds; comedy ≥7; ≤2 safety checks and ≤2 builds per video.
 
-**Status (9 Oct, owner: no preference, so the recommendation):** findings 1 + 3 APPLIED as v3.8 (section 6, 7, 8; story-designer, animator, safety-checker; `plan_check.py` cap 2,500; rollback tag `agents-v3.7-pre-zbr`; diet_check PASS). Findings 2 and 4 OPEN.
+**Status (9 Oct, owner: no preference, so the recommendation):** findings 1 + 3 APPLIED as v3.8 (section 6, 7, 8; story-designer, animator, safety-checker; `plan_check.py` cap 2,500; rollback tag `agents-v3.7-pre-zbr`; diet_check PASS). Finding 4 APPLIED 9 Oct as v4.0 (Lead core rules; `docs/agents/lead_reference.md`; `diet_check.py --lead` PASS; rollback tag `agents-v3.9-pre-lead-diet`). Finding 2 OPEN.

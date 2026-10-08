@@ -8,7 +8,7 @@ PASS|FAIL|DONE|PARTIAL; tool_calls or budget not a number; tool_calls > budget; 
 empty evidence, evidence that says "estimate" or "looks", evidence with no number or file path, a cited path that
 doesn't exist; a listed file that doesn't exist (relative paths are
 tried from the current folder, then from the project root); files, checks or not_done not lists.
-A FAIL is a mistake-log row (MASTER_PROMPT 10.11 item 10).
+A FAIL is a mistake-log row (docs/agents/lead_reference.md 10.11 item 10).
 """
 import json
 import os
