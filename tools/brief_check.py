@@ -2,7 +2,7 @@
 
     python3 tools/brief_check.py brief.txt        (or:  echo "<brief>" | python3 tools/brief_check.py -)
 
-FAIL (exit 1) when the brief does not say "feasibility first" (the animator measures the plan's estimates and returns
+FAIL (exit 1) when an animator brief does not say "feasibility first" (the animator measures the plan's estimates and returns
 numbers before any code edit), or when it sets a tool-call budget (the budget lives in the agent file; a brief that
 names one overrides it, e.g. "<=14 calls", "budget 10").
 With `--plan <plan.md>`: FAIL a brief that goes on to build ("then build") while the plan's `## Measured checks` still has
@@ -33,9 +33,12 @@ def check(text, plan=None):
         est = open_estimates(plan)
         if est:
             fails.append(f'{len(est)} open estimate(s) in the plan ({est[0]}...): brief "Stage: feasibility only" first (M39)')
-    if "feasibility first" not in text.lower() and "feasibility only" not in text.lower():
+    agent = text.strip().split(":", 1)[0].strip().lower()
+    # M46 (twice): "feasibility first" applies to animator build briefs only; a general-purpose agent has no
+    # agent file, so its budget lives in its spec and the budget rule is skipped too.
+    if agent == "animator" and "feasibility first" not in text.lower() and "feasibility only" not in text.lower():
         fails.append('no "feasibility first": measure every estimate and return numbers before any code edit (M27)')
-    for m in BUDGET.finditer(text):
+    for m in ([] if agent == "general-purpose" else BUDGET.finditer(text)):
         fails.append(f'the brief sets a budget ("{m.group(0).strip()}"); the budget lives in the agent file (10.11.7)')
     return fails
 

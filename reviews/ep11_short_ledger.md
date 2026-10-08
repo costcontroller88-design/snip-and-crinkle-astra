@@ -45,3 +45,5 @@
 | 9 Oct | Studio: details filled by the Lead (owner picked video + cover files, clicked Schedule); verified Scheduled Oct 18; M49 | Lead | — | — | browser only |
 | 9 Oct | rule diet v3.7 → fresh general-purpose (Sonnet) from reviews/diet_spec_2026-10-09.md; tag agents-v3.6-pre-diet | Lead | 5 | 93 | preflight: ANY AGENT: <60% |
 | 9 Oct | diet agent stopped at owner's 'wait' before any edit; owner: start in a fresh session | Lead | 5 | 93 | — |
+| 9 Oct | rule diet v3.7 -> fresh general-purpose (Sonnet) from reviews/diet_spec_2026-10-09.md (new session, owner) | Lead | 9 | 93 | preflight: ANY AGENT: <60% |
+| 9 Oct | diet v3.7 done (Sonnet 153k tok, 32 calls vs 30: M50; 5h 9→16, weekly 93→94): diet_check PASS (Lead re-ran), return_check FAILs the overrun correctly, reviewer files story-free (grep); brief_check M46/M52 fixed as a script | Lead | 16 | 94 | owner: weekly use OK |

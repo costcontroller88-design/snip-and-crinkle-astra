@@ -89,3 +89,5 @@ lantern gap measured whole masks, M35; B3/END cut faces, M34), r4 (cameras W 1.0
 at 1260, R4-1 (a) hit the drawing paw, M40), r5 (Option A: Crinkle walks to 1180 in W 25.7-26.2; R4-1 r5 exemption
 6.5-21.2; handover_check PASS). New script checks: brief_check `--plan` (feasibility only while estimates are open, M39),
 plan_check reads ≤ limits. Render check_video PASS -13.5 LUFS. Blind r2: overall 7 (r1 7), comedy 5.
+
+- 9 Oct handoff trim: Rollback tags: agents-v2-pre-retro, agents-v3-pre-youseo, agents-v3.1-pre-vidiq, agents-v3.2-pre-comedy, agents-v3.3-pre-ratings, agents-v3.4-pre-measure, agents-v3.5-pre-audit (`git checkout <tag> -- MASTER_PROMPT.md && python3 tools/build_agents.py`). Old Lead sessions archived 8 and 9 Oct (owner); only one Lead session at a time.
