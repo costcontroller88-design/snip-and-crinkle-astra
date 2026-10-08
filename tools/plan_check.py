@@ -4,13 +4,15 @@
     python3 tools/plan_check.py reviews/ep11_short_plan.md
 
 Exits 1 and lists every failure. A plan must contain a line `**Length:** <seconds> s` (≤60 s counts as a Short) and
+a line `**Lesson beat:** <a>-<b> s` (the wrong → right moment, from the mistake to the fix), and
 these tables (header cells in this order; extra text after a header word is fine, e.g. "Set-up (s)"):
 
   Gag table (docs/COMEDY_PLAYBOOK.md sections 3-4):
   | Time (s) | Type | Trait | Set-up (s) | Pause (s) | Break (s) | Break size (%) | Joke signal | Reaction (s) | Sound | Topper | Test |
     Time "a-b"; Type G1-G9; set-up ≥1.5; pause 0.3-0.6; break ≥0.8; break size ≥10 (% of frame width, or a close-up);
     reaction ≥1.0; Test says PASS; no empty cell (write "none" for no topper). Density: Shorts first gag by 5 s, then
-    a gag every ≤15 s; episodes every ≤20 s. Never the same type twice in a row. Episodes: ≥3 types, a G4 or G5
+    a gag every ≤15 s (or by 2 s after the lesson beat when the mistake is the hook); episodes every ≤20 s; no
+    gag starts inside the lesson beat (playbook 4: no gag on the erring moment). Never the same type twice in a row. Episodes: ≥3 types, a G4 or G5
     (rule of three), a row whose Trait says "callback", ≥1 topper.
   Key actions table (lesson 2; M3, M14):
   | Key action | Time (s) | Object | Size (%) | Uncovered (s) |
@@ -79,6 +81,10 @@ def check(text):
         return fails + ["no `**Length:** <seconds> s` line"]
     length = float(m.group(1))
     short = length <= 60
+    lb = re.search(r"\*\*Lesson beat:\*\*\s*([\d.]+)\s*[-–]\s*([\d.]+)\s*s", text)
+    if not lb:
+        return fails + ["no `**Lesson beat:** <a>-<b> s` line"]
+    lesson = (float(lb.group(1)), float(lb.group(2)))
     if "misread" not in text.lower():
         fails.append("no misread check section")
     tabs = tables(text)
@@ -102,6 +108,8 @@ def check(text):
                 fails.append(f"{tag}: no time")
             else:
                 starts.append(sp[0])
+                if lesson[0] <= sp[0] < lesson[1]:
+                    fails.append(f"{tag}: starts inside the lesson beat {lesson[0]:g}-{lesson[1]:g} s")
             if not ty:
                 fails.append(f"{tag}: type is not G1-G9")
             else:
@@ -125,7 +133,7 @@ def check(text):
         if not starts:
             fails.append("gag table has no rows")
         else:
-            first, gap = (5, 15) if short else (20, 20)
+            first, gap = (max(5, lesson[1] + 2), 15) if short else (20, 20)
             if starts[0] > first:
                 fails.append(f"first gag at {starts[0]:g} s (by {first} s)")
             for a, b in zip(starts, starts[1:] + [length]):

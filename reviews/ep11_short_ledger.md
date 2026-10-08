@@ -19,3 +19,4 @@
 | 8 Oct | Fix mode r1 (B1 2.6x take 1.0 s, R1 no tongue, B2 1.3 s + 0.9 s, C1 spin gag); 30.0 s; Lead accepts the marker-box reading of ≥10%; M17 logged | story-designer (100k tok, 19 calls) | 32 | 69 | → safety re-check shots 1b,2,3,4,9,10,11 |
 | 8 Oct | Safety re-check r1: FIX x3 (no bending organ note; sway leans away from lantern; nobody reacts to his slip) + N4, pasted by Lead | safety-checker (44k tok, 11 calls) | — | — | → fresh animator build |
 | — | Render chain: `EP11S_RES=3 python3 episodes/ep11_short_transform.py --hires && python3 episodes/ep11_short_transform.py --render && python3 tools/check_video.py output/ep11_short_transform.mp4 --no-loop --cuts <cuts>` | | | | |
+| 8 Oct | Ratings + v3.4 tools done (~5% of 5-hour); 7(b) moved to ep11_short_plan.md; comedy fix mode → story-designer | Lead | 23 | 73 | preflight: ANY AGENT: <60% |
