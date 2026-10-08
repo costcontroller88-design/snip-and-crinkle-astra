@@ -11,6 +11,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **Channel:** Snip & Crinkle, wordless Made-for-Kids cartoons for ages 2-6: Snip (lilac bunny, blue star tee, curious), Crinkle (caramel bear, yellow striped scarf, kind), Pip (little yellow duckling). A grown-up appears only as a paper arm and hand, and handles anything dangerous.
 - **Never:** words on screen except numerals, "?" and ✓/✗ (drawn as icons); voices or talking sounds; third-party characters, music, sound files, logos, brands or branded food; anything scary, violent, gross or mean; a dangerous action a child could copy; laughing at whoever is sad, unsure or wrong.
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
+- **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag; never at the one who is sad or wrong. Standard: `docs/COMEDY_PLAYBOOK.md` (your section is named in your file).
 - **Files by convention** (a brief names only the episode): plan `reviews/epNN_plan.md`; safety `reviews/epNN_safety.md`; blind reviews `reviews/epNN_blind_rK.md` and `reviews/epNN_storyboard_blind_sbK.md` (the reviewer writes next to its neutral copy; the Lead moves and renames); upload sheet `reviews/<video>_upload.md`; key sheet `reviews/<video>_keys.png`; code `episodes/epNN_<slug>.py`; props `episodes/props_<slug>.py`; Shorts `episodes/epNN_short_story.py`, `episodes/epNN_short_transform.py`; renders `output/`; the owner's copies `Videos/`.
 - **Know the toolkit from `docs/TOOLKIT.md`** and module docstrings (`sed -n 1,45p <file>`), not by reading source you aren't changing. Never re-read a file you already read.
 - **Scope:** only your job; shared modules only if the brief says so; commit only if the brief says so; never touch YouTube.
@@ -21,7 +22,7 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **Stop when the job is done.** Return ≤150 words: the result and decision first, then open problems and file paths; no account of your process.
 
 ## Inputs
-The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" changed in round K) and, if the brief names one, the change list `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions and carry-forward checks in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; then only the modules you call or change (docstrings first). Copy patterns from the reference builds (`episodes/pilot02_splash_of_blue.py`, `episodes/pilot02_short.py`) only for the parts you need.
+The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" changed in round K) and, if the brief names one, the change list `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions and carry-forward checks in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6 and 7 (the gag test, the timing card, comedy sound); then only the modules you call or change (docstrings first). Copy patterns from the reference builds (`episodes/pilot02_splash_of_blue.py`, `episodes/pilot02_short.py`) only for the parts you need.
 
 ## Stages (the brief says which) and budgets (tool calls)
 - **Feasibility first (≤5),** for any fix list or new plan: can each line be built? Answer with measured numbers. If any line can't, stop and return it with 2 options; build nothing.
@@ -44,6 +45,7 @@ The plan (`reviews/epNN_plan.md`, the one source of truth; rows marked "rK" chan
 - **Key sheet times from the changes:** every shot changed this round, its boundaries, and the fixed story beats (the cause, the lesson, the wow).
 - **No reuse of rendered frames across rounds** unless the shot's code is unchanged, checked (e.g. a hash of its inputs).
 - From the shot list: a face close-up after every gag, and no stretch over 6 s without a change (list any).
+- **Every gag in the gag table:** an every-drawing strip from the set-up to the end of the reaction, with its measured seconds (pause, break, extreme hold, reaction) next to the plan's and the timing card's; the sound hit 1 drawing after the visual accent. A gag with no strip is "not checked".
 - `--still` at every close-up; every-drawing strips of the key actions; a numeric clearance check for anything that flies or shines (≥30 design units from any face); lesson-critical props drawn in front; prop colours near any cutting scene (never plain white); the carry-forward checks.
 
 ## Known traps (each cost us a round)

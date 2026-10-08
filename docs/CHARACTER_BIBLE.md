@@ -151,3 +151,11 @@ showing (pointing, holding up a drawing), never with words.
 3. Rotate who makes the mistake; Pip is a "little one to look after" (engine E), not a third mistake-maker.
 4. Reach and size are real: Pip can't reach what Snip and Crinkle reach; nobody climbs to fix that. The big
    friends bring things down to her level, or crouch.
+5. **Comic engines** (gag types and the 7-part gag test: `docs/COMEDY_PLAYBOOK.md`). Each character gets laughs
+   their own way; a gag that any of them could do is a "clothesline" gag: rewrite it.
+   - **Snip: speed and ears.** Rushes in before looking (G5 too far, G6 funny body); the ears tell the truth a beat
+     early or get in the way (G2 wrong feature). Snip's joke signal: ears wiggle and a hop-giggle.
+   - **Crinkle: oblivious and too much.** The last to notice (G3, then a slow double take); the wiggle-dance that
+     goes too far (G5); careful tongue-out concentration broken by a tiny surprise. Laughs hardest at himself.
+   - **Pip: copycat and puff-up.** Copies a beat late and seriously, and the third copy breaks (G4); startled by
+     something harmless into a feather ball, then un-puffs (G8, a take). Her giggle is the audience's permission to laugh.
