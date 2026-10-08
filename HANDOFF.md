@@ -4,7 +4,7 @@ How we work: `MASTER_PROMPT.md` (**v3.6**, 8 Oct: audit H1-H8; rollback tag `age
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`. Limits and fixes:
 `docs/LIMITATIONS.md`. Audit: `reviews/checkpoint_audit_2026-10-08.md`.
 
-**Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct; build by 15 Oct) is at the PLATEAU: blind round 2 scored overall 7, the same as round 1 (`reviews/ep11_short_blind_r2.md`; render `output/ep11_short_transform.mp4`, check_video PASS). Next work package (owner, 9 Oct: the 3 blocking issues "look completely fine"; no fix round): packaging (`title_check`), then gate 3, files to `Videos/`, upload Sun 18 Oct. Owner overruled gate 2 (M44); compare this score with real data (A1).**
+**Current phase: 0 (to 19 Oct). Step: Episode 11 Halloween transformation Short (Sun 18 Oct; build by 15 Oct) is at the PLATEAU: blind round 2 scored overall 7, the same as round 1 (`reviews/ep11_short_blind_r2.md`; render `output/ep11_short_transform.mp4`, check_video PASS). Next work package (owner, 9 Oct: the 3 blocking issues "look completely fine", phone checked too; no fix round): packaging (`title_check`), then gate 3, files to `Videos/`, upload Sun 18 Oct. Owner overruled gate 2 (M44); compare this score with real data (A1).**
 Round 2 blocking issues (owner judged fine; details in the blind review): tummy marker 21-30 s, tea light 23.5-24.5 s, pumpkin in the right-12% zone 24-25.5 s (M42, M43). Comedy 5 (sense 6), so the yardstick is missed: per `docs/LIMITATIONS.md` A2, a rig acting job before Ep 12.
 Usage: 5-hour 72%, weekly 91% (reset Tue 13 Oct ~12:30 PM IST): small jobs only until then (C1). Ledger `reviews/ep11_short_ledger.md`.
 
