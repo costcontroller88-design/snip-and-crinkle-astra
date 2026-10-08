@@ -28,7 +28,7 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
   scores <7 again: designer checks each gag against gags that passed, before any build.
 
 ## Phase 1: Test the new style (20 Oct – 15 Nov)
-- Uploads at 6:00 PM IST, one a day: Sun 18 Oct the Episode 11 Halloween transformation Short (queued, owner 8 Oct);
+- Uploads at 6:00 PM IST, one a day: Sun 18 Oct the Episode 11 Halloween transformation Short (SCHEDULED in Studio 9 Oct);
   Tue 20 Oct pilot Short; Wed 21 Oct pilot episode. Mon 19 and Sat 24 Oct are open (the Episode 11 story Short
   and episode are parked after 3 failed blind rounds).
 - Episode 11: a gentle "friendly glow" Halloween (accepted from the growth-analyst's scan, 6 Oct): Pip is a little
@@ -76,7 +76,7 @@ growth-analyst proposes topic changes in the last section. How we work: `MASTER_
 - A printables page for parents and teachers (adults only, no data from children); parent-facing social clips only.
 
 ## Topic pipeline (by demand)
-1. Halloween "friendly glow" (Episode 11): episode parked (8 Oct); the transformation Short is queued for Sun 18 Oct
+1. Halloween "friendly glow" (Episode 11): episode parked (8 Oct); the transformation Short is scheduled for Sun 18 Oct (9 Oct)
 2. **Episode 12: "Tidy up together" (every toy has a home) + colour sorting** (Lead go, 8 Oct; evidence
    `docs/benchmark-topic-ep12.md`). Engine A (Snip errs: his mess buries Pip's ball by accident; the three put toys
    in picture baskets, 1-2-3, and the ball appears). One new thing: the playroom. Misread to rule out: "Snip took
