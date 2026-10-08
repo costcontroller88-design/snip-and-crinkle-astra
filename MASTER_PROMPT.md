@@ -279,7 +279,7 @@ Episode/video: <NN or path>          (the file names in section 2 do the rest)
 Lead decisions: <only what the files don't already say>
 Special: <stage, deadline, files not to touch, "don't commit" when agents run in parallel>
 ```
-A build brief always says "Stage: feasibility first, then build" and sets no budget; `tools/brief_check.py` fails it otherwise (M27).
+A build brief always says "Stage: feasibility first, then build" and sets no budget; `tools/brief_check.py` fails it otherwise (M27). While the plan has an "estimate" row, the brief is "Stage: feasibility only" (`brief_check.py <brief> --plan <plan>`); the Lead reads the numbers, then sends "build" to the same agent (SendMessage) (M39).
 For the fresh-eyes reviewer, only: `fresh-eyes-reviewer: blind review. Video: <neutral copy path>. Round: <k>.`
 For gate 1b, only: `fresh-eyes-reviewer: storyboard blind check. Sheet: build/sbK/storyboard.png. Round: <k>.`
 
