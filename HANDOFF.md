@@ -1,6 +1,6 @@
 # Handoff: read this first (updated 2026-10-09)
 
-How we work: `MASTER_PROMPT.md` (**v4.0**, 9 Oct: the Lead's 12 core rules, the rest in `docs/agents/lead_reference.md`; v3.9: research rules from `docs/research-agent-craft-oct-2026.md` and `docs/research-comedy-acting-oct-2026.md`, acting in `docs/COMEDY_PLAYBOOK.md` section 9; v3.8 zero-based review `reviews/zero_based_review_2026-10-09.md`; rollback tag `agents-v3.8-pre-research`). Plan, dates and the upload
+How we work: `MASTER_PROMPT.md` (**v4.1**, 17 Oct: hooks in `tools/agent_hooks.py` run return_check, brief and preflight checks and write scopes; agent runs logged in `reviews/agent_runs.md`; tests `python3 tools/regress.py`; v4.0: the Lead's 12 core rules, the rest in `docs/agents/lead_reference.md`; versions in the MASTER_PROMPT header). Plan, dates and the upload
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`. Limits and fixes:
 `docs/LIMITATIONS.md`. Audit: `reviews/checkpoint_audit_2026-10-08.md`.
 

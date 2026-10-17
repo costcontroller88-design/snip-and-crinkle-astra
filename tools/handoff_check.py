@@ -47,7 +47,9 @@ def main():
         hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
         with open(hook, "w") as f:
             f.write("#!/bin/sh\nif git diff --cached --name-only | grep -qx HANDOFF.md; then\n"
-                    "  python3 tools/handoff_check.py --staged || exit 1\nfi\n")
+                    "  python3 tools/handoff_check.py --staged || exit 1\nfi\n"
+                    "if git diff --cached --name-only | grep -qE '^(tools/|MASTER_PROMPT.md|\\.claude/)'; then\n"
+                    "  python3 tools/regress.py || exit 1\nfi\n")
         os.chmod(hook, 0o755)
         print("installed", hook)
         return 0

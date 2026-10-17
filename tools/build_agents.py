@@ -5,7 +5,7 @@
     python3 tools/build_agents.py --allow-growth   (write even if a block grew >10%; prints the growth)
 
 Audit M10: exits 1 and writes nothing if any agent block has >10% more words than the same block at the newest
-`agents-*` git tag (`git tag -l 'agents-*' --sort=-creatordate`); --allow-growth overrides and prints the growth.
+`agents-*` git tag (v4.1: words after the frontmatter only; hook and tool settings are not rules) (`git tag -l 'agents-*' --sort=-creatordate`); --allow-growth overrides and prints the growth.
 
 MASTER_PROMPT.md is the source: edit an agent there, then run this. The shared "Rules card" block is inserted
 wherever an agent block says {{RULES_CARD}}, so every agent carries the same short rules without reading the
@@ -22,6 +22,12 @@ CARD = re.compile(r"^Rules card \(inserted where an agent file says \{\{RULES_CA
                   re.M | re.S)
 
 
+def prose_words(text):
+    """Words after the YAML frontmatter (the rule budget counts rules, not hook configuration)."""
+    parts = text.split("\n---\n", 1) if text.startswith("---") else [text]
+    return len(parts[-1].split())
+
+
 def words_at_newest_tag():
     """({file: word count of the built agent block}, tag) at the newest agents-* tag; ({}, None) if there is none."""
     git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
@@ -30,7 +36,7 @@ def words_at_newest_tag():
     if not old or old.returncode:
         return {}, None
     card = CARD.search(old.stdout)
-    return {rel: len(body.replace("{{RULES_CARD}}", card.group(1) if card else "").split())
+    return {rel: prose_words(body.replace("{{RULES_CARD}}", card.group(1) if card else ""))
             for rel, body in BLOCK.findall(old.stdout)}, tags[0]
 
 
@@ -57,7 +63,7 @@ def main():
         base, tag = words_at_newest_tag()
         grown = []
         for rel, body in blocks:
-            n, o = len(body.replace("{{RULES_CARD}}", card.group(1)).split()), base.get(rel)
+            n, o = prose_words(body.replace("{{RULES_CARD}}", card.group(1))), base.get(rel)
             if o and n > o * 1.10:
                 grown.append(f"{rel}: {o} -> {n} words (+{(n - o) / o:.0%}) vs {tag}")
         for g in grown:

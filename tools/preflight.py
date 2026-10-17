@@ -12,7 +12,13 @@ Weekly pace (audit M6): --weekly-reset-days <d> (days to the weekly reset) with 
 + 10 the band is at most "SMALL AGENTS ONLY (weekly above pace)", unless --weekly-ok (the owner's word, 9 Oct).
 Exit 2 (nothing logged) when --log names an agent the band forbids: SMALL: animator, growth-analyst, general-purpose;
 NO AGENT / STOP: any agent.
+v4.1: every run writes .preflight_band; tools/agent_hooks.py brief refuses an agent call when that file is missing,
+older than 2 hours, or its band forbids the agent. --owner-ok "<the owner's words>" (an owner override in chat, e.g.
+"continue, I don't have an issue") makes the band ANY AGENT and records the quote. A set CLAUDE_CODE_SUBAGENT_MODEL
+(or _FORCE) is printed as a FAIL line: it silently overrides the models pinned in the agent files.
 """
+import json
+import time
 import argparse
 import datetime
 import glob
@@ -62,13 +68,21 @@ def main():
     ap.add_argument("--weekly-ok", action="store_true", help="the owner's word that the weekly pace is fine")
     ap.add_argument("--ctx", type=float, default=None, help="Lead context in k tokens")
     ap.add_argument("--estimate", type=float, default=None, help="estimated 5-hour points for the next piece of Lead work")
+    ap.add_argument("--owner-ok", default=None, help="the owner's override, quoted from chat")
     ap.add_argument("--log", default=None)
     ap.add_argument("--ledger", default=None)
     a = ap.parse_args()
     st = subprocess.run(["git", "status", "--short"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print("git status:", st.replace("\n", "; ") or "clean")
     b = band(a.used, a.reset_min, a.weekly, a.weekly_reset_days, a.weekly_ok)
+    if a.owner_ok:
+        b = f"ANY AGENT: owner override ({a.owner_ok[:80]}); computed band was '{b}'"
     print("band:", b)
+    with open(os.path.join(ROOT, ".preflight_band"), "w", encoding="utf-8") as fh:
+        json.dump({"band": b, "time": time.time()}, fh)
+    for var in ("CLAUDE_CODE_SUBAGENT_MODEL", "CLAUDE_CODE_SUBAGENT_MODEL_FORCE"):
+        if os.environ.get(var):
+            print(f"FAIL {var}={os.environ[var]} overrides the agents' pinned models: unset it")
     if a.weekly is not None and a.weekly_reset_days is not None:
         print(f"weekly pace: {a.weekly:g}% used, {(7 - a.weekly_reset_days) / 7 * 100:g}% of the week gone "
               f"(over pace above {(7 - a.weekly_reset_days) / 7 * 100 + 10:g}%){'; --weekly-ok given' if a.weekly_ok else ''}")

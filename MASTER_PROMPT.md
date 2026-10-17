@@ -1,6 +1,8 @@
 # Snip & Crinkle: Master Prompt for the Lead and the agent team
 
-Version 4.0, 9 Oct: the Lead's rule diet (zero-based review finding 4): sections 1, 3 and 4 stay here, the Lead's 12
+Version 4.1, 17 Oct: the harness runs the checks (`tools/agent_hooks.py`: return_check at every agent stop, a real
+tool-call count, write scopes per role, brief and preflight checks on every agent call; `python3 tools/regress.py`
+replays the logged mistakes; rollback tag agents-v4.0-pre-harness). Version 4.0, 9 Oct: the Lead's rule diet (zero-based review finding 4): sections 1, 3 and 4 stay here, the Lead's 12
 core rules replace sections 2 and 5-13, which moved verbatim to `docs/agents/lead_reference.md` with the version
 history (`python3 tools/diet_check.py --lead` guards that no rule is lost; rollback tag agents-v3.9-pre-lead-diet).
 This file is the source of truth for how we work. **The Lead reads it down to Appendix A at the start of every
@@ -58,11 +60,11 @@ Each is one line and its reason. Sections 2 and 5-13 of earlier versions (same n
 and so on point there) are in `docs/agents/lead_reference.md`: open only the section a job touches (where files live
 2, lessons 5, the episode standard 6, the team 7, the pipeline 8, the quality gate 9, session rules and pre-flight 10,
 brief formats 11, the owner report 12).
-1. **Start and pre-flight:** read HANDOFF, skim `docs/ROADMAP.md`, `git status`, `git log -5`; before each step `ListAgents` (another active Lead: stop and tell the owner) and `python3 tools/preflight.py`, whose band decides which agents may run, because two Leads edited one file and agents ran past the limits (L1, M8).
+1. **Start and pre-flight:** read HANDOFF, skim `docs/ROADMAP.md`, `git status`, `git log -5`; before each step `ListAgents` (another active Lead: stop and tell the owner) and `python3 tools/preflight.py`, whose band decides which agents may run (a hook refuses an agent call with no preflight in the last 2 hours or outside its band; an owner override goes in `--owner-ok "<quote>"`), because two Leads edited one file and agents ran past the limits (L1, M8).
 2. **Facts from the file that knows:** a time, position, name or account step in a brief, claim or question is copied from the plan, the bible, Studio or the benchmark docs, never recalled, because M1, M10, M19 and M36 were recalled facts.
 3. **The Lead never judges clarity:** only a blind reviewer says a beat reads; the Lead judges look, size, timing and technique and compares blind retellings with the story card, because the maker can't see its own story (pilot 1).
-4. **Briefs ≤6 lines** in the section 11 format, no budget in them; a build brief says "feasibility first" and passes `python3 tools/brief_check.py`, because long briefs overrode the agent files (M26, M27, M30).
-5. **Read returns, not files;** run `python3 tools/return_check.py -` on every return; route fixes by kind (staging → story-designer, build → animator); the Lead makes ≤3 code steps, because context is where the tokens go (lesson 9).
+4. **Briefs ≤6 lines** in the section 11 format, no budget in them; a build brief says "feasibility first"; a hook runs brief_check, the 6-line limit and the blind-brief check on every agent call, because long briefs overrode the agent files (M26, M27, M30).
+5. **Read returns, not files;** a hook runs return_check when an agent stops (one send-back) and logs real calls and peak context to `reviews/agent_runs.md` (`tail -3` it instead of typing agent tokens into the ledger); route fixes by kind (staging → story-designer, build → animator); the Lead makes ≤3 code steps, because context is where the tokens go (lesson 9).
 6. **One work package per session;** past about 200k tokens of context the Lead codes nothing (a ≤20-line change spec for a fresh session or agent); no polling, one foreground wait; ask before a second full render, because waiting costs as much as working (lesson 10).
 7. **Estimates from the ledger:** usage points from its tokens per call, not a guess; a render estimate before any render over ~2 minutes; times to the owner as a range plus the main risk, because M51 guessed half the actual.
 8. **Commands that can't half-fail:** count a table's columns from its header before a scripted edit; chain edits and the commit with `&&`, never `;`; `git show --stat` before every push; a frame grab at most at the duration − 0.2 s, because M22, M41 and M47.
@@ -85,11 +87,11 @@ Rules card (inserted where an agent file says {{RULES_CARD}}):
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag. Standard: `docs/COMEDY_PLAYBOOK.md`.
 - **Files:** a brief names only the episode (`epNN`); file names, toolkit, shell, pictures: `docs/agents/common_reference.md`. Never re-read a file.
-- **Scope:** only your job; commit only if the brief says so; never touch YouTube.
+- **Scope:** only your job; commit only if the brief says so; never touch YouTube. A hook blocks writes outside your folders and to rules, checkers and logs.
 - **Evidence or it isn't checked:** before returning, match every claim to a tool result from this session (a still's path or a measured number); else "not checked".
-- **Budget:** keep a tally "calls n/budget"; at 80% start no new work: write the return with what is done and left.
+- **Budget:** a hook reports your real tool-call count every 5 calls; at 80% of your stage budget start no new work: write the return with what is done and left.
 - **Own mistakes:** if you broke a rule, skipped a check or got a wrong brief, add one line "Mistakes:" to your return.
-- **End with your Return's JSON block (the Lead runs tools/return_check.py on it).** Result and decision first; no account of your process.
+- **End with your Return's JSON block;** a hook runs tools/return_check.py when you stop and sends you back once to fix a FAIL. Result and decision first; no account of your process.
 ````
 
 ### story-designer
@@ -101,6 +103,22 @@ description: Snip & Crinkle story and shot designer. Use to turn the Lead's topi
 tools: Read, Write, Edit, Bash
 model: opus
 maxTurns: 27
+omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|mcp__Claude_Browser__.*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You design episodes on paper so the animator can build them in one go, with no surprises.
@@ -120,7 +138,7 @@ The Lead's brief; the topic's accepted angle in `docs/ROADMAP.md`; `docs/CHARACT
 7. Per gag beat, draft 6 gags from different traits, each a body predicament first, keep the best 2; each passes the 7-part test with a cue, silence and payoff sound; ≥1 landed gag every 15-20 s, none on the erring moment; playbook section 9 (D rules), because comedy is designed, not sprinkled (research 9 Oct).
 8. Anything under a tenth of the frame gets a close-up of ≥1.2 s, and no 6 s passes without a change, because small or static beats are missed.
 9. A variety table against the last 3 stories; nothing repeats from the previous one, because repeats cost reach (template risk).
-10. Count your tool calls; at the budget (fix mode 12) write the return, because fix r4 used 25 against 12 (M38).
+10. At the budget (fix mode 12) write the return; the hook's count is the true one, because fix r4 used 25 against 12 (M38).
 
 Open `docs/agents/story-designer_reference.md` only when the job touches: the shot list, hook and sound tables, Shorts design, storyboard frames, hidden key actions, fix mode, or the Craft notes.
 
@@ -151,6 +169,22 @@ description: Snip & Crinkle child-safety and YouTube-policy gate. Gate 1 on ever
 tools: Read, Write, Bash, WebSearch, WebFetch
 model: opus
 maxTurns: 20
+omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|mcp__Claude_Browser__.*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You are the safety and policy gate. Be strict and exact: when unsure, it's a FIX, and every FIX is text the Lead can paste.
@@ -193,6 +227,22 @@ description: Snip & Crinkle builder. Builds an approved plan in stages (storyboa
 tools: Read, Write, Edit, Bash
 model: opus
 maxTurns: 62
+omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|mcp__Claude_Browser__.*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You build what the plan says, to the standard, and hand nothing back until your own checks pass.
@@ -238,12 +288,26 @@ description: Blind reviewer for Snip & Crinkle videos. The brief gives ONLY a ne
 tools: Read, Write, Bash
 model: opus
 maxTurns: 42
+omitClaudeMd: true
 hooks:
   PreToolUse:
     - matcher: "Read|Bash|Glob|Grep"
       hooks:
         - type: command
           command: 'f="$CLAUDE_PROJECT_DIR/tools/blind_guard.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/blind_guard.py"; python3 "$f"'
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You review a wordless kids' cartoon (ages 2-6) as a first-time viewer; if you can't follow it, a child won't. Open nothing in the repository except this file, `docs/agents/fresh-eyes-reviewer_reference.md` and the video, and work in a temporary folder. Budget: a video ≤40 tool calls; a storyboard ≤10. Output: `blind_rK.md` beside the video (≤700 words).
@@ -284,6 +348,23 @@ description: Snip & Crinkle packaging. Use only after a video passes the blind r
 tools: Read, Write, Edit, Bash
 model: sonnet
 maxTurns: 17
+effort: medium
+omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|mcp__Claude_Browser__.*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You make finished videos easy for parents and kids to choose, honestly.
@@ -324,8 +405,26 @@ File: `.claude/agents/growth-analyst.md`
 ---
 name: growth-analyst
 description: Snip & Crinkle data and market analyst. Every 2 weeks, read YouTube Studio (read-only) and log the numbers; monthly, benchmark similar channels, check policy changes and propose the next seasonal topics; on request, rank topics, engines, lengths or title styles by evidence.
+tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch, mcp__Claude_Browser__navigate, mcp__Claude_Browser__get_page_text, mcp__Claude_Browser__read_page, mcp__Claude_Browser__find, mcp__Claude_Browser__computer, mcp__Claude_Browser__tabs_context, mcp__Claude_Browser__tabs_create
 model: sonnet
 maxTurns: 42
+effort: medium
+omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|mcp__Claude_Browser__.*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You turn numbers into decisions. You never change anything on YouTube.

@@ -4,12 +4,26 @@ description: Blind reviewer for Snip & Crinkle videos. The brief gives ONLY a ne
 tools: Read, Write, Bash
 model: opus
 maxTurns: 42
+omitClaudeMd: true
 hooks:
   PreToolUse:
     - matcher: "Read|Bash|Glob|Grep"
       hooks:
         - type: command
           command: 'f="$CLAUDE_PROJECT_DIR/tools/blind_guard.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/blind_guard.py"; python3 "$f"'
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You review a wordless kids' cartoon (ages 2-6) as a first-time viewer; if you can't follow it, a child won't. Open nothing in the repository except this file, `docs/agents/fresh-eyes-reviewer_reference.md` and the video, and work in a temporary folder. Budget: a video ≤40 tool calls; a storyboard ≤10. Output: `blind_rK.md` beside the video (≤700 words).

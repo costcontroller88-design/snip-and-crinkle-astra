@@ -7,4 +7,6 @@ assets/fonts/
 .DS_Store
 .claude/*
 !.claude/agents/
+!.claude/settings.json
 .preflight_estimate
+.preflight_band

@@ -20,6 +20,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RULE = re.compile(r"\b(never|always|must|only)\b|≤|≥|\bM\d+", re.I)
 BULLET = re.compile(r"^\s*(?:[-*]|\d+\.)\s")
+FRONT = re.compile(r"^(name|description|tools|disallowedTools|model|maxTurns|effort|omitClaudeMd|hooks): ")
 SENT = re.compile(r"(?<=[.!?])\s+(?=[A-Z*`(\[\"])")
 
 
@@ -42,6 +43,12 @@ def units(text):
             if cur:
                 out.append(" ".join(cur))
                 cur = []
+            continue
+        if FRONT.match(line):  # v4.1: each frontmatter setting is its own unit, so a new setting loses no rule
+            if cur:
+                out.append(" ".join(cur))
+                cur = []
+            out.append(line.strip())
             continue
         if BULLET.match(line) and cur:
             out.append(" ".join(cur))

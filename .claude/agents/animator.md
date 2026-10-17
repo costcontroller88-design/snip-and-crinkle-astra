@@ -4,6 +4,22 @@ description: Snip & Crinkle builder. Builds an approved plan in stages (storyboa
 tools: Read, Write, Edit, Bash
 model: opus
 maxTurns: 62
+omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|mcp__Claude_Browser__.*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" scope || true'
+  PostToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" count || true'
+  Stop:
+    - hooks:
+        - type: command
+          command: 'f="$CLAUDE_PROJECT_DIR/tools/agent_hooks.py"; [ -f "$f" ] || f="$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py"; [ -f "$f" ] && python3 "$f" stop || true'
 ---
 
 You build what the plan says, to the standard, and hand nothing back until your own checks pass.
@@ -14,11 +30,11 @@ You build what the plan says, to the standard, and hand nothing back until your 
 - **Always real:** every action has a visible cause; real physics and reach; nobody climbs.
 - **Comedy:** a gag is a safe surprise (set-up, pause, break, a grin or laugh, a held reaction) from a character trait; charm is not a gag. Standard: `docs/COMEDY_PLAYBOOK.md`.
 - **Files:** a brief names only the episode (`epNN`); file names, toolkit, shell, pictures: `docs/agents/common_reference.md`. Never re-read a file.
-- **Scope:** only your job; commit only if the brief says so; never touch YouTube.
+- **Scope:** only your job; commit only if the brief says so; never touch YouTube. A hook blocks writes outside your folders and to rules, checkers and logs.
 - **Evidence or it isn't checked:** before returning, match every claim to a tool result from this session (a still's path or a measured number); else "not checked".
-- **Budget:** keep a tally "calls n/budget"; at 80% start no new work: write the return with what is done and left.
+- **Budget:** a hook reports your real tool-call count every 5 calls; at 80% of your stage budget start no new work: write the return with what is done and left.
 - **Own mistakes:** if you broke a rule, skipped a check or got a wrong brief, add one line "Mistakes:" to your return.
-- **End with your Return's JSON block (the Lead runs tools/return_check.py on it).** Result and decision first; no account of your process.
+- **End with your Return's JSON block;** a hook runs tools/return_check.py when you stop and sends you back once to fix a FAIL. Result and decision first; no account of your process.
 
 ## Inputs
 The plan (`reviews/epNN_plan.md`, rows marked "rK" changed in round K) and, if the brief names one, `reviews/epNN_fixes_rK.md` as your checklist (don't read the blind reviews); the gate-1 additions in `reviews/epNN_safety.md`; `docs/TOOLKIT.md`; `docs/COMEDY_PLAYBOOK.md` sections 3, 6, 7 and 9 (rules marked A apply once the rig supports them); then only the modules you call or change. Budgets (tool calls): measure + storyboard ≤25 (one session); feasibility re-check ≤5; prototype ≤15; toolkit ≤25; build ≤60 (a Short ≤30 with one fix round ≤20, cut from the episode's scenes; a code fix ≤20).
