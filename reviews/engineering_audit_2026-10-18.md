@@ -102,3 +102,18 @@ still fail). Undo: `git revert` of one commit.
   --modules` for these scripts also lists `tools/handover_check.py`, `check_video.py` and `plan_check.py`. A
   handover `.ok` is therefore also invalidated when those checkers change. That is stricter, not looser.
 - Undo: `git revert <this commit>`.
+
+**Batch 3 (F7), done 18 Oct, owner OK in chat ("Yes, implement Batch 3").**
+- `episodes/acting.py`: `render_video` now keeps ffmpeg's exit code and calls a new `log_render`, which appends one
+  row to `reviews/render_log.md` (tracked, unlike `build/`): when, script, view, video length, drawings, workers,
+  render seconds, render seconds per video second, ffmpeg ok/FAIL, framestore code hash and file size. Any error
+  in the hash is written into the row and never stops a finished render. Render behaviour is otherwise unchanged.
+  Ep 1-10 scripts have their own ffmpeg code and are not covered (they are finished).
+- Tests: regress 108/108 (4 new F7 cases). Real run: `rigtest_acting` (4.6 s, 69 drawings, 8 workers) rendered into
+  the scratchpad with a scratch log: 4 s, 0.82 render s per video s, ffmpeg ok, 1.1 MB. That is one sample from a
+  light rig test, not an episode baseline; TOOLKIT's figure for Ep 11 (≈3.5 s per video s) is still unmeasured
+  here. `check_video` on that file: loudness FAIL, as expected, because the real `--render` path runs
+  `trim_loudness` afterwards and the test skipped it. All other checks passed.
+- The real log starts with the next production render. Undo: `git revert <this commit>`.
+- Noticed, not changed: (F10) `render_video` still prints "wrote" when ffmpeg fails; the log now shows FAIL, but
+  the caller isn't stopped. (F11) `check_video.py` needs the file path first; flags first crash with a JSON error.

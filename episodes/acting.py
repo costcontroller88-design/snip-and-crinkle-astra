@@ -35,6 +35,7 @@ from paperlib import Cut, clamp01, ease_out_back, place  # noqa: E402
 
 DPS = 15                              # drawings per second ("on twos" at 30 fps)
 FPS = 30
+RENDER_LOG = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reviews", "render_log.md")
 TEAR = (150, 206, 246)
 
 
@@ -400,8 +401,27 @@ def _draw(i):
     return _EP.render_frame(i / DPS, _VIEW).convert("RGB").tobytes()
 
 
+def log_render(ep_path, view, dur, n, workers, secs, code, out, log=None):
+    """One row per render in reviews/render_log.md (audit F7): the render-cost baseline, and which code made it."""
+    log = log or RENDER_LOG
+    if not os.path.exists(log):
+        with open(log, "w", encoding="utf-8") as f:
+            f.write("# Render log (written by episodes/acting.py render_video; one row per render)\n\n"
+                    "| When | Script | View | Video s | Drawings | Workers | Render s | Render s per video s | ffmpeg "
+                    "| Code hash | MB |\n|---|---|---|---|---|---|---|---|---|---|---|\n")
+    try:
+        from framestore import code_hash
+        h = code_hash(ep_path)[:12]
+    except Exception as e:  # the log must never stop a finished render
+        h = f"? ({type(e).__name__})"
+    mb = os.path.getsize(out) / 1e6 if os.path.exists(out) else 0
+    with open(log, "a", encoding="utf-8") as f:
+        f.write(f"| {time.strftime('%d %b %H:%M')} | {os.path.basename(ep_path)} | {view} | {dur:g} | {n} | {workers} "
+                f"| {secs:.0f} | {secs / dur:.2f} | {'ok' if code == 0 else f'FAIL (exit {code})'} | {h} | {mb:.1f} |\n")
+
+
 def render_video(ep_path, out, wav, dur, view, workers=8):
-    """Render drawing i at t = i/15 in parallel; write each one twice into a 30 fps MP4."""
+    """Render drawing i at t = i/15 in parallel; write each one twice into a 30 fps MP4; log a row (log_render)."""
     import multiprocessing as mp
     size = (1920, 1080) if view == "land" else (1080, 1920)
     n = int(round(dur * DPS))
@@ -421,6 +441,8 @@ def render_video(ep_path, out, wav, dur, view, workers=8):
                     proc.stdin.write(frame)
             print(f"drawing {min(n, b + step)}/{n}  {time.time() - t0:.0f}s", flush=True)
     proc.stdin.close()
-    proc.wait()
-    print("wrote", out, f"in {time.time() - t0:.0f}s")
+    code = proc.wait()
+    secs = time.time() - t0
+    print("wrote", out, f"in {secs:.0f}s")
+    log_render(ep_path, view, dur, n, workers, secs, code, out)
     return out

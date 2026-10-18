@@ -411,6 +411,20 @@ case("F2 the stamp covers the imports (rig2, rig2_pip, props_hand2, hires, actin
      all(f"episodes/{m}.py" in short_files for m in ("rig2", "rig2_pip", "props_hand2", "hires", "acting"))
      and not any(f.startswith("tools/") for f in short_files))
 
+# ---- render log (audit F7: every render leaves one row: time, cost, ffmpeg result, which code)
+import acting  # noqa: E402
+
+rl = os.path.join(TMP, "render_log.md")
+acting.log_render(fs_script, "land", 4.0, 60, 8, 14.2, 0, fs_script, log=rl)
+acting.log_render(fs_script, "vert", 2.0, 30, 8, 5.0, 1, os.path.join(TMP, "none.mp4"), log=rl)
+rows = [ln for ln in open(rl).read().splitlines() if ln.startswith("| ") and "ep99_fs.py" in ln]
+case("F7 one row per render, header written once", len(rows) == 2 and open(rl).read().count("| When |") == 1)
+case("F7 the row has the cost per video second and the code hash",
+     "| 14 | 3.55 | ok | " + framestore.code_hash(fs_script)[:12] in rows[0])
+case("F7 an ffmpeg failure is logged as FAIL", "FAIL (exit 1)" in rows[1])
+case("F7 render_video logs to reviews/, not build/ (git-ignored)",
+     acting.RENDER_LOG == os.path.join(ROOT, "reviews", "render_log.md"))
+
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:
     if not ok or "-v" in sys.argv:
