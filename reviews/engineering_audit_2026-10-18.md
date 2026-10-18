@@ -84,3 +84,21 @@ still fail). Undo: `git revert` of one commit.
   refusal switched off in memory, regress goes red (96/98: M39 and F1 fail), so the tests can still fail.
 - Undo: `git revert <this commit>`, then `python3 tools/handoff_check.py --install`.
 - Next proposed: Batch 2 (F2, code-hash stamp for stored frames). Not started.
+
+**Batch 2 (F2), done 18 Oct, owner OK in chat ("Yes, implement Batch 2").**
+- New `episodes/framestore.py`: a stored frame is reused only when its folder's `STAMP` equals the sha256 of the
+  script plus every repo module it imports (`handover_check.modules`, `tools/` left out). `begin()` clears the stamp
+  before a pass and `finish()` writes it atomically after the last frame, so a half-finished pass is never used. A
+  stale or unstamped folder prints one warning, and those frames are drawn fresh.
+- Wired into `ep11_friendly_glow.py` (it had no stamp) and `ep11_short_transform.py` (its stamp covered 2 files; it
+  now covers 19 files, the script included, `rig2`, `rig2_pip`, `props_hand2`, `hires` and `acting` among them). Same file names, same `--hires` flags.
+- Tests: regress 104/104 (6 new F2 cases); selftest 28/28. Mutation check: with `load()` ignoring the stamp, regress
+  goes red (102/104). Live: one frame from each script, rendered from a cached range, printed the warning and drew
+  fresh at the right size (Short 1080x1920 in 9.6 s; Ep 11 1920x1080).
+- **Effect now:** `build/ep11_hi_r3/` and `build/ep11s_hi/` have no valid stamp (their old frames cannot be proven
+  current), so a re-render of either draws the close shots at 2x until `--hires` is run again. Both are finished
+  or parked; nothing was deleted (the old `build/ep11s_hi/code_hash.txt` is left in place).
+- Side effect: because the scripts now import `framestore` (which imports `handover_check`), `handover_check
+  --modules` for these scripts also lists `tools/handover_check.py`, `check_video.py` and `plan_check.py`. A
+  handover `.ok` is therefore also invalidated when those checkers change. That is stricter, not looser.
+- Undo: `git revert <this commit>`.

@@ -384,6 +384,33 @@ cp = os.path.join(os.path.dirname(ROOT), ".claude", "settings.json")
 case("copilot settings.json is a link to the project's", not os.path.exists(cp) or (
     os.path.islink(cp) and os.path.realpath(cp) == os.path.realpath(os.path.join(ROOT, ".claude", "settings.json"))))
 
+# ---- stored-frame stamps (audit F2: a frame folder is reused only with the current code)
+sys.path.insert(0, os.path.join(ROOT, "episodes"))
+import framestore  # noqa: E402
+from PIL import Image  # noqa: E402
+
+fs_dir, fs_script = os.path.join(TMP, "frames"), os.path.join(TMP, "ep99_fs.py")
+with open(fs_script, "w") as f:
+    f.write("X = 1\n")
+with contextlib.redirect_stderr(io.StringIO()):
+    framestore.begin(fs_dir, fs_script)
+    Image.new("RGB", (4, 4), (9, 9, 9)).save(framestore.path(fs_dir, 7))
+    case("F2 a half-finished pass (no stamp) is not used", framestore.load(fs_dir, 7, fs_script) is None)
+    framestore.finish(fs_dir, fs_script)
+    case("F2 a stamped frame with the same code is used", framestore.load(fs_dir, 7, fs_script) is not None)
+    case("F2 a missing drawing is a miss", framestore.load(fs_dir, 8, fs_script) is None)
+    with open(fs_script, "w") as f:
+        f.write("X = 2\n")
+    framestore.code_hash.cache_clear()
+    case("F2 a code change makes the folder stale", framestore.load(fs_dir, 7, fs_script) is None)
+    framestore.begin(fs_dir, fs_script)
+    case("F2 begin() clears the stamp", framestore.stamp_of(fs_dir) is None)
+short_files = [os.path.relpath(f, ROOT) for f in
+               framestore.hashed_files(os.path.join(ROOT, "episodes", "ep11_short_transform.py"))]
+case("F2 the stamp covers the imports (rig2, rig2_pip, props_hand2, hires, acting), not tools/",
+     all(f"episodes/{m}.py" in short_files for m in ("rig2", "rig2_pip", "props_hand2", "hires", "acting"))
+     and not any(f.startswith("tools/") for f in short_files))
+
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:
     if not ok or "-v" in sys.argv:

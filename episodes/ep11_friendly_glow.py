@@ -35,6 +35,7 @@ from PIL import Image, ImageDraw, ImageFilter  # noqa: E402
 import acting as K  # noqa: E402
 import audio as A  # noqa: E402
 import ep11_light as L  # noqa: E402
+import framestore  # noqa: E402
 import music_extra as MX  # noqa: E402
 import props_glow as G  # noqa: E402
 import props_hand2 as H  # noqa: E402
@@ -1836,9 +1837,9 @@ def render_frame(t, view="land", report=None, centre=None, z=None, fresh=False):
     tq = d / K.DPS
     if not fresh and centre is None and RES == 2 and any(a - 1e-6 <= tq < b for a, b in HI_T):
         for folder in (HI_DIR, HI40B):
-            p = os.path.join(folder, f"d{d:05d}.png")
-            if os.path.exists(p):
-                return Image.open(p).convert("RGB")
+            img = framestore.load(folder, d, __file__)   # audit F2: only a folder stamped with the current code
+            if img is not None:
+                return img
     f = render_world(tq, d, report=report)
     c, zz = shot_at(tq)
     return shoot(f, centre or c, z or zz).convert("RGB")
@@ -2472,14 +2473,15 @@ if __name__ == "__main__":
     elif args == ["--hires"]:
         if RES < 2.5:
             sys.exit("run with EP11_RES=3")
-        os.makedirs(HI_DIR, exist_ok=True)
+        framestore.begin(HI_DIR, __file__)
         for a, b in HI_T:
             for d in range(int(math.ceil(a * K.DPS - 1e-6)), int(math.ceil(b * K.DPS - 1e-6))):
                 tq = d / K.DPS
                 f = render_world(tq, d)
                 c, z = shot_at(tq)
-                shoot(f, c, z).convert("RGB").save(os.path.join(HI_DIR, f"d{d:05d}.png"))
+                shoot(f, c, z).convert("RGB").save(framestore.path(HI_DIR, d))
                 print("hi", d, flush=True)
+        framestore.finish(HI_DIR, __file__)
     elif args == ["--render"]:
         wav = os.path.join(ROOT, "build", "ep11_audio.wav")
         build_audio(wav)

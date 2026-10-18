@@ -19,7 +19,6 @@ Any other flag is refused.
     make_buses()                           # (music, sfx) Mix buses
     render_frame(t, view="vert")           # one finished 1080x1920 frame (for acting.render_video)
 """
-import hashlib
 import math
 import os
 import sys
@@ -38,6 +37,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont  # noqa: E4
 import acting as K  # noqa: E402
 import audio as A  # noqa: E402
 import ep11_light as L  # noqa: E402
+import framestore  # noqa: E402
 import music_extra as MX  # noqa: E402
 import props_glow as G  # noqa: E402
 import props_hand2 as H  # noqa: E402
@@ -582,14 +582,6 @@ def film(f, c, z):
     return f.convert("RGB").resize((1080, 1920), Image.LANCZOS, box=box)
 
 
-def code_hash():
-    h = hashlib.sha1()
-    for p in (__file__, PL.__file__):
-        with open(p, "rb") as fh:
-            h.update(fh.read())
-    return h.hexdigest()[:12]
-
-
 def hi_range():
     return [(0.6, 2.8), (4.5, 5.9)]     # cameras T (2.6x) and G (2.5x) at render scale 3
 
@@ -599,10 +591,9 @@ def render_frame(t, view="vert", fresh=False):
     tq = d / K.DPS
     name, c, z = shot_at(tq)
     if not fresh and RES < 2.5 and z > 2.0 + 1e-6:
-        p = os.path.join(HI_DIR, f"d{d:05d}.png")
-        stamp = os.path.join(HI_DIR, "code_hash.txt")
-        if os.path.exists(p) and os.path.exists(stamp) and open(stamp).read().strip() == code_hash():
-            return Image.open(p).convert("RGB")
+        img = framestore.load(HI_DIR, d, __file__)   # audit F2: the stamp covers every repo import, not 2 files
+        if img is not None:
+            return img
     return film(render_world(tq, d), c, z)
 
 
@@ -1287,13 +1278,12 @@ if __name__ == "__main__":
     elif args == ["--hires"]:
         if RES < 2.5:
             sys.exit("run with EP11S_RES=3")
-        os.makedirs(HI_DIR, exist_ok=True)
+        framestore.begin(HI_DIR, __file__)
         for a, b in hi_range():
             for d in range(int(math.ceil(a * K.DPS - 1e-6)), int(math.ceil(b * K.DPS - 1e-6))):
-                render_frame(d / K.DPS, fresh=True).save(os.path.join(HI_DIR, f"d{d:05d}.png"))
+                render_frame(d / K.DPS, fresh=True).save(framestore.path(HI_DIR, d))
                 print("hi", d, flush=True)
-        with open(os.path.join(HI_DIR, "code_hash.txt"), "w") as fh:
-            fh.write(code_hash())
+        framestore.finish(HI_DIR, __file__)
     elif args == ["--audio"]:
         build_audio(os.path.join(ROOT, "build", "ep11s_audio.wav"))
     elif args == ["--render"]:
