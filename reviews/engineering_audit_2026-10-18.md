@@ -127,3 +127,8 @@ still fail). Undo: `git revert` of one commit.
   no path, or two paths, prints the usage and exits 1. Live: flags first or last give the same result.
 - Tests: regress 110/110 (2 new F11 cases). The F10 check is a live one-off, not in regress, because it starts a
   render pool and regress must stay at about 0.2 s. Undo: `git revert <this commit>`.
+
+**F4 done 18 Oct, owner OK in chat ("Yes, prune the 4 stale git worktrees").** Checked first: branches `episode-02`
+to `05` have 0 commits not in main, and every tracked file in the 4 folders is identical to its branch; the extras
+were old build frames (≈15 MB) and font copies (the font still loads from `~/Library/Fonts`). Ran `git worktree
+prune` and removed the 4 folders under `.claude/worktrees/` (git-ignored). The branches are kept.
