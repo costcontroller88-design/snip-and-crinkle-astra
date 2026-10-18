@@ -81,5 +81,12 @@ CUTS = ([float(x) for x in sys.argv[sys.argv.index("--cuts") + 1].split(",")] if
 LOOP = "--no-loop" not in sys.argv
 DUR = ([float(x) for x in sys.argv[sys.argv.index("--dur") + 1].split("-")] if "--dur" in sys.argv else None)
 
+def path_arg(argv):
+    """The one argument that is neither a flag nor a flag's value (audit F11: the path may come anywhere)."""
+    pos = [a for i, a in enumerate(argv[1:], 1) if not a.startswith("--") and argv[i - 1] not in ("--cuts", "--dur")]
+    return pos[0] if len(pos) == 1 else None
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1]))
+    p = path_arg(sys.argv)
+    sys.exit(main(p) if p else __doc__)

@@ -433,16 +433,26 @@ def render_video(ep_path, out, wav, dur, view, workers=8):
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     t0 = time.time()
     ctx = mp.get_context("spawn")
+    broken = False
     with ctx.Pool(workers, initializer=_init, initargs=(ep_path, view)) as pool:
         step = workers * 4
         for b in range(0, n, step):
-            for frame in pool.map(_draw, range(b, min(n, b + step))):
-                for _ in range(FPS // DPS):
-                    proc.stdin.write(frame)
+            try:
+                for frame in pool.map(_draw, range(b, min(n, b + step))):
+                    for _ in range(FPS // DPS):
+                        proc.stdin.write(frame)
+            except BrokenPipeError:     # ffmpeg died mid-stream: stop drawing (audit F10)
+                broken = True
+                break
             print(f"drawing {min(n, b + step)}/{n}  {time.time() - t0:.0f}s", flush=True)
-    proc.stdin.close()
-    code = proc.wait()
+    try:
+        proc.stdin.close()
+    except BrokenPipeError:
+        broken = True
+    code = proc.wait() or (-1 if broken else 0)
     secs = time.time() - t0
-    print("wrote", out, f"in {secs:.0f}s")
     log_render(ep_path, view, dur, n, workers, secs, code, out)
+    if code != 0:               # audit F10: never report a failed encode as written
+        raise RuntimeError(f"render_video: ffmpeg exited {code}; {out} is not a valid render (reviews/render_log.md)")
+    print("wrote", out, f"in {secs:.0f}s")
     return out

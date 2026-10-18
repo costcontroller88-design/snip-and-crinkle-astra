@@ -425,6 +425,16 @@ case("F7 an ffmpeg failure is logged as FAIL", "FAIL (exit 1)" in rows[1])
 case("F7 render_video logs to reviews/, not build/ (git-ignored)",
      acting.RENDER_LOG == os.path.join(ROOT, "reviews", "render_log.md"))
 
+# ---- check_video argument order (audit F11: flags first used to crash with a JSON error)
+import check_video  # noqa: E402
+
+case("F11 the path is found after the flags",
+     check_video.path_arg(["cv", "--landscape", "--no-loop", "x.mp4"]) == "x.mp4"
+     and check_video.path_arg(["cv", "--cuts", "3.0,5.2", "x.mp4", "--dur", "15-30"]) == "x.mp4"
+     and check_video.path_arg(["cv", "x.mp4", "--landscape"]) == "x.mp4")
+case("F11 no path, or two, is refused (not guessed)",
+     check_video.path_arg(["cv", "--landscape"]) is None and check_video.path_arg(["cv", "a.mp4", "b.mp4"]) is None)
+
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:
     if not ok or "-v" in sys.argv:

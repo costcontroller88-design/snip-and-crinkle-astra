@@ -117,3 +117,13 @@ still fail). Undo: `git revert` of one commit.
 - The real log starts with the next production render. Undo: `git revert <this commit>`.
 - Noticed, not changed: (F10) `render_video` still prints "wrote" when ffmpeg fails; the log now shows FAIL, but
   the caller isn't stopped. (F11) `check_video.py` needs the file path first; flags first crash with a JSON error.
+
+**Batch 4 (F10, F11), done 18 Oct, owner OK in chat ("Fix F10 ... and F11 ... as a small Batch 4").**
+- F10 `episodes/acting.py`: if ffmpeg dies mid-stream (broken pipe), `render_video` stops drawing. On any non-zero
+  exit it logs the FAIL row and then raises `RuntimeError`, so the caller (`trim_loudness`, the render chain) stops
+  and never prints "wrote". Live: a missing WAV raised "ffmpeg exited 254" and logged `FAIL (exit 254)`; a good
+  render still wrote and logged `ok` (4 s, 0.82 s per video s).
+- F11 `tools/check_video.py`: new `path_arg` takes the one argument that is neither a flag nor a flag's value;
+  no path, or two paths, prints the usage and exits 1. Live: flags first or last give the same result.
+- Tests: regress 110/110 (2 new F11 cases). The F10 check is a live one-off, not in regress, because it starts a
+  render pool and regress must stay at about 0.2 s. Undo: `git revert <this commit>`.
