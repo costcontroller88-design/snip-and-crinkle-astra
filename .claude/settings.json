@@ -40,6 +40,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/tools/agent_hooks.py\"; [ -f \"$f\" ] || f=\"$CLAUDE_PROJECT_DIR/Project Snip and Crinkle/tools/agent_hooks.py\"; [ -f \"$f\" ] && python3 \"$f\" leadstop || true"
+          }
+        ]
+      }
     ]
   }
 }

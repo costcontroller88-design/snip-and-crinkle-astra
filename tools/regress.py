@@ -318,7 +318,34 @@ with open(tr4, "w") as f:
             "name": "SubagentHandback", "input": {"message": ret(good_ev, calls=1, budget=15)}}]}}) + "\n")
 case("M61 a report delivered by SubagentHandback is read (not 'no final message')",
      stop("a4", "", tr4) == {} and "| 1 / 1 / 15 |" in open(agent_hooks.RUNS).read().splitlines()[-1])
-case("every stop writes a run row", sum(1 for _ in open(agent_hooks.RUNS)) >= 4 + 5)
+tr5 = os.path.join(TMP, "agent-h1.jsonl")
+with open(tr5, "w") as f:
+    f.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "tool_use", "id": "h", "name":
+            "SubagentHandback", "input": {"message": "All done!"}}]}}) + "\n")
+case("M62 after a hand-back the stop hook doesn't 'send back' (the run has ended)", stop("h1", "", tr5) == {})
+
+
+def leadstop(lead=True, active=False):
+    d = {"hook_event_name": "Stop", "stop_hook_active": active}
+    if not lead:
+        d["agent_type"] = "story-designer"
+    return hook(agent_hooks.cmd_leadstop, d)
+
+
+case("M62 ... the Lead's turn can't end until it sends that agent back once (SendMessage)",
+     "'h1'" in leadstop().get("reason", "") and leadstop() == {})
+case("M62 a passing hand-back leaves the Lead nothing to do", stop("h2", "", tr4) == {} and leadstop() == {})
+stop("h3", "", tr5)
+case("M62 the send-back note is for the Lead only, and never loops",
+     leadstop(lead=False) == {} and leadstop(active=True) == {} and leadstop().get("decision") == "block"
+     and leadstop() == {})
+stop("h4", "", tr5)
+case("M62 the Lead's next Bash is refused once with the send-back, then runs",
+     lead("Bash", {"command": "ls"}) and not lead("Bash", {"command": "ls"}))
+stop("h5", "", tr5)
+case("M62 ... or its next Agent call", brief("story-designer", "story-designer: ep12 plan") and
+     not brief("story-designer", "story-designer: ep12 plan"))
+case("every stop writes a run row", sum(1 for _ in open(agent_hooks.RUNS)) >= 4 + 9)
 
 # ---- wiring: each agent file carries its hooks; both settings files carry the brief hook
 for name in agent_hooks.TEAM:
@@ -337,7 +364,8 @@ for sp in (os.path.join(ROOT, ".claude", "settings.json"),
                      for e in s["hooks"]["PreToolUse"] for h in e["hooks"])
         except (OSError, ValueError, KeyError):
             ok = False
-        case(f"brief hook wired in {os.path.relpath(sp, os.path.dirname(ROOT))}", ok)
+        case(f"brief hook wired in {os.path.relpath(sp, os.path.dirname(ROOT))}", ok and any(
+            "leadstop" in h["command"] for e in s["hooks"]["Stop"] for h in e["hooks"]))
 cp = os.path.join(os.path.dirname(ROOT), ".claude", "settings.json")
 case("copilot settings.json is a link to the project's", not os.path.exists(cp) or (
     os.path.islink(cp) and os.path.realpath(cp) == os.path.realpath(os.path.join(ROOT, ".claude", "settings.json"))))

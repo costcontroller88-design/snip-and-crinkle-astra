@@ -24,6 +24,10 @@ Checks that used to depend on someone remembering them now run on their own, at 
                                          refuses typing, clicking or form filling on a studio.youtube.com page unless
                                          tools/approve.py "<owner quote>" ran in the last 30 minutes (rule 11).
     python3 tools/agent_hooks.py leadpost  PostToolUse (settings.json): records git show --stat and the browser URL.
+    Send-back (M62): the app ends a run with a SubagentHandback call, so an agent's Stop-hook send-back comes too
+                                         late; a fixable FAIL leaves a note, and the Lead's next Bash or Agent call is
+                                         refused once with "send it back (SendMessage)". leadstop: the same at the
+                                         Lead's Stop (settings.json), where the app runs it.
     python3 tools/agent_hooks.py selftest  feeds sample events to every hook on scratch state; exit 1 on any wrong
                                          decision. --hook (SessionStart): silent on PASS, one warning line on FAIL.
 
@@ -73,6 +77,7 @@ BAND = os.path.join(ROOT, ".preflight_band")
 BAND_MAX_AGE = 2 * 3600
 GATES = os.path.join(ROOT, "state", "gates.json")  # tools/gate.py writes it
 APPROVALS = os.path.join(ROOT, "state", "approvals.jsonl")  # tools/approve.py appends to it
+SENDBACK_MAX_AGE = 1800
 PENDING_MAX_AGE = 600  # a stage left by a brief is picked up by the agent's first call within 10 minutes
 SHOW_MAX_AGE, APPROVAL_MAX_AGE = 600, 1800
 EPISODE = re.compile(r"\bep(?:isode)?[\s_-]?0*(\d{1,2})(?!\d)", re.I)
@@ -286,6 +291,15 @@ def last_text_from_transcript(path):
     return text
 
 
+def handed_back(d):
+    """True when the agent's transcript ends its run with a SubagentHandback call."""
+    try:
+        with open(agent_transcript(d) or "", encoding="utf-8") as f:
+            return bool(re.search(r'"name":\s*"' + HANDBACK + '"', f.read()))
+    except OSError:
+        return False
+
+
 def agent_transcript(d):
     p = d.get("agent_transcript_path")
     if p and os.path.exists(p):
@@ -361,7 +375,7 @@ def cmd_stop(d):
         fixable.append(f"tool_calls says {reported}, the harness counted {real}: report the true count")
     if isinstance(budget, int) and real and real > budget and not record_only:
         record_only.append(f"over budget: {real} real calls > budget {budget}")
-    can_block = fixable and st.get("blocks", 0) < 1 and not d.get("stop_hook_active")
+    can_block = fixable and st.get("blocks", 0) < 1 and not d.get("stop_hook_active") and not handed_back(d)
     rc = "PASS" if not problems and not fixable else "FAIL: " + "; ".join((fixable + record_only))[:160].replace("|", "/")
     if can_block:
         st["blocks"] = st.get("blocks", 0) + 1
@@ -370,6 +384,9 @@ def cmd_stop(d):
                 rc, True)
         return out({"decision": "block", "reason": "return_check FAIL (fix only these, with no new work, then end "
                     "with the corrected JSON block): " + "; ".join(fixable)})
+    if fixable and handed_back(d) and not d.get("stop_hook_active"):
+        with open(pending_path("sendback_" + agent), "w", encoding="utf-8") as f:
+            json.dump({"agent_id": aid, "reasons": fixable, "time": time.time()}, f)
     log_run(agent, js.get("verdict", "?") if isinstance(js, dict) else "?", real, reported, budget, peak, out_tok, rc,
             False)
     try:
@@ -393,6 +410,9 @@ def read_band():
 def cmd_brief(d):
     ti = d.get("tool_input") or {}
     agent = ti.get("subagent_type", "")
+    sb = None if d.get("agent_type") else take_sendback()
+    if sb:
+        return deny(sb)
     if agent not in TEAM:
         return 0
     prompt = ti.get("prompt", "")
@@ -498,6 +518,10 @@ def cmd_lead(d):
     if d.get("agent_type"):
         return 0  # agents are guarded by their own scope hook
     tool, ti = d.get("tool_name", ""), d.get("tool_input") or {}
+    if tool == "Bash":
+        sb = take_sendback()
+        if sb:
+            return deny(sb)
     st = load_state(LEAD_STATE)
     if tool == "Bash" and git_runs(ti.get("command", ""), "push"):
         age = time.time() - st.get("show_time", 0)
@@ -600,6 +624,16 @@ def selftest():
         sp = lambda aid, text: run("stop", {"agent_type": "packaging", "agent_id": aid, "last_assistant_message": text})
         ok("stop: a return without JSON is sent back once", sp("s1", "done").get("decision") == "block")
         ok("stop: ... and allowed the second time", sp("s1", "done") == {} and os.path.exists(RUNS))
+        ap = lambda: run("leadstop", {"hook_event_name": "Stop"})
+        note = lambda aid: json.dump({"agent_id": aid, "reasons": ["no json"], "time": time.time()},
+                                     open(pending_path("sendback_packaging"), "w"))
+        note("s8")
+        ok("lead: the next Bash is refused once with the send-back", "'s8'" in json.dumps(run("lead", {
+            "tool_name": "Bash", "tool_input": {"command": "ls"}})) and not denies("lead", {
+            "tool_name": "Bash", "tool_input": {"command": "ls"}}))
+        note("s9")
+        ok("leadstop: the Lead is told once to send a failed hand-back back", "'s9'" in ap().get("reason", "")
+           and ap() == {})
         lb = lambda cmd: denies("lead", {"tool_name": "Bash", "tool_input": {"command": cmd}})
         ok("lead: git push without git show --stat refused", lb("git push"))
         run("leadpost", {"tool_name": "Bash", "tool_input": {"command": "git show --stat"}})
@@ -616,8 +650,9 @@ def selftest():
         for sp in (os.path.join(ROOT, ".claude", "settings.json"),
                    os.path.join(os.path.dirname(ROOT), ".claude", "settings.json")):
             hooks = json.dumps(load_json(sp, {}).get("hooks", {}))
-            ok(f"wiring: {os.path.relpath(sp, os.path.dirname(ROOT))} runs brief, lead, leadpost, selftest",
-               all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "selftest")))
+            ok(f"wiring: {os.path.relpath(sp, os.path.dirname(ROOT))} runs brief, lead, leadpost, leadstop, selftest",
+               all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "leadstop",
+                                                                         "selftest")))
         for name in TEAM:
             head = open(os.path.join(ROOT, ".claude", "agents", f"{name}.md"), encoding="utf-8").read().split("\n---\n")[0]
             ok(f"wiring: {name} runs scope, count, stop", all(f'"$f" {c}' in head for c in ("scope", "count", "stop")))
@@ -643,10 +678,35 @@ def cmd_selftest():
     return 1 if bad else 0
 
 
+def take_sendback():
+    """The Lead's send-back order for agents whose hand-back FAILED return_check (each note is used once), or None.
+    The app runs no hook on SubagentHandback or after an Agent call (M62), so the Lead's next Bash or Agent call (and
+    its Stop, where that fires) carries it."""
+    notes = []
+    for agent in TEAM:
+        p = pending_path("sendback_" + agent)
+        sb = load_json(p, None)
+        if sb:
+            os.remove(p)
+            if time.time() - sb.get("time", 0) < SENDBACK_MAX_AGE:
+                notes.append(f"{agent} '{sb['agent_id']}': " + "; ".join(sb["reasons"]))
+    if not notes:
+        return None
+    return ("agent_hooks: an agent's return FAILS return_check. First send it back once with SendMessage (only these "
+            "fixes, no new work), then read its new return (core rule 5); this call was not run: " + " | ".join(notes))
+
+
+def cmd_leadstop(d):
+    if d.get("agent_type") or d.get("stop_hook_active"):
+        return 0
+    reason = take_sendback()
+    return out({"decision": "block", "reason": reason}) if reason else 0
+
+
 def dispatch(cmd, raw):
     d = json.loads(raw)
     return {"count": cmd_count, "scope": cmd_scope, "stop": cmd_stop, "brief": cmd_brief, "lead": cmd_lead,
-            "leadpost": cmd_leadpost}[cmd](d) or 0
+            "leadpost": cmd_leadpost, "leadstop": cmd_leadstop}[cmd](d) or 0
 
 
 def main():
