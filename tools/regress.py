@@ -32,6 +32,8 @@ agent_hooks.RUNS = os.path.join(TMP, "agent_runs.md")
 agent_hooks.BAND = os.path.join(TMP, "band.json")
 agent_hooks.GATES = os.path.join(TMP, "gates.json")
 agent_hooks.APPROVALS = os.path.join(TMP, "approvals.jsonl")
+gate.EPISODES = os.path.join(TMP, "episodes")  # M77 gate rule reads rough scripts: a scratch folder, never live ones
+os.makedirs(gate.EPISODES)
 results = []
 
 
@@ -434,6 +436,119 @@ case("F11 the path is found after the flags",
      and check_video.path_arg(["cv", "x.mp4", "--landscape"]) == "x.mp4")
 case("F11 no path, or two, is refused (not guessed)",
      check_video.path_arg(["cv", "--landscape"]) is None and check_video.path_arg(["cv", "a.mp4", "b.mp4"]) is None)
+
+# ---- M75, M76, M80, M81: a resumed agent reports its own run; the harness counts the calls since its last hand-back
+def handback_tr(name, runs, end_handback=False, final=None):
+    """A transcript of runs of n tool calls each, every run but the last ended by a SubagentHandback (a resume);
+    `final` is the last run's return text."""
+    path, k = os.path.join(TMP, name), 0
+    with open(path, "w") as f:
+        for i, n in enumerate(runs):
+            for _ in range(n):
+                k += 1
+                f.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "tool_use", "id": f"u{k}",
+                        "name": "Bash"}]}}) + "\n")
+            if i < len(runs) - 1 or end_handback:
+                f.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "tool_use", "id": f"hb{i}",
+                        "name": "SubagentHandback", "input": {"message": "x"}}]}}) + "\n")
+                f.write(json.dumps({"message": {"role": "user", "content": "The coordinator sent a message while you "
+                        "were working:\nnext stage"}}) + "\n")
+        if final:
+            f.write(json.dumps({"message": {"role": "assistant", "content": [{"type": "text", "text": final}]}}) + "\n")
+    return path
+
+
+rs = handback_tr("agent-r1.jsonl", [24, 7], final=ret(good_ev, calls=8, budget=20))
+case("M75 a resumed agent's own count (8 of the harness's 7 this run) is not sent back",
+     stop("r1", ret(good_ev, calls=8, budget=20), rs) == {}
+     and "| 7 (of 31 in all runs) / 8 / 20 |" in open(agent_hooks.RUNS).read().splitlines()[-1])
+r2 = stop("r2", ret(good_ev, calls=4, budget=20), handback_tr("agent-r2.jsonl", [24, 12],
+                                                                      final=ret(good_ev, calls=4, budget=20)))
+case("M76 a real undercount in the resumed run is still sent back, with the harness's count for this run",
+     r2.get("decision") == "block" and "counted 12 calls in this run" in r2.get("reason", ""))
+case("M80 a run that only fixes its return (0 calls) counts 0, the hand-back ended run counts its own",
+     agent_hooks.transcript_stats(handback_tr("agent-r3.jsonl", [24, 7, 0], end_handback=True))[0] == 0 and
+     agent_hooks.transcript_stats(handback_tr("agent-r4.jsonl", [24, 7], end_handback=True))[::3] == (7, 31))
+
+# ---- M73, M74: framing pre-check on the designer's shot rows (tools/framing_check.py; plan_check runs it)
+import framing_check  # noqa: E402
+import plan_check  # noqa: E402
+
+SZ = framing_check.sizes()
+
+
+def frow(shot, whole, rest="x"):
+    return framing_check.check_row("t", ["t", "1-2", shot, whole, rest], SZ)
+
+
+case("M73 Snip whole in a 2.0x shot fails on height; at 1.4x passes",
+     any("tall" in f for f in frow("C 2.0x", "Snip incl. ears")) and not frow("M 1.4x", "Snip incl. ears, Pip"))
+case("M73 a 960 u frame in 787 u of room between the out characters fails",
+     any("widest gap" in f for f in frow("C2 2.0x", "ball; Snip, Crinkle wholly out", "Snip x 380, Crinkle x 1653")))
+case("M74 Snip's ear past the window edge fails (x 380, window 535); window 606 passes",
+     any("clear window" in f for f in frow("C2 2.0x (x 535-1495)", "ball; Snip, Crinkle wholly out",
+                                           "Snip x 380, Crinkle x 1850"))
+     and not frow("C2 2.0x (x 606-1566)", "ball, Pip at 800; Snip, Crinkle wholly out", "Snip x 380, Crinkle x 1850"))
+case("M73 an out character without an x fails (the gap can't be checked)",
+     any("no x in the row" in f for f in frow("C2 2.0x", "ball; Snip wholly out")))
+case("a window the wrong width for its zoom fails", any("u wide" in f for f in frow("C 2.0x (x 400-1300)", "ball")))
+case("crouched characters and parts ('Snip's ears') skip the height check",
+     not frow("C 2.0x", "Snip (crouched), Snip's ears, ball"))
+case("sizes follow the bible's rig scale",
+     framing_check.bible_scales() == {"Snip": 1.15, "Crinkle": 1.2, "Pip": 0.9}
+     and framing_check.sizes({"Snip": 2.3})["Snip"][0] == 2 * framing_check.MEASURED["Snip"][1])
+shot_plan = ("**Length:** 120 s\n**Lesson beat:** 20-24 s\n\n| # | Time (s) | Shot | Whole in frame | What happens |\n"
+             "|---|---|---|---|---|\n| 3 | 9.2-12.8 | C 2.0x | Snip incl. ears and feet | x |\n")
+case("M73 plan_check runs the framing check", any("Snip is 748 u tall" in f for f in plan_check.check(shot_plan)))
+
+# ---- M77: the full prop clearance sweep (tools/clearance_check.py) and the gate that waits for it
+import clearance_check  # noqa: E402
+import numpy as np  # noqa: E402
+from PIL import ImageDraw  # noqa: E402
+
+bg = Image.new("RGBA", (200, 100), (255, 255, 255, 255))
+ch = Image.new("RGBA", (200, 100), (0, 0, 0, 0))
+ImageDraw.Draw(ch).rectangle([50, 20, 80, 90], fill=(200, 0, 0, 255))
+img = bg.copy()
+ImageDraw.Draw(img).line([(20, 85), (120, 85)], fill=(0, 0, 255, 255), width=3)    # a rope behind the figure
+img.alpha_composite(ch)
+ImageDraw.Draw(img).rectangle([100, 0, 110, 10], fill=(0, 160, 0, 255))           # a toy drawn over everything
+pm = clearance_check.prop_mask(img, bg, [ch])
+case("M77 prop pixels = the frame minus the background and the characters' layers",
+     pm[85, 30] and pm[85, 110] and pm[5, 105] and not pm[85, 65] and not pm[50, 150] and not pm[50, 65])
+body = np.asarray(ch.getchannel("A")) > 160
+feet, head = body.copy(), body.copy()
+feet[:80] = False
+head[36:] = False
+hits = clearance_check.sweep_frame(pm, {"xx.feet": feet, "xx.head": head}, 1, 10)
+case("M77 a rope across the feet is a contact; a toy 25 u from the head is not",
+     [h[0] for h in hits] == ["xx.feet"] and hits[0][1] <= 1)
+case("M77 --allow names who.part, for all times or one",
+     clearance_check.allowed_at(["sn.paws", "cr.feet@38.8"], 38.8) == {"sn.paws", "cr.feet"}
+     and clearance_check.allowed_at(["cr.feet@38.8"], 36.6) == set()
+     and clearance_check.sweep_frame(pm, {"xx.feet": feet}, 1, 10, {"xx.feet"})[0][3])
+ST = os.path.join(TMP, "clearance.json")
+for nm in ("ep97_rough.py", "ep97_rough_r2.py"):
+    with open(os.path.join(gate.EPISODES, nm), "w") as f:
+        f.write("X = 1\n")
+rough = os.path.join(gate.EPISODES, "ep97_rough_r2.py")
+g97 = lambda *extra: run_quiet(gate.main, ["set", "ep97", "gate1", "PASS", "--evidence", plan, "--file", G,
+                                           "--clearance", ST, *extra])
+case("M77 gate1 PASS refused while the newest rough script has no clearance sweep",
+     clearance_check.newest_rough("ep97", gate.EPISODES) == rough and g97() == 1)
+clearance_check.stamp(os.path.join(gate.EPISODES, "ep97_rough.py"), {"result": "PASS", "times": [1.0],
+                      "not_checked": [], "hits": []}, 10, [], ST)
+case("M77 ... a sweep of an older rough script doesn't count", g97() == 1)
+clearance_check.stamp(rough, {"result": "FAIL", "times": [1.0], "not_checked": [],
+                              "hits": [{"time": 1.0, "part": "cr.feet", "allowed": False}]}, 10, [], ST)
+case("M77 ... a FAIL sweep doesn't count", g97() == 1)
+clearance_check.stamp(rough, {"result": "PASS", "times": [1.0], "not_checked": [], "hits": []}, 10, [], ST)
+case("M77 ... a PASS sweep of the current code lets gate1 pass", g97() == 0)
+with open(rough, "a") as f:
+    f.write("Y = 2\n")
+case("M77 ... a code change after the sweep refuses gate1b again",
+     run_quiet(gate.main, ["set", "ep97", "gate1b", "PASS", "--evidence", plan, "--file", G, "--clearance", ST]) == 1)
+case("M77 an owner-ok still records (M44)", g97("--owner-ok", "go ahead, I checked it") == 0)
 
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:

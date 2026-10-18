@@ -9,6 +9,9 @@ video and upload text). Results: PASS, FAIL or none (clears it). --evidence must
 that decided it); --owner-ok "<the owner's words>" records an owner override (M44) and makes --evidence optional.
 tools/agent_hooks.py brief reads it: an animator "build" brief waits for gate1 PASS, packaging for gate2 PASS or an
 owner-ok. Agents may not run `set` (scope hook). --file <path> points at a scratch copy (tests).
+M77: gate1 or gate1b PASS is refused while the episode's newest rough script (episodes/epNN_rough*.py) has no PASS
+from `python3 tools/clearance_check.py <script> --check` for its current code (state/clearance.json; --clearance
+<path> for tests); an --owner-ok record is not refused.
 """
 import argparse
 import datetime
@@ -19,6 +22,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GATES = os.path.join(ROOT, "state", "gates.json")
+EPISODES = os.path.join(ROOT, "episodes")  # where the rough scripts live (tests point it at a scratch folder)
 NAMES = ("gate1", "gate1b", "gate2", "gate3")
 
 
@@ -40,6 +44,7 @@ def main(argv=None):
     s.add_argument("--evidence")
     s.add_argument("--owner-ok")
     s.add_argument("--file", default=GATES)
+    s.add_argument("--clearance", help="clearance stamp file (tests; default state/clearance.json)")
     sh = sub.add_parser("show")
     sh.add_argument("episode", nargs="?")
     sh.add_argument("--file", default=GATES)
@@ -60,6 +65,13 @@ def main(argv=None):
     elif not owner and a.result != "none":
         print("FAIL: --evidence <existing file> is required (or --owner-ok \"<the owner's words>\")", file=sys.stderr)
         return 1
+    if a.gate in ("gate1", "gate1b") and a.result == "PASS" and not owner:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import clearance_check
+        why = clearance_check.gate_problem(a.episode, EPISODES, a.clearance)
+        if why:
+            print(f"FAIL: {a.episode} {a.gate} PASS refused: {why}; nothing recorded", file=sys.stderr)
+            return 1
     ep = gates.setdefault(a.episode, {})
     if a.result == "none":
         ep.pop(a.gate, None)

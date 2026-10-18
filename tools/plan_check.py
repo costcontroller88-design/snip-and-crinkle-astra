@@ -34,6 +34,8 @@ these tables (header cells in this order; extra text after a header word is fine
     scene not built yet; tools/handover_check.py fails on any estimate left, so the animator measures before building).
     A measured value below its Need fails.
 Also: ≤2,500 words (v3.8; M17; the measured checks table is data and doesn't count), and a misread check section.
+Framing (M73, M74): tools/framing_check.py runs on the shot list (| # | Time | Shot | Whole in frame | ...): character
+height against the frame height at each zoom, window widths, and out characters' x against the window or the gap.
 """
 import re
 import sys
@@ -257,6 +259,9 @@ def check(text):
         est = [r[0] for r in rows if r[2] is None]
         if est:
             print(f"NOTE {len(est)} estimate(s) the animator must measure before building: {est}")
+
+    import framing_check
+    fails += framing_check.check(text)
 
     props = find(tabs, "prop", "colour")
     if not props:

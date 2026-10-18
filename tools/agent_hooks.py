@@ -3,7 +3,9 @@
 Checks that used to depend on someone remembering them now run on their own, at zero model tokens:
 
     python3 tools/agent_hooks.py stop    SubagentStop (a Stop hook in each agent's frontmatter): runs return_check on
-                                         the agent's last message and compares its tool_calls with the harness count;
+                                         the agent's last message and compares its tool_calls with the harness count
+                                         of THIS run (since the last resume; M75/M76/M80: a resumed agent reports its
+                                         own run, so the harness counts the calls after its previous hand-back);
                                          a fixable FAIL sends the agent back ONCE with the reason; every run gets a
                                          row in reviews/agent_runs.md (real calls, peak context, verdict).
     python3 tools/agent_hooks.py count   PostToolUse (frontmatter): counts the agent's real tool calls; every 5th call
@@ -166,7 +168,7 @@ def cmd_count(d):
     elif n == int(cap * 0.8):
         msg = f"Hook count: {n} tool calls (80% of your largest budget {cap}). Finish the current item, then return."
     elif n % 5 == 0:
-        msg = f"Hook count: {n} tool calls so far (use this, not your own tally; " + (
+        msg = f"Hook count: {n} tool calls in this run so far (use this, not your own tally; " + (
             f"your '{stage}' stage budget is {sb})." if sb else "stage budgets are in your file).")
     else:
         return 0
@@ -292,10 +294,12 @@ def last_text_from_transcript(path):
 
 
 def handed_back(d):
-    """True when the agent's transcript ends its run with a SubagentHandback call."""
+    """True when the agent's transcript ends its run with a SubagentHandback call (its last tool call: a resumed
+    agent's earlier runs end with one too, M75)."""
     try:
         with open(agent_transcript(d) or "", encoding="utf-8") as f:
-            return bool(re.search(r'"name":\s*"' + HANDBACK + '"', f.read()))
+            names = re.findall(r'"type":\s*"tool_use"[^{}]*?"name":\s*"([^"]+)"', f.read())
+        return bool(names) and names[-1] == HANDBACK
     except OSError:
         return False
 
@@ -313,10 +317,13 @@ def agent_transcript(d):
 
 
 def transcript_stats(path):
-    """(tool calls, peak context tokens, output tokens) from an agent transcript; Nones if unreadable."""
+    """(tool calls this run, peak context tokens, output tokens, tool calls in all runs) from an agent transcript;
+    Nones if unreadable. A resumed agent's transcript holds every run, each ended by a SubagentHandback call; "this
+    run" is the calls after the previous hand-back (M75, M76, M80, M81: agents report their own run's count)."""
     if not path:
-        return None, None, None
+        return None, None, None, None
     tools, peak, outs = set(), 0, {}
+    run, last, total = 0, None, 0  # calls since the latest hand-back; the run that hand-back ended; all runs
     try:
         with open(path, encoding="utf-8") as f:
             for line in f:
@@ -328,19 +335,25 @@ def transcript_stats(path):
                 if m.get("role") != "assistant":
                     continue
                 for c in m.get("content", []):
-                    if isinstance(c, dict) and c.get("type") == "tool_use" and c.get("name") != HANDBACK:
-                        tools.add(c.get("id"))
+                    if not isinstance(c, dict) or c.get("type") != "tool_use" or c.get("id") in tools:
+                        continue
+                    tools.add(c.get("id"))
+                    if c.get("name") == HANDBACK:
+                        run, last = 0, run
+                    else:
+                        run, total = run + 1, total + 1
                 u = m.get("usage") or {}
                 ctx = sum(u.get(k, 0) or 0 for k in ("input_tokens", "cache_creation_input_tokens",
                                                        "cache_read_input_tokens"))
                 peak = max(peak, ctx)
                 outs[e.get("requestId") or m.get("id") or len(outs)] = u.get("output_tokens", 0) or 0
     except OSError:
-        return None, None, None
-    return len(tools), peak, sum(outs.values())
+        return None, None, None, None
+    return (last if run == 0 and last is not None else run), peak, sum(outs.values()), total
 
 
 def log_run(agent, verdict, real, reported, budget, peak, out_tok, rc, blocked):
+    """real: this run's harness count, or "<run> (of <all> in all runs)" for a resumed agent."""
     new = not os.path.exists(RUNS)
     with open(RUNS, "a", encoding="utf-8") as f:
         if new:
@@ -358,10 +371,11 @@ def cmd_stop(d):
         return 0
     import return_check
     text = last_text_from_transcript(agent_transcript(d) or "") or d.get("last_assistant_message")
-    real, peak, out_tok = transcript_stats(agent_transcript(d))
+    real, peak, out_tok, total = transcript_stats(agent_transcript(d))
     st = load_state(aid)
     if real is None:
         real = st.get("calls") or None
+    ran = f"{real} (of {total} in all runs)" if total and real is not None and total != real else real
     problems = return_check.check(text) if text else ["no final message found"]
     record_only = [p for p in problems if p.startswith("over budget")]
     fixable = [p for p in problems if p not in record_only]
@@ -372,7 +386,8 @@ def cmd_stop(d):
     reported = js.get("tool_calls", "?") if isinstance(js, dict) else "?"
     budget = js.get("budget", "?") if isinstance(js, dict) else "?"
     if isinstance(reported, int) and real and real - reported >= 3:
-        fixable.append(f"tool_calls says {reported}, the harness counted {real}: report the true count")
+        fixable.append(f"tool_calls says {reported}; the harness counted {real} calls in this run (since your last "
+                       f"resume, if any): put {real} in tool_calls")
     if isinstance(budget, int) and real and real > budget and not record_only:
         record_only.append(f"over budget: {real} real calls > budget {budget}")
     can_block = fixable and st.get("blocks", 0) < 1 and not d.get("stop_hook_active") and not handed_back(d)
@@ -380,14 +395,14 @@ def cmd_stop(d):
     if can_block:
         st["blocks"] = st.get("blocks", 0) + 1
         save_state(aid, st)
-        log_run(agent, js.get("verdict", "?") if isinstance(js, dict) else "?", real, reported, budget, peak, out_tok,
+        log_run(agent, js.get("verdict", "?") if isinstance(js, dict) else "?", ran, reported, budget, peak, out_tok,
                 rc, True)
         return out({"decision": "block", "reason": "return_check FAIL (fix only these, with no new work, then end "
                     "with the corrected JSON block): " + "; ".join(fixable)})
     if fixable and handed_back(d) and not d.get("stop_hook_active"):
         with open(pending_path("sendback_" + agent), "w", encoding="utf-8") as f:
             json.dump({"agent_id": aid, "reasons": fixable, "time": time.time()}, f)
-    log_run(agent, js.get("verdict", "?") if isinstance(js, dict) else "?", real, reported, budget, peak, out_tok, rc,
+    log_run(agent, js.get("verdict", "?") if isinstance(js, dict) else "?", ran, reported, budget, peak, out_tok, rc,
             False)
     try:
         os.remove(state_path(aid))
