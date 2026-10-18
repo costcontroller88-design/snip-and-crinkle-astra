@@ -29,3 +29,19 @@
 | 18 Oct 15:17 | safety-checker | FAIL | 15 / 13 / 14 | 50k | 0k | PASS | no |
 | 18 Oct 15:23 | story-designer | PASS | 9 / 8 / 12 | 52k | 0k | FAIL: check 4 (restaged numbers): evidence says estimate/looks: '23 estimates listed by plan_check NOTE'; fix: measure it or write 'not checked' | no |
 | 18 Oct 15:23 | story-designer | PASS | 9 / 10 / 12 | 53k | 0k | PASS | no |
+| 18 Oct 22:31 | animator | PARTIAL | 24 / 26 / 25 | 136k | 20k | FAIL: over budget: tool_calls 26 > budget 25 | no |
+| 18 Oct 22:38 | story-designer | DONE | 8 / 8 / 12 | 61k | 0k | PASS | no |
+| 18 Oct 22:44 | animator | PARTIAL | 31 / 8 / 12 | 171k | 21k | FAIL: tool_calls says 8, the harness counted 31: report the true count; over budget: 31 real calls > budget 12 | no |
+| 18 Oct 22:45 | animator | PARTIAL | 31 / 31 / 37 | 172k | 21k | PASS | no |
+| 18 Oct 22:52 | animator | FAIL | 13 / 11 / 25 | 62k | 1k | PASS | no |
+| 18 Oct 22:58 | animator | PASS | 26 / 11 / 25 | 91k | 6k | FAIL: tool_calls says 11, the harness counted 26: report the true count; over budget: 26 real calls > budget 25 | no |
+| 18 Oct 22:59 | animator | PASS | 26 / 26 / 50 | 92k | 6k | PASS | no |
+| 18 Oct 23:02 | safety-checker | FAIL | 14 / 11 / 14 | 48k | 0k | FAIL: check 6 (F6 cushion vs Pip feet): evidence says estimate/looks: 'build/sb3/ep12/f_011.0.png, about -23 u estimate'; fix: measure it or write 'not checked'; tool | no |
+| 18 Oct 23:02 | safety-checker | FAIL | 14 / 14 / 14 | 49k | 0k | PASS | no |
+| 18 Oct 23:19 | animator | PASS | 40 / 39 / 50 | 172k | 20k | PASS | no |
+| 18 Oct 23:22 | animator | FAIL | 4 / 4 / 5 | 20k | 0k | FAIL: check 4 (full clearance --check): evidence has no number or file path: 'not checked; no --check in script'; fix: cite the still or the measured number | no |
+| 18 Oct 23:42 | animator | PARTIAL | 19 / 15 / 20 | 111k | 1k | FAIL: tool_calls says 15, the harness counted 19: report the true count | no |
+| 18 Oct 23:43 | animator | PARTIAL | 19 / 19 / 25 | 112k | 1k | PASS | no |
+| 18 Oct 23:44 | safety-checker | FAIL | 19 / 21 / 14 | 66k | 1k | FAIL: over budget: tool_calls 21 > budget 14 | no |
+| 18 Oct 23:44 | fresh-eyes-reviewer | DONE | 6 / 6 / 10 | 18k | 1k | FAIL: check 1 (loudness): evidence has no number or file path: 'n/a, storyboard mode'; fix: cite the still or the measured number | no |
+| 18 Oct 23:44 | fresh-eyes-reviewer | DONE | 6 / 5 / 10 | 19k | 1k | PASS | no |

@@ -1,13 +1,13 @@
 {
  "ep12": {
   "gate1": {
-   "date": "2026-10-18 15:18",
+   "date": "2026-10-18 23:45",
    "evidence": "reviews/ep12_safety.md",
    "result": "FAIL"
   },
   "gate1b": {
-   "date": "2026-10-18 15:15",
-   "evidence": "build/sb2/storyboard_blind.md",
+   "date": "2026-10-18 23:45",
+   "evidence": "build/sb3/storyboard_blind.md",
    "result": "FAIL"
   }
  }
