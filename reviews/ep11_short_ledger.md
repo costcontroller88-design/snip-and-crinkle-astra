@@ -54,3 +54,4 @@
 | 9 Oct | Lead rule diet (finding 4) + audit items | Lead | 31 | 96 | preflight: ANY AGENT: <60% |
 | 9 Oct | general-purpose (Sonnet): audit script items M1,M3,M4,M6,M10,M11,L1 per reviews/audit_fix_spec_2026-10-09.md | Lead | 35 | 96 | preflight: ANY AGENT: <60% |
 | 9 Oct | research x2 (Sonnet, parallel; owner asked): agent reliability (hooks, harnesses, regression evals, practitioners) + YouTube reliability (2026 policy, AI-channel practitioners) → docs/research-agent-reliability-oct-2026.md, docs/research-youtube-reliability-oct-2026.md | Lead | 41 | 97 | preflight: ANY AGENT: <60% (--weekly-ok) |
+| 18 Oct | A2 rig acting toolkit job (animator 30 calls over 3 rounds) + 2 blind gag-test rounds (14 and 18 calls) + Lead | Lead | 28 | 9 | 13 → 28% for the whole package (~15 points) |

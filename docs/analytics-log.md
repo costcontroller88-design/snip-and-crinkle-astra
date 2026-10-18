@@ -16,3 +16,12 @@ Reading: YouTube has not yet shown either Short to a real audience. Checkpoint 1
 The Last Cookie 1), 5 scheduled 8-14 Oct (0-2 preview views each). Hot Sunny Day unchanged since 7 Oct: channel page
 45.8%, playlist 41.7%, Shorts feed 8.3% (2 views), Creator Studio 4.2%; no suggested or search traffic. Still no real
 audience. Note: all 8 Shorts are 0:19 with the same title/description pattern (template risk, hard rule 5).
+
+**Studio check, 2026-10-16 (Lead, read-only; the 14 Oct checkpoint, 2 days late):** last 28 days (18 Sep-15 Oct):
+123 views, 57 engaged, 0.4 h watch time, 8 likes, +2 subs, **monthly audience 5** (the owner + ~4 people).
+Views: Hot Sunny Day 40, Wash Before You Munch 26, Whose Toy 14, Achoo 14, Can Snip Wait 13, Last Cookie 10,
+Swing 4, Helmet 2. Sources: Shorts feed 33.3% (~41 views; was 2 on 8 Oct), playlists 26.8%, channel pages 21.1%,
+direct 12.2%, external 4.1%. Stayed 72.2% / swiped 27.8%. Mobile 100%; India 15.5% of views (rest unreported).
+Halloween Short scheduled 18 Oct; Videos tab empty (Ep 9 v3 due 15 Oct, Ep 5 v2 due 16 Oct: not uploaded).
+Reading: the feed has started testing the Shorts, but 5 viewers is too few to judge (A1/M44 comparison not yet
+possible). Next checkpoint: Fri 30 Oct.
