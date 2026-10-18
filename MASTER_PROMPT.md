@@ -1,8 +1,8 @@
 # Snip & Crinkle: Master Prompt for the Lead and the agent team
 
-Version 4.1, 17 Oct: the harness runs the checks (`tools/agent_hooks.py`: return_check at every agent stop, a real
-tool-call count, write scopes per role, brief and preflight checks on every agent call; `python3 tools/regress.py`
-replays the logged mistakes; rollback tag agents-v4.0-pre-harness). Version 4.0, 9 Oct: the Lead's rule diet (zero-based review finding 4): sections 1, 3 and 4 stay here, the Lead's 12
+Version 4.2, 17 Oct: the harness checks order and the Lead (`tools/agent_hooks.py selftest` at each session
+start; gates in `state/gates.json`, set only by `tools/gate.py`; stage budgets from the brief's "Stage:";
+the Lead's push and Studio edits guarded; rollback tag agents-v4.1-pre-guards). Version 4.0, 9 Oct: the Lead's rule diet (zero-based review finding 4): sections 1, 3 and 4 stay here, the Lead's 12
 core rules replace sections 2 and 5-13, which moved verbatim to `docs/agents/lead_reference.md` with the version
 history (`python3 tools/diet_check.py --lead` guards that no rule is lost; rollback tag agents-v3.9-pre-lead-diet).
 This file is the source of truth for how we work. **The Lead reads it down to Appendix A at the start of every
@@ -60,17 +60,17 @@ Each is one line and its reason. Sections 2 and 5-13 of earlier versions (same n
 and so on point there) are in `docs/agents/lead_reference.md`: open only the section a job touches (where files live
 2, lessons 5, the episode standard 6, the team 7, the pipeline 8, the quality gate 9, session rules and pre-flight 10,
 brief formats 11, the owner report 12).
-1. **Start and pre-flight:** read HANDOFF, skim `docs/ROADMAP.md`, `git status`, `git log -5`; before each step `ListAgents` (another active Lead: stop and tell the owner) and `python3 tools/preflight.py`, whose band decides which agents may run (a hook refuses an agent call with no preflight in the last 2 hours or outside its band; an owner override goes in `--owner-ok "<quote>"`), because two Leads edited one file and agents ran past the limits (L1, M8).
+1. **Start and pre-flight:** read HANDOFF, skim `docs/ROADMAP.md`, `git status`, `git log -5`; before each step `ListAgents` (another Lead: stop, tell the owner) and `python3 tools/preflight.py`, whose band (under 2 hours old; owner override `--owner-ok "<quote>"`) a hook enforces on agent calls; record gates with `tools/gate.py` (a hook reads them), because two Leads edited one file and agents ran past the limits (L1, M8).
 2. **Facts from the file that knows:** a time, position, name or account step in a brief, claim or question is copied from the plan, the bible, Studio or the benchmark docs, never recalled, because M1, M10, M19 and M36 were recalled facts.
 3. **The Lead never judges clarity:** only a blind reviewer says a beat reads; the Lead judges look, size, timing and technique and compares blind retellings with the story card, because the maker can't see its own story (pilot 1).
 4. **Briefs ≤6 lines** in the section 11 format, no budget in them; a build brief says "feasibility first"; a hook runs brief_check, the 6-line limit and the blind-brief check on every agent call, because long briefs overrode the agent files (M26, M27, M30).
-5. **Read returns, not files;** a hook runs return_check when an agent stops (one send-back) and logs real calls and peak context to `reviews/agent_runs.md` (`tail -3` it instead of typing agent tokens into the ledger); route fixes by kind (staging → story-designer, build → animator); the Lead makes ≤3 code steps, because context is where the tokens go (lesson 9).
+5. **Read returns, not files;** hooks run return_check at an agent's stop (one send-back), warn at 80%/100% of the brief's "Stage:" budget and log real calls and peak context to `reviews/agent_runs.md` (`tail -3` it); route fixes by kind (staging → story-designer, build → animator); the Lead makes ≤3 code steps, because context is where the tokens go (lesson 9).
 6. **One work package per session;** past about 200k tokens of context the Lead codes nothing (a ≤20-line change spec for a fresh session or agent); no polling, one foreground wait; ask before a second full render, because waiting costs as much as working (lesson 10).
 7. **Estimates from the ledger:** usage points from its tokens per call, not a guess; a render estimate before any render over ~2 minutes; times to the owner as a range plus the main risk, because M51 guessed half the actual.
 8. **Commands that can't half-fail:** count a table's columns from its header before a scripted edit; chain edits and the commit with `&&`, never `;`; `git show --stat` before every push; a frame grab at most at the duration − 0.2 s, because M22, M41 and M47.
 9. **Mistake log:** every mistake (the Lead's too) is a row in `reviews/mistake_log.md` the moment it is found; after every video turn the OPEN rows into rules (tag first, `python3 tools/build_agents.py`); a repeat becomes a script check, because rules reworded twice still failed (owner, 8 Oct).
 10. **HANDOFF ≤500 words,** current state only, `tools/handoff_check.py` PASS; before the commit, compare its pending items with the last commit so none vanishes; never put an unreleased story in this file or CLAUDE.md, because M53 dropped a pending item and the blind reviewer could read it.
-11. **Studio only after the owner's "yes":** set title and description with `form_input` and check the page text; pick the time from the list ("6:00 PM"); the owner uploads a Short's cover still, because typed text mixed with the defaults (M49).
+11. **Studio only after the owner's "yes",** logged first with `tools/approve.py "<their words>"` (a hook checks, 30 min); set title and description with `form_input` and check the page text; pick the time from the list ("6:00 PM"); the owner uploads a Short's cover still, because typed text mixed with the defaults (M49).
 12. **Report to the owner** in the section 12 order (done; scorecard with the weakest item named; numbers vs targets; risks; numbered steps; mistakes logged; a firm recommendation), ≤200 words per work package; ask only for the owner's decisions, multiple choice, recommended option first, because the owner wants finished work and a firm call.
 
 ## Appendix A: agent files

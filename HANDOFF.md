@@ -1,6 +1,6 @@
 # Handoff: read this first (updated 2026-10-09)
 
-How we work: `MASTER_PROMPT.md` (**v4.1**, 17 Oct: hooks in `tools/agent_hooks.py` run return_check, brief and preflight checks and write scopes; agent runs logged in `reviews/agent_runs.md`; tests `python3 tools/regress.py`; v4.0: the Lead's 12 core rules, the rest in `docs/agents/lead_reference.md`; versions in the MASTER_PROMPT header). Plan, dates and the upload
+How we work: `MASTER_PROMPT.md` (**v4.2**, 17 Oct: hooks (`tools/agent_hooks.py`, `tools/gate.py`) run return_check, brief, preflight, gate, stage and Lead checks, write scopes; runs logged in `reviews/agent_runs.md`; tests `python3 tools/regress.py`; v4.0: the Lead's 12 core rules, the rest in `docs/agents/lead_reference.md`; versions in the MASTER_PROMPT header). Plan, dates and the upload
 calendar: `docs/ROADMAP.md`. Code index: `docs/TOOLKIT.md`. History: `docs/HISTORY.md`. Limits and fixes:
 `docs/LIMITATIONS.md`. Audit: `reviews/checkpoint_audit_2026-10-08.md`.
 

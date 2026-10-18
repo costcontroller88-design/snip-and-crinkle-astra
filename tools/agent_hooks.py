@@ -15,7 +15,17 @@ Checks that used to depend on someone remembering them now run on their own, at 
     python3 tools/agent_hooks.py brief   PreToolUse on Agent|Task (the Lead's settings.json): briefs <=6 lines;
                                          animator briefs pass brief_check (with --plan when the plan exists); a
                                          reviewer brief carries no story; the preflight band (.preflight_band, <2 h
-                                         old) allows the agent.
+                                         old) allows the agent. v4.2: the gate tracker (state/gates.json, written
+                                         only by tools/gate.py) refuses an animator "build" brief before gate1 PASS
+                                         and packaging before gate2 PASS (or an --owner-ok record, M44); a brief's
+                                         "Stage: <name>" leaves that stage's budget for the agent's count hook.
+    python3 tools/agent_hooks.py lead    PreToolUse (settings.json, the Lead only = no agent_type): refuses git push
+                                         unless git show --stat ran in the last 10 minutes on the same HEAD (rule 8);
+                                         refuses typing, clicking or form filling on a studio.youtube.com page unless
+                                         tools/approve.py "<owner quote>" ran in the last 30 minutes (rule 11).
+    python3 tools/agent_hooks.py leadpost  PostToolUse (settings.json): records git show --stat and the browser URL.
+    python3 tools/agent_hooks.py selftest  feeds sample events to every hook on scratch state; exit 1 on any wrong
+                                         decision. --hook (SessionStart): silent on PASS, one warning line on FAIL.
 
 Claude Code pipes the event as JSON on stdin. Decisions are JSON on stdout with exit 0. Any error inside this script
 allows the action (fail open): the blind reviewer's own guard, tools/blind_guard.py, is the one that fails closed.
@@ -38,8 +48,17 @@ TEAM = ("story-designer", "safety-checker", "animator", "fresh-eyes-reviewer", "
 # The largest budget each agent file gives (count warnings); stage budgets are smaller and live in the agent file.
 MAX_BUDGET = {"story-designer": 25, "safety-checker": 18, "animator": 60, "fresh-eyes-reviewer": 40,
               "packaging": 15, "growth-analyst": 40}
+# Stage budgets from the "Inputs and budget" lines of MASTER_PROMPT Appendix A; a brief's "Stage: <name>" picks
+# the first key found, in this order ("feasibility first, then build" = build; "feasibility only" = feasibility).
+STAGE_BUDGET = {
+    "animator": (("short", 30), ("build", 60), ("toolkit", 25), ("prototype", 15), ("storyboard", 25),
+                 ("measure", 25), ("fix", 20), ("feasibility", 5)),
+    "story-designer": (("fix", 12), ("plan", 25)),
+    "safety-checker": (("gate 3", 18), ("gate3", 18), ("gate 1", 14), ("gate1", 14), ("re-check", 14),
+                       ("recheck", 14)),
+}
 PROTECTED = ("tools/", "MASTER_PROMPT.md", "HANDOFF.md", "CLAUDE.md", ".claude/", "docs/agents/", ".git/",
-             "reviews/mistake_log.md", "reviews/agent_runs.md", ".preflight_band")
+             "reviews/mistake_log.md", "reviews/agent_runs.md", ".preflight_band", "state/")
 WRITE_OK = {  # repo-relative prefixes each role may write (temp folders are always fine)
     "story-designer": ("reviews/", "docs/CHARACTER_BIBLE.md", "build/"),
     "safety-checker": ("reviews/", "build/"),
@@ -52,6 +71,15 @@ STATE = os.path.join(tempfile.gettempdir(), "snc_agent_hooks")
 RUNS = os.path.join(ROOT, "reviews", "agent_runs.md")
 BAND = os.path.join(ROOT, ".preflight_band")
 BAND_MAX_AGE = 2 * 3600
+GATES = os.path.join(ROOT, "state", "gates.json")  # tools/gate.py writes it
+APPROVALS = os.path.join(ROOT, "state", "approvals.jsonl")  # tools/approve.py appends to it
+PENDING_MAX_AGE = 600  # a stage left by a brief is picked up by the agent's first call within 10 minutes
+SHOW_MAX_AGE, APPROVAL_MAX_AGE = 600, 1800
+EPISODE = re.compile(r"\bep(?:isode)?[\s_-]?0*(\d{1,2})(?!\d)", re.I)
+BUILD = re.compile(r"\bbuild\b(?!/)", re.I)
+STUDIO = re.compile(r"studio\.youtube\.com|youtube\.com/upload", re.I)
+HANDBACK = "SubagentHandback"
+BROWSER_WRITE = ("left_click", "right_click", "double_click", "triple_click", "type", "key", "left_click_drag")
 LEAK = re.compile(r"\bep\s?\d|\bplan\b|\blesson|\bstory\b|story card|\bsnip\b|crinkle|\bpip\b|reviews/|episodes/|"
                   r"\bgag|\bmoral\b", re.I)
 
@@ -90,6 +118,19 @@ def save_state(agent_id, st):
         json.dump(st, f)
 
 
+def pending_path(agent):
+    os.makedirs(STATE, exist_ok=True)
+    return os.path.join(STATE, f"pending_{agent}.json")
+
+
+def load_json(path, default):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return default
+
+
 # ---------------------------------------------------------------- count
 
 def cmd_count(d):
@@ -98,14 +139,30 @@ def cmd_count(d):
         return 0
     st = load_state(aid)
     st["calls"] += 1
+    if st["calls"] == 1:  # the agent's first call picks up the stage its brief named
+        p = pending_path(agent)
+        try:
+            with open(p, encoding="utf-8") as f:
+                pend = json.load(f)
+            os.remove(p)
+            if time.time() - pend.get("time", 0) < PENDING_MAX_AGE:
+                st["stage"], st["stage_budget"] = pend["stage"], pend["budget"]
+        except (OSError, ValueError, KeyError):
+            pass
     save_state(aid, st)
     n, cap = st["calls"], MAX_BUDGET[agent]
-    if n >= cap:
+    stage, sb = st.get("stage"), st.get("stage_budget")
+    if sb and n >= sb:
+        msg = f"Hook count: {n} tool calls = your '{stage}' stage budget ({sb}). Start no new work; write your return now."
+    elif n >= cap:
         msg = f"Hook count: {n} tool calls = your largest budget ({cap}). Start no new work; write your return now."
+    elif sb and n == int(sb * 0.8):
+        msg = f"Hook count: {n} tool calls (80% of your '{stage}' stage budget {sb}). Finish the current item, then return."
     elif n == int(cap * 0.8):
         msg = f"Hook count: {n} tool calls (80% of your largest budget {cap}). Finish the current item, then return."
     elif n % 5 == 0:
-        msg = f"Hook count: {n} tool calls so far (use this, not your own tally; stage budgets are in your file)."
+        msg = f"Hook count: {n} tool calls so far (use this, not your own tally; " + (
+            f"your '{stage}' stage budget is {sb})." if sb else "stage budgets are in your file).")
     else:
         return 0
     return context(msg, "PostToolUse")
@@ -175,6 +232,8 @@ def bash_targets(cmd):
                 bad = f"git {sub} {'--hard ' if sub == 'reset' else ''}is destructive: ask the Lead"
             elif sub in ("checkout", "restore") and "--" in w:
                 targets += w[w.index("--") + 1:]
+        if any(os.path.basename(a) in ("gate.py", "approve.py") for a in w) and "show" not in w:
+            bad = "only the Lead records gates and owner approvals (tools/gate.py, tools/approve.py)"
     return targets, bad
 
 
@@ -217,6 +276,9 @@ def last_text_from_transcript(path):
                 if m.get("role") == "assistant":
                     t = "".join(c.get("text", "") for c in m.get("content", []) if isinstance(c, dict)
                                 and c.get("type") == "text")
+                    for c in m.get("content", []):  # the desktop app delivers the report as a tool call (M61)
+                        if isinstance(c, dict) and c.get("type") == "tool_use" and c.get("name") == HANDBACK:
+                            t = str((c.get("input") or {}).get("message", ""))
                     if t.strip():
                         text = t
     except OSError:
@@ -252,7 +314,7 @@ def transcript_stats(path):
                 if m.get("role") != "assistant":
                     continue
                 for c in m.get("content", []):
-                    if isinstance(c, dict) and c.get("type") == "tool_use":
+                    if isinstance(c, dict) and c.get("type") == "tool_use" and c.get("name") != HANDBACK:
                         tools.add(c.get("id"))
                 u = m.get("usage") or {}
                 ctx = sum(u.get(k, 0) or 0 for k in ("input_tokens", "cache_creation_input_tokens",
@@ -281,7 +343,7 @@ def cmd_stop(d):
     if agent not in TEAM:
         return 0
     import return_check
-    text = d.get("last_assistant_message") or last_text_from_transcript(agent_transcript(d) or "")
+    text = last_text_from_transcript(agent_transcript(d) or "") or d.get("last_assistant_message")
     real, peak, out_tok = transcript_stats(agent_transcript(d))
     st = load_state(aid)
     if real is None:
@@ -349,22 +411,250 @@ def cmd_brief(d):
         if m:
             return deny(f"agent_hooks brief: a blind brief may not mention '{m.group(0)}': give only the neutral "
                         "copy's path and the round number")
+    ep = episode(prompt)
+    if agent == "animator" and ep and BUILD.search(prompt) and not gate_ok(ep, "gate1"):
+        return deny(f"agent_hooks brief: {ep} gate1 is not PASS in state/gates.json; a build waits for the safety "
+                    f"PASS (python3 tools/gate.py set {ep} gate1 PASS --evidence reviews/{ep}_safety.md)")
+    if agent == "packaging" and ep and not gate_ok(ep, "gate2"):
+        return deny(f"agent_hooks brief: {ep} gate2 is not PASS in state/gates.json; packaging waits for the blind "
+                    f"review PASS (tools/gate.py set {ep} gate2 PASS --evidence <blind review>, or --owner-ok "
+                    "\"<the owner's words>\" as in M44)")
     if agent == "animator":
         import brief_check
         text = prompt if prompt.lower().startswith("animator") else "animator: " + prompt
-        ep = re.search(r"\bep(\d{2})", prompt, re.I)
-        plan = os.path.join(ROOT, "reviews", f"ep{ep.group(1)}_plan.md") if ep else None
+        plan = os.path.join(ROOT, "reviews", f"{ep}_plan.md") if ep else None
         fails = brief_check.check(text, plan if plan and os.path.exists(plan) else None)
         if fails:
             return deny("agent_hooks brief (brief_check): " + "; ".join(fails))
+    st = stage_of(agent, prompt)
+    if st:
+        with open(pending_path(agent), "w", encoding="utf-8") as f:
+            json.dump({"stage": st[0], "budget": st[1], "time": time.time()}, f)
     return 0
+
+
+def episode(text):
+    m = EPISODE.search(text)
+    return f"ep{int(m.group(1)):02d}" if m else None
+
+
+def gate_ok(ep, gate):
+    rec = (load_json(GATES, {}).get(ep) or {}).get(gate) or {}
+    return rec.get("result") == "PASS" or bool(rec.get("owner_ok"))
+
+
+def stage_of(agent, prompt):
+    """(stage key, budget) from the brief's "Stage: <name>" line, or None."""
+    m = re.search(r"\bstage:\s*(.+)", prompt, re.I)
+    if not m or agent not in STAGE_BUDGET:
+        return None
+    for key, budget in STAGE_BUDGET[agent]:
+        if re.search(r"\b" + re.escape(key) + r"\b", m.group(1), re.I):
+            return key, budget
+    return None
+
+
+# ---------------------------------------------------------------- lead (the Lead's own risky actions)
+
+LEAD_STATE = "lead"  # state file name in STATE
+
+
+def git_head():
+    import subprocess
+    try:
+        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True,
+                              timeout=5).stdout.strip() or None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def git_runs(cmd, sub, flag=""):
+    """True when a segment of the command runs `git <sub>` (with `flag`), not when the words sit in a heredoc."""
+    for seg in SPLIT.split(cmd):
+        try:
+            w = shlex.split(seg, posix=True)
+        except ValueError:
+            w = seg.split()
+        while w and re.match(r"^\w+=", w[0]):  # VAR=value prefixes
+            w = w[1:]
+        if w and os.path.basename(w[0]) == "git" and sub in w[1:] and (not flag or flag in w):
+            return True
+    return False
+
+
+def browser_steps(tool, ti):
+    """(tool short name, input) for a browser call; a browser_batch yields each of its items."""
+    short = tool.rsplit("__", 1)[-1]
+    if short == "browser_batch":
+        return [(a.get("name", ""), a.get("input") or {}) for a in ti.get("actions") or [] if isinstance(a, dict)]
+    return [(short, ti)]
+
+
+def is_browser(tool):
+    return tool.startswith(("mcp__Claude_Browser__", "mcp__claude-in-chrome__"))
+
+
+def cmd_lead(d):
+    if d.get("agent_type"):
+        return 0  # agents are guarded by their own scope hook
+    tool, ti = d.get("tool_name", ""), d.get("tool_input") or {}
+    st = load_state(LEAD_STATE)
+    if tool == "Bash" and git_runs(ti.get("command", ""), "push"):
+        age = time.time() - st.get("show_time", 0)
+        if age > SHOW_MAX_AGE:
+            return deny("agent_hooks lead: run git show --stat first and read it (core rule 8); last one "
+                        + (f"{age / 60:.0f} min ago" if st.get("show_time") else "never"))
+        if st.get("show_head") and st["show_head"] != git_head():
+            return deny("agent_hooks lead: HEAD changed since your last git show --stat; run it again (core rule 8)")
+    elif is_browser(tool):
+        tabs, last = dict(st.get("tabs") or {}), st.get("last_url", "")
+        for short, inp in browser_steps(tool, ti):
+            if short == "navigate":
+                last = tabs[str(inp.get("tabId", ""))] = inp.get("url", "")
+                continue
+            url = tabs.get(str(inp.get("tabId")), last) if inp.get("tabId") else last
+            write = short in ("form_input", "javascript_tool", "file_upload", "upload_image") or (
+                short == "computer" and inp.get("action") in BROWSER_WRITE)
+            if write and STUDIO.search(url or ""):
+                rows = [ln for ln in open(APPROVALS, encoding="utf-8")] if os.path.exists(APPROVALS) else []
+                t = json.loads(rows[-1]).get("time", 0) if rows else 0
+                if time.time() - t > APPROVAL_MAX_AGE:
+                    return deny("agent_hooks lead: a Studio change needs the owner's fresh yes: python3 tools/approve.py"
+                                " \"<the owner's exact words>\" (core rule 11; valid 30 minutes)")
+    return 0
+
+
+def cmd_leadpost(d):
+    if d.get("agent_type"):
+        return 0
+    tool, ti = d.get("tool_name", ""), d.get("tool_input") or {}
+    st = load_state(LEAD_STATE)
+    if tool == "Bash" and git_runs(ti.get("command", ""), "show", "--stat"):
+        st["show_time"], st["show_head"] = time.time(), git_head()
+    elif is_browser(tool):
+        resp = json.dumps(d.get("tool_response", ""))[:3000]
+        st.setdefault("tabs", {})
+        for short, inp in browser_steps(tool, ti):
+            if short in ("navigate", "preview_start") and inp.get("url"):
+                url = inp["url"] + (" studio.youtube.com" if STUDIO.search(resp) else "")
+                st["tabs"][str(inp.get("tabId", ""))] = st["last_url"] = url
+    else:
+        return 0
+    save_state(LEAD_STATE, st)
+    return 0
+
+
+# ---------------------------------------------------------------- selftest (SessionStart health check)
+
+def selftest():
+    """[(name, ok)] from sample events fed through dispatch() on scratch state; live files are never touched."""
+    import shutil
+    g = globals()
+    keep = {k: g[k] for k in ("STATE", "RUNS", "BAND", "GATES", "APPROVALS")}
+    tmp = tempfile.mkdtemp(prefix="snc_selftest_")
+    g.update(STATE=os.path.join(tmp, "s"), RUNS=os.path.join(tmp, "runs.md"), BAND=os.path.join(tmp, "band"),
+             GATES=os.path.join(tmp, "gates.json"), APPROVALS=os.path.join(tmp, "approvals.jsonl"))
+    res = []
+
+    def run(cmd, d):
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            dispatch(cmd, json.dumps(d))
+        s = buf.getvalue().strip()
+        return json.loads(s) if s else {}
+
+    def denies(cmd, d):
+        return (run(cmd, d).get("hookSpecificOutput") or {}).get("permissionDecision") == "deny"
+
+    def ok(name, cond):
+        res.append((name, bool(cond)))
+
+    def br(agent, prompt):
+        return denies("brief", {"tool_input": {"subagent_type": agent, "prompt": prompt}})
+
+    try:
+        sc = lambda tool, ti: denies("scope", {"agent_type": "animator", "agent_id": "x", "tool_name": tool,
+                                               "tool_input": ti, "cwd": ROOT})
+        ok("scope: animator can't edit tools/", sc("Edit", {"file_path": "tools/preflight.py"}))
+        ok("scope: animator may write episodes/", not sc("Write", {"file_path": "episodes/ep99_x.py"}))
+        ok("scope: agents can't flip a gate", sc("Bash", {"command": "python3 tools/gate.py set ep99 gate1 PASS"}))
+        ok("brief: no preflight band refuses", br("packaging", "packaging: ep99 upload sheet"))
+        with open(BAND, "w") as f:
+            json.dump({"band": "ANY AGENT: <60%", "time": time.time()}, f)
+        ok("brief: packaging before gate2 refused", br("packaging", "packaging: ep99 upload sheet"))
+        ok("brief: animator build before gate1 refused", br("animator", "animator: ep99 Stage: feasibility first, then build"))
+        with open(GATES, "w") as f:
+            json.dump({"ep99": {"gate1": {"result": "PASS"}, "gate2": {"result": "FAIL", "owner_ok": "ship it"}}}, f)
+        ok("brief: packaging with an owner-ok allowed", not br("packaging", "packaging: ep99 upload sheet"))
+        ok("brief: animator build after gate1 allowed",
+           not br("animator", "animator: ep99 Stage: feasibility first, then build"))
+        ok("brief: 'Stage: feasibility only' leaves budget 5", not br("animator", "animator: ep99 Stage: feasibility "
+                                                                     "only") and '"budget": 5' in open(pending_path("animator")).read())
+        ok("brief: 7 lines refused", br("story-designer", "\n".join("x" * 7)))
+        cnt = lambda: run("count", {"agent_type": "animator", "agent_id": "c1"})
+        msgs = [cnt() for _ in range(5)]
+        ok("count: stage budget picked up (feasibility 5 -> warn at 4 and 5)",
+           "80%" in json.dumps(msgs[3]) and "stage budget (5)" in json.dumps(msgs[4]) and msgs[0] == {})
+        sp = lambda aid, text: run("stop", {"agent_type": "packaging", "agent_id": aid, "last_assistant_message": text})
+        ok("stop: a return without JSON is sent back once", sp("s1", "done").get("decision") == "block")
+        ok("stop: ... and allowed the second time", sp("s1", "done") == {} and os.path.exists(RUNS))
+        lb = lambda cmd: denies("lead", {"tool_name": "Bash", "tool_input": {"command": cmd}})
+        ok("lead: git push without git show --stat refused", lb("git push"))
+        run("leadpost", {"tool_name": "Bash", "tool_input": {"command": "git show --stat"}})
+        ok("lead: git push after git show --stat allowed", not lb("git push origin main"))
+        ok("lead: an agent's call is not the Lead's", not denies("lead", {"agent_type": "packaging", "tool_name":
+                                                                          "Bash", "tool_input": {"command": "x"}}))
+        nav = {"tool_name": "mcp__Claude_Browser__navigate", "tool_input": {"url": "https://studio.youtube.com/x"}}
+        run("leadpost", nav)
+        fi = {"tool_name": "mcp__Claude_Browser__form_input", "tool_input": {"ref": "r1", "value": "x"}}
+        ok("lead: Studio form_input without approval refused", denies("lead", fi))
+        with open(APPROVALS, "a") as f:
+            f.write(json.dumps({"time": time.time(), "quote": "yes, schedule it"}) + "\n")
+        ok("lead: Studio form_input with a fresh approval allowed", not denies("lead", fi))
+        for sp in (os.path.join(ROOT, ".claude", "settings.json"),
+                   os.path.join(os.path.dirname(ROOT), ".claude", "settings.json")):
+            hooks = json.dumps(load_json(sp, {}).get("hooks", {}))
+            ok(f"wiring: {os.path.relpath(sp, os.path.dirname(ROOT))} runs brief, lead, leadpost, selftest",
+               all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "selftest")))
+        for name in TEAM:
+            head = open(os.path.join(ROOT, ".claude", "agents", f"{name}.md"), encoding="utf-8").read().split("\n---\n")[0]
+            ok(f"wiring: {name} runs scope, count, stop", all(f'"$f" {c}' in head for c in ("scope", "count", "stop")))
+    except Exception as e:  # a crash is a failed health check, not a pass
+        res.append((f"selftest crashed: {type(e).__name__}: {e}", False))
+    finally:
+        g.update(keep)
+        shutil.rmtree(tmp, ignore_errors=True)
+    return res
+
+
+def cmd_selftest():
+    res = selftest()
+    bad = [n for n, ok in res if not ok]
+    if "--hook" in sys.argv:
+        if bad:
+            print(f"WARNING: agent_hooks selftest FAIL ({len(bad)}/{len(res)}): {bad[0]}. The harness checks may not "
+                  "run: python3 tools/agent_hooks.py selftest, fix before any agent call.")
+        return 0
+    for n, ok in res:
+        print(("PASS " if ok else "FAIL ") + n)
+    print(f"SELFTEST {'PASS' if not bad else 'FAIL'}: {len(res) - len(bad)}/{len(res)}")
+    return 1 if bad else 0
+
+
+def dispatch(cmd, raw):
+    d = json.loads(raw)
+    return {"count": cmd_count, "scope": cmd_scope, "stop": cmd_stop, "brief": cmd_brief, "lead": cmd_lead,
+            "leadpost": cmd_leadpost}[cmd](d) or 0
 
 
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
+    if cmd == "selftest":
+        return cmd_selftest()
     try:
-        d = json.load(sys.stdin)
-        return {"count": cmd_count, "scope": cmd_scope, "stop": cmd_stop, "brief": cmd_brief}[cmd](d) or 0
+        return dispatch(cmd, sys.stdin.read())
     except Exception as e:  # fail open: a broken hook must never trap an agent
         print(f"agent_hooks {cmd}: internal error, allowed ({type(e).__name__}: {e})", file=sys.stderr)
         return 0

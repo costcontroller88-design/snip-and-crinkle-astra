@@ -63,7 +63,7 @@ def check(text):
         elif SOFT.search(ev):
             bad.append(f"check {i} ({c['name']}): evidence says estimate/looks: {ev!r}; fix: measure it or write 'not checked'")
         else:
-            paths = PATH.findall(ev)
+            paths = PATH.findall(ev.replace(ROOT + "/", "./"))  # absolute paths hold spaces (M61)
             if not paths and not re.search(r"\d", ev):
                 bad.append(f"check {i} ({c['name']}): evidence has no number or file path: {ev!r}; fix: cite the still or the measured number")
             for f in paths:
