@@ -1,7 +1,7 @@
 """Replay the logged mistakes against the checkers (v4.1, v4.2; reliability research row 9: every fixed mistake is a test).
 
-    python3 tools/regress.py        (exit 1 if any case fails; runs from the pre-commit hook when tools/,
-                                     MASTER_PROMPT.md or .claude/ change)
+    python3 tools/regress.py        (exit 1 if any case fails; runs from the pre-commit hook on every commit:
+                                     the checkers also read reviews/ and state/, audit F3)
 
 Each case names the mistake-log row it guards. A case passes when the checker still catches the bad input AND
 still lets the good input through. No model calls, no network; scratch files go to a temp folder, never live files
@@ -68,8 +68,16 @@ def band(text, age=0):
         json.dump({"band": text, "time": time.time() - age}, f)
 
 
+SCRATCH_ROOT = os.path.join(TMP, "root")   # cmd_brief reads <ROOT>/reviews/<ep>_plan.md: a scratch root, never the
+os.makedirs(os.path.join(SCRATCH_ROOT, "reviews"))   # live plans (audit F1, 18 Oct: a real ep12 plan turned 2 cases red)
+
+
 def brief(agent, prompt):
-    return denied(hook(agent_hooks.cmd_brief, {"tool_input": {"subagent_type": agent, "prompt": prompt}}))
+    live, agent_hooks.ROOT = agent_hooks.ROOT, SCRATCH_ROOT
+    try:
+        return denied(hook(agent_hooks.cmd_brief, {"tool_input": {"subagent_type": agent, "prompt": prompt}}))
+    finally:
+        agent_hooks.ROOT = live
 
 
 # ---- return_check (M38, M50, M56, evidence rule)
@@ -155,6 +163,12 @@ case("M27 animator brief without feasibility refused", brief("animator", "animat
 case("blind brief naming the episode refused", brief("fresh-eyes-reviewer", "Round 2: build/blind/ep12_cut.mp4"))
 case("neutral blind brief allowed", not brief("fresh-eyes-reviewer", "Round 2: review build/blind/v_r2.mp4"))
 case("a good animator brief allowed", not brief("animator", "animator: ep12 Stage: feasibility first, then build"))
+with open(os.path.join(SCRATCH_ROOT, "reviews", "ep98_plan.md"), "w") as f, open(plan) as src:
+    f.write(src.read())
+with contextlib.redirect_stdout(io.StringIO()):
+    gate.main(["set", "ep98", "gate1", "PASS", "--evidence", plan, "--file", agent_hooks.GATES])
+case("F1 the hook still reads the episode's plan: open estimates refuse a build",
+     brief("animator", "animator: ep98 Stage: feasibility first, then build"))
 
 # ---- v4.2 gate tracker (tools/gate.py; review: no gate-order enforcement; M44 owner override)
 G = agent_hooks.GATES
