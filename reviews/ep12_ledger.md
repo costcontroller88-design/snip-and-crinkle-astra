@@ -1,0 +1,13 @@
+# Ep 12: token ledger
+
+| Date | Step | Agent | 5-hour % | Weekly % | Note |
+|---|---|---|---|---|---|
+| 18 Oct | Lead go/no-go: GO. Lesson: every toy has a home (wrong: Snip's toys left everywhere bury Pip's ball; right: the three sort toys into picture baskets by colour, 1-2-3, and the ball turns up). Rig: rig2 + A2 acting, Pip as in Ep 11; one new set (playroom). Worth it: ROADMAP topic 2, Diwali Short 3 Nov | Lead | 31 | 9 | weekly even pace ~83%: any agent |
+| 18 Oct | Plan → story-designer | Lead | 31 | 9 | preflight: ANY AGENT: <60% |
+| 18 Oct | Measure + storyboard → animator (designer 18 calls, 9 points vs est 4) | Lead | 40 | 10 | preflight: ANY AGENT: <60% |
+| 18 Oct | Fix r1 → story-designer (animator measure: 3 lines unbuildable, 9 points vs est 18) | Lead | 49 | 12 | preflight: ANY AGENT: <60% |
+| 18 Oct | Re-measure r1 + sheet sb2 → animator (designer fix r1: 11 calls, 3 points vs est 4) | Lead | 52 | 12 | preflight: ANY AGENT: <60% |
+| 18 Oct | Gate 1 safety-checker + gate 1b fresh-eyes-reviewer, parallel (last step 14 points vs est 7: M68) | Lead | 66 | 14 | preflight: SMALL AGENTS ONLY: 60-75% (reviewer, safety, designer, packaging) |
+| 18 Oct | Gate 1b round 1: MISMATCH. Card vs retelling: problem (card: Pip's ball buried under the cushion in Snip's mess / read: messy room, bunny hides in the chest); cause (card: Snip drops toys and the cushion without looking / read: unknown, nobody shown making the mess); lesson (card: every toy has a home, put it back / read: tidying is quick and fun together, partial). The ball was never mentioned. Misread support: the lid hiding Snip's head (r1 fix 1, Lead pick) reads as hiding; the cushion is unreadable (bar, dome) | fresh-eyes-reviewer (19k tok, 7 calls) | 66 | 14 | restage → story-designer after gate 1 returns |
+| 18 Oct | Restage r2 story-designer (gate 1 FAIL 5 FIX; gate 1b r1 MISMATCH) | Lead | 70 | 14 | preflight: SMALL AGENTS ONLY: 60-75% (reviewer, safety, designer, packaging) |
+| 18 Oct | Gate 1: FAIL, 5 FIX (F1 nothing on a neck or scarf: gag 3 moved to a boat tow rope; F2 toy-chest lid; F3/F4 sit-down and blind walk on clear floor; F5 Diwali chalk rangoli, LED diyas by the hand only). Restage r2 by story-designer (10 calls, 4 points): no box or lid, cause and loss on the sheet, F1-F5 in; plan_check PASS; 23 rows back to estimate | safety-checker (50k tok, 15 calls) + story-designer (54k tok, 10 calls) | 74 | 15 | band 60-75 forbids the re-measure (big agent); stop, save, commit. Next after the 18:20 IST reset: re-measure + sheet sb3, then gate 1 re-check (r2 rows) + gate 1b round 2 (last) in parallel |

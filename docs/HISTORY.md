@@ -92,3 +92,5 @@ plan_check reads ≤ limits. Render check_video PASS -13.5 LUFS. Blind r2: overa
 
 - 9 Oct handoff trim: Rollback tags: agents-v2-pre-retro, agents-v3-pre-youseo, agents-v3.1-pre-vidiq, agents-v3.2-pre-comedy, agents-v3.3-pre-ratings, agents-v3.4-pre-measure, agents-v3.5-pre-audit (`git checkout <tag> -- MASTER_PROMPT.md && python3 tools/build_agents.py`). Old Lead sessions archived 8 and 9 Oct (owner); only one Lead session at a time.
 - 9 Oct: Ep 11 transform Short scheduled by the owner (clicked Schedule); packaging title_check PASS; gate 3 PASS (`reviews/ep11_safety.md`); Videos/ holds video, upload text, cover frame 25.9 s. Retrain v3.7 done (diet_check PASS, 129 rules kept; agent files 467-859 words); v3.8 zero-based review the same day.
+
+- 18 Oct: A2 rig acting job: first gag test before a build (review finding 2): two 4.6 s clips (`episodes/rigtest_acting.py`), blind round 1 overall 4 and 6, round 2 7 and 7, comedy 6 and 7 (`build/blind_g2/blind_r2.md`). Rig job cost 15 points of the 5-hour window, weekly 7 → 9%.
