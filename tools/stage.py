@@ -4,7 +4,11 @@ whole table with episodes/stage_kit.py and writes the row, or refuses (exit 1, n
     python3 tools/stage.py menu [land|vert]                      marks, presets and who is whole in / out / cut where
     python3 tools/stage.py new ep13 porch vert "Snip@B:right Crinkle@D:left Pip@WL marker@Snip lantern@C" [--light 95]
     python3 tools/stage.py beat ep13 2.0-3.4 Snip walk_to C.L    (moves: see stage_kit; arg words after the move)
+    python3 tools/stage.py beat ep13 0.6-2.8 Snip draw lantern.eye_l    an intent row: the kit works out the stand x,
+                                     side, lean and crouch (and a walk or turn before it) and a legal frame, writes
+                                     them, or refuses with the nearest rows that work  [--no-shot: add no frame]
     python3 tools/stage.py shot ep13 [7] 31.0-33.5 ML ["Snip@B Pip@A Crinkle@WR"]   (placements are asserted)
+    python3 tools/stage.py shot ep13 4.0-6.0 VM@group[:Snip+Crinkle]   a vertical frame centred on the group
     python3 tools/stage.py legal ep13 2.0-3.4 Snip walk_to       the spots that move would accept
     python3 tools/stage.py show ep13                              the table's problems (none = PASS) and shot coverage
     python3 tools/stage.py sheet ep13 0.5,3.0,6.2 [out.png]       key-beat stills through the shot cameras
@@ -91,21 +95,22 @@ def load(ep):
 
 
 def cmd_beat(a):
+    flags = [x for x in a if x.startswith("--")]
+    a = [x for x in a if not x.startswith("--")]
     if len(a) < 4:
         sys.exit(__doc__)
     ep, span, who, move, arg = a[0], a[1], a[2], a[3], " ".join(a[4:])
     old = load(ep)
     t0, t1 = SK._span(span)
-    new = copy.deepcopy(old)
-    new.beats.append((t0, t1, who, move, arg))
-    sim, bad = check_new(old, new, "beat")
-    if bad:
-        legal = None
-        if move in ("walk_to", "enter"):
-            legal = legal_spots(old, t0, t1, who, move)
-        refuse(" | ".join(bad), legal)
+    try:
+        new, rows, shot = SK.solve(old, t0, t1, who, move, arg, add_shot="--no-shot" not in flags)
+    except SK.Refused as e:
+        SK.save_cache()
+        refuse(str(e), legal_spots(old, t0, t1, who, move) if move in ("walk_to", "enter") else None)
     write(new)
-    print(f"beat {t0:g}-{t1:g} {who} {move} {arg}: OK ({len(new.beats)} beats)")
+    SK.save_cache()
+    print(f"beat {t0:g}-{t1:g} {who} {move} {arg}: OK, wrote {SK.fmt_rows(rows)}" +
+          (f"; shot {t0:g}-{t1:g} {shot}" if shot else "") + f" ({len(new.beats)} beats)")
 
 
 def legal_spots(table, t0, t1, who, move):
@@ -131,6 +136,10 @@ def cmd_shot(a):
     old = load(ep)
     t0, t1 = SK._span(span)
     sim0 = SK.Sim(old)
+    g = re.match(r"^(VW|VM|VC)@group(?::([\w+]+))?$", pre)
+    if g:
+        names = sim0.group_presets(t0, t1, tuple(g.group(2).split("+")) if g.group(2) else None)
+        pre = next(n for n in names if n.startswith(g.group(1)))
     for s0, s1, p in old.shots:
         if t0 < s1 - 1e-9 and s0 < t1 - 1e-9:
             refuse(f"overlaps shot {s0:g}-{s1:g} {p}")
@@ -157,6 +166,13 @@ def cmd_legal(a):
     tab = load(ep)
     if move == "shot":
         print("legal:", ", ".join(SK.Sim(tab).legal_presets(t0, t1)))
+    elif move in SK.INTENT:
+        try:
+            _, rows, shot = SK.solve(tab, t0, t1, who, move, " ".join(a[4:]))
+            print("would write:", SK.fmt_rows(rows) + (f"; shot {shot}" if shot else ""))
+        except SK.Refused as e:
+            print("REFUSED:", e)
+        SK.save_cache()
     else:
         print("legal:", ", ".join(legal_spots(tab, t0, t1, who, move)))
 
@@ -190,6 +206,11 @@ def cmd_menu(a):
                    ("Pip", "Crinkle")):
         ho = SK.handover_distance(a_, b_)
         print(f"hand-over pair {a_} (L) + {b_} (R):", f"{ho[0]:.0f} u apart, pass at y {ho[1]:.0f}" if ho else "none")
+    print("v2 work spots beside the lantern (front prop; centre distance):",
+          ", ".join(f"{w} {SK.front_spot(w, 'lantern', 1):.0f}" for w in SK.CAST))
+    print("v2 poses: lean=0-12 (deg toward the target), sq=0.88-1 (crouch); passes: lean= sq= (giver), rlean= rsq= "
+          "(receiver); moves: take, draw, sway, wiggle [up], spin [left|right], bow, puff (Pip); walk_to <spot> front;"
+          " vertical frames VW|VM|VC@x<n> (shot ... VM@group)")
     for name, (v, z, win) in SK.PRESETS.items():
         if v != view:
             continue
@@ -210,7 +231,8 @@ def cmd_sheet(a):
 
 # ---------------------------------------------------------------- move test
 MOVE_CASES = ("enter", "exit", "walk_to", "turn", "look", "nod", "shake", "react", "hop", "hold", "point",
-              "pick_up", "put_down", "place_on", "drop", "hand_over")
+              "pick_up", "put_down", "place_on", "drop", "hand_over",
+              "take", "sway", "wiggle", "spin", "bow", "puff", "draw", "pass")      # v2: the last 8
 
 
 def _case(who, mark, move):
@@ -258,9 +280,37 @@ def _case(who, mark, move):
         t.start[other] = (f"{mark}.R", "left")
         t.start["block"] = (who, "")
         beats.append((0.5, 1.7, who, "hand_over", f"block {other}"))
+    elif move == "take":                  # the solver places the taker
+        other = "Crinkle" if who != "Crinkle" else "Snip"
+        t.start[who] = (mark, "right")
+        t.start[other] = (f"x:{min(1900, SK.MARKS[mark] + 520):.0f}", "left")
+        t.start["marker"] = (other, "")
+        t.shots = [(0.0, 3.2, "W")]
+        return _solved(t, (0.9, 2.1, who, "take", "marker")), [1.0, 1.4, 1.9]
+    elif move in ("sway", "wiggle", "spin", "bow", "puff"):
+        beats.append((0.5, {"spin": 1.3, "bow": 1.5}.get(move, 1.7), who, move, "up" if move == "wiggle" else ""))
+    elif move == "draw":                  # the solver places who; the lantern stands on the mark (porch floor)
+        t = SK.Table("kittest", "porch", "land")
+        t.start = {who: (f"x:{max(20, SK.MARKS[mark] - 330):.0f}", "right"), "marker": (who, ""), "lantern": (mark, "")}
+        t.shots = [(0.0, 3.2, "W")]
+        return _solved(t, (0.5, 1.9, who, "draw", "lantern.eye_l")), [0.8, 1.2, 1.7]
+    elif move == "pass":                  # the solver finds lean / crouch passes (Crinkle-Pip included)
+        other = "Pip" if who != "Pip" else "Crinkle"
+        t.start[who] = (mark, "right")
+        t.start[other] = (f"x:{min(1900, SK.MARKS[mark] + 420):.0f}", "left")
+        t.start["marker"] = (who, "")
+        t.shots = [(0.0, 3.2, "W")]
+        return _solved(t, (0.9, 2.1, who, "hand_over", f"marker {other}")), [1.0, 1.4, 1.9]
     t.beats = beats
     t.shots = [(0.0, 3.2, "W")]          # the kit judges framing only against a declared shot
     return t, [0.6, 1.0, 1.4, 2.4] if move in ("enter", "exit", "walk_to") else [0.8, 1.1, 1.5]
+
+
+def _solved(t, beat):
+    try:
+        return SK.solve(t, *beat, add_shot=False, nearest=False)[0]
+    except SK.Refused as e:
+        return str(e)
 
 
 def run_case(args):
@@ -269,6 +319,8 @@ def run_case(args):
     sys.path.insert(0, TOOLS)
     import clearance_check as CC
     t, times = _case(who, mark, move)
+    if isinstance(t, str):
+        return who, mark, move, "R", t[:140]
     try:
         sim = SK.Sim(t)
         probs = sim.problems()
@@ -319,6 +371,7 @@ def cmd_test(a):
         res = pool.map(run_case, cases)
     import framestore
     code = framestore.code_hash(os.path.join(ROOT, "episodes", "stage_kit.py"))
+    SK.save_cache()
     bad = [r for r in res if r[3] == "X"]
     L = [f"# Stage kit move test ({datetime.date.today():%d %b %Y}; `python3 tools/stage.py test`)", "",
          f"Kit code hash {code[:12]}. ok = the kit accepts the move and the rendered frames are clear (clearance "

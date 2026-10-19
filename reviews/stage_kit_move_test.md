@@ -1,6 +1,6 @@
 # Stage kit move test (19 Oct 2026; `python3 tools/stage.py test`)
 
-Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frames are clear (clearance sweep, 10 u, the holder's paws allowed) and nobody is cut in W; R = the kit refuses it (reason below); X = accepted but the render touches or cuts (a kit bug).
+Kit code hash 4dafe4b79836. ok = the kit accepts the move and the rendered frames are clear (clearance sweep, 10 u, the holder's paws allowed) and nobody is cut in W; R = the kit refuses it (reason below); X = accepted but the render touches or cuts (a kit bug).
 
 | Who | Move | WL | A | B | C | D | E | WR |
 |---|---|---|---|---|---|---|---|---|
@@ -20,6 +20,14 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 | Snip | place_on | R | ok | R | R | R | R | R |
 | Snip | drop | R | R | R | R | R | R | R |
 | Snip | hand_over | R | R | ok | ok | ok | R | R |
+| Snip | take | R | ok | ok | ok | R | R | R |
+| Snip | sway | R | ok | ok | ok | ok | ok | R |
+| Snip | wiggle | R | ok | ok | ok | ok | ok | R |
+| Snip | spin | R | ok | ok | ok | ok | ok | R |
+| Snip | bow | R | ok | ok | ok | ok | ok | R |
+| Snip | puff | R | R | R | R | R | R | R |
+| Snip | draw | R | R | ok | ok | ok | ok | ok |
+| Snip | pass | R | R | R | R | R | R | R |
 | Crinkle | enter | R | ok | ok | ok | ok | ok | R |
 | Crinkle | exit | R | ok | ok | ok | ok | ok | R |
 | Crinkle | walk_to | R | ok | ok | ok | ok | ok | R |
@@ -36,6 +44,14 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 | Crinkle | place_on | R | ok | R | R | R | R | R |
 | Crinkle | drop | R | R | R | R | R | R | R |
 | Crinkle | hand_over | R | R | ok | ok | ok | R | R |
+| Crinkle | take | R | ok | ok | ok | R | R | R |
+| Crinkle | sway | R | ok | ok | ok | ok | ok | R |
+| Crinkle | wiggle | R | ok | ok | ok | ok | ok | R |
+| Crinkle | spin | R | ok | ok | ok | ok | ok | R |
+| Crinkle | bow | R | ok | ok | ok | ok | R | R |
+| Crinkle | puff | R | R | R | R | R | R | R |
+| Crinkle | draw | R | R | ok | ok | ok | ok | ok |
+| Crinkle | pass | R | R | R | R | R | R | R |
 | Pip | enter | ok | ok | ok | ok | ok | ok | ok |
 | Pip | exit | ok | ok | ok | ok | ok | ok | ok |
 | Pip | walk_to | R | R | R | R | R | R | R |
@@ -52,6 +68,14 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 | Pip | place_on | R | R | R | R | R | R | R |
 | Pip | drop | R | R | R | R | R | R | R |
 | Pip | hand_over | R | R | R | R | R | R | R |
+| Pip | take | R | R | R | R | R | R | R |
+| Pip | sway | ok | ok | ok | ok | ok | ok | ok |
+| Pip | wiggle | ok | ok | ok | ok | ok | ok | ok |
+| Pip | spin | ok | ok | ok | ok | ok | ok | ok |
+| Pip | bow | ok | ok | ok | ok | ok | ok | ok |
+| Pip | puff | ok | ok | ok | ok | ok | ok | ok |
+| Pip | draw | R | R | R | R | R | R | R |
+| Pip | pass | ok | ok | ok | ok | R | R | R |
 
 ## Refusals and failures
 
@@ -75,17 +99,17 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 - R Snip hop at WR: shot 1 W 0-3.2: Snip at x 1720 is cut at 0.0 s
 - R Snip hold at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
 - R Snip hold at WR: shot 1 W 0-3.2: Snip at x 1720 is cut at 0.0 s
-- R Snip point at WL: beat 0.5-1.2 Snip point E: (1600, 1280) is 1288 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
-- R Snip point at A: beat 0.5-1.2 Snip point E: (1600, 1280) is 1188 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
-- R Snip point at B: beat 0.5-1.2 Snip point E: (1600, 1280) is 848 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
-- R Snip point at C: beat 0.5-1.2 Snip point E: (1600, 1280) is 528 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
-- R Snip point at D: beat 0.5-1.2 Snip point E: (1600, 1280) is 208 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
-- R Snip point at E: beat 0.5-1.2 Snip point A: (300, 1280) is 1188 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
-- R Snip point at WR: beat 0.5-1.2 Snip point A: (300, 1280) is 1308 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
+- R Snip point at WL: beat 0.5-1.2 Snip point E: (1600, 1280) is 1288 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (
+- R Snip point at A: beat 0.5-1.2 Snip point E: (1600, 1280) is 1188 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (
+- R Snip point at B: beat 0.5-1.2 Snip point E: (1600, 1280) is 848 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Snip point at C: beat 0.5-1.2 Snip point E: (1600, 1280) is 528 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Snip point at D: beat 0.5-1.2 Snip point E: (1600, 1280) is 208 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Snip point at E: beat 0.5-1.2 Snip point A: (300, 1280) is 1188 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Snip point at WR: beat 0.5-1.2 Snip point A: (300, 1280) is 1308 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch (s
 - R Snip pick_up at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
 - R Snip pick_up at B: beat 0.5-1.5 Snip pick_up block: Snip faces right: turn to reach (390, 1340)
 - R Snip put_down at WL: beat 0.5-1.5 Snip put_down A: block at x 300 would be on or by Snip's feet (76-344)
-- R Snip put_down at B: beat 0.5-1.5 Snip put_down C: (960, 1422) is 260 u from Snip's shoulder; the reach is 129: stand closer (a work spot <mark>.L/.R)
+- R Snip put_down at B: beat 0.5-1.5 Snip put_down C: (960, 1422) is 260 u from Snip's shoulder; the reach is 129: stand closer (x:<n>), lean (lean=4-12) or crouch 
 - R Snip put_down at C: beat 0.5-1.5 Snip put_down B: Snip faces right: turn to reach (640, 1422)
 - R Snip put_down at D: beat 0.5-1.5 Snip put_down C: Snip faces right: turn to reach (960, 1422)
 - R Snip put_down at E: beat 0.5-1.5 Snip put_down D: Snip faces right: turn to reach (1280, 1422)
@@ -103,6 +127,21 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 - R Snip hand_over at A: shot 1 W 0-3.2: Snip at x 59 is cut at 0.0 s
 - R Snip hand_over at E: shot 1 W 0-3.2: Crinkle at x 1841 is cut at 0.0 s
 - R Snip hand_over at WR: shot 1 W 0-3.2: Crinkle at x 1961 is cut at 0.0 s
+- R Snip take at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
+- R Snip take at D: shot 1 W 0-3.2: Crinkle at x 1800 is cut at 0.0 s
+- R Snip take at E: 0.0 s: Snip (x 1600) and Crinkle (x 1900) silhouettes are 0 u apart; need 10 (move apart or lean less)
+- R Snip take at WR: beat 0.9-2.1 Snip take marker: Snip faces right: turn to reach (1691, 1349)
+- R Snip sway at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
+- R Snip sway at WR: shot 1 W 0-3.2: Snip at x 1720 is cut at 0.0 s
+- R Snip wiggle at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
+- R Snip wiggle at WR: shot 1 W 0-3.2: Snip at x 1720 is cut at 0.0 s
+- R Snip spin at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
+- R Snip spin at WR: shot 1 W 0-3.2: Snip at x 1720 is cut at 0.0 s
+- R Snip bow at WL: shot 1 W 0-3.2: Snip at x 200 is cut at 0.0 s
+- R Snip bow at WR: shot 1 W 0-3.2: Snip at x 1720 is cut at 0.0 s
+- R Snip puff at WL: beat 0.5-1.7 Snip puff : only Pip puffs up
+- R Snip draw at WL: shot 1 W 0-3.2: Snip at x 20 is cut at 0.0 s
+- R Snip pass at WL: beat 0.9-2.1 Snip hand_over marker Pip: no hand-over pair for Snip (left) and Pip (right) here: their reach bands don't meet clear of heads 
 - R Crinkle enter at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 3.1 s
 - R Crinkle enter at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 3.1 s
 - R Crinkle exit at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
@@ -123,17 +162,17 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 - R Crinkle hop at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 0.0 s
 - R Crinkle hold at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
 - R Crinkle hold at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 0.0 s
-- R Crinkle point at WL: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 1258 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
-- R Crinkle point at A: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 1158 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
-- R Crinkle point at B: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 818 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
-- R Crinkle point at C: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 498 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
-- R Crinkle point at D: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 180 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
-- R Crinkle point at E: beat 0.5-1.2 Crinkle point A: (300, 1280) is 1158 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
-- R Crinkle point at WR: beat 0.5-1.2 Crinkle point A: (300, 1280) is 1278 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
+- R Crinkle point at WL: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 1258 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cr
+- R Crinkle point at A: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 1158 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cr
+- R Crinkle point at B: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 818 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cro
+- R Crinkle point at C: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 498 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cro
+- R Crinkle point at D: beat 0.5-1.2 Crinkle point E: (1600, 1280) is 180 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cro
+- R Crinkle point at E: beat 0.5-1.2 Crinkle point A: (300, 1280) is 1158 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cro
+- R Crinkle point at WR: beat 0.5-1.2 Crinkle point A: (300, 1280) is 1278 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or cro
 - R Crinkle pick_up at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
 - R Crinkle pick_up at B: beat 0.5-1.5 Crinkle pick_up block: Crinkle faces right: turn to reach (390, 1340)
 - R Crinkle put_down at WL: beat 0.5-1.5 Crinkle put_down A: block at x 300 would be on or by Crinkle's feet (40-385)
-- R Crinkle put_down at B: beat 0.5-1.5 Crinkle put_down C: (960, 1422) is 247 u from Crinkle's shoulder; the reach is 148: stand closer (a work spot <mark>.L/.R)
+- R Crinkle put_down at B: beat 0.5-1.5 Crinkle put_down C: (960, 1422) is 247 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or c
 - R Crinkle put_down at C: beat 0.5-1.5 Crinkle put_down B: Crinkle faces right: turn to reach (640, 1422)
 - R Crinkle put_down at D: beat 0.5-1.5 Crinkle put_down C: Crinkle faces right: turn to reach (960, 1422)
 - R Crinkle put_down at E: beat 0.5-1.5 Crinkle put_down D: Crinkle faces right: turn to reach (1280, 1422)
@@ -151,29 +190,45 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 - R Crinkle hand_over at A: shot 1 W 0-3.2: Crinkle at x 59 is cut at 0.0 s
 - R Crinkle hand_over at E: shot 1 W 0-3.2: Snip at x 1841 is cut at 0.0 s
 - R Crinkle hand_over at WR: shot 1 W 0-3.2: Snip at x 1961 is cut at 0.0 s
+- R Crinkle take at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
+- R Crinkle take at D: shot 1 W 0-3.2: Snip at x 1800 is cut at 0.0 s
+- R Crinkle take at E: 0.0 s: Crinkle (x 1600) and Snip (x 1900) silhouettes are 0 u apart; need 10 (move apart or lean less)
+- R Crinkle take at WR: beat 0.9-2.1 Crinkle take marker: (1730, 1353) is 168 u from Crinkle's shoulder; the reach is 148: stand closer (x:<n>), lean (lean=4-12) or
+- R Crinkle sway at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
+- R Crinkle sway at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 0.0 s
+- R Crinkle wiggle at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
+- R Crinkle wiggle at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 0.0 s
+- R Crinkle spin at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
+- R Crinkle spin at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 0.0 s
+- R Crinkle bow at WL: shot 1 W 0-3.2: Crinkle at x 200 is cut at 0.0 s
+- R Crinkle bow at E: shot 1 W 0-3.2: Crinkle at x 1600 is cut at 0.5 s
+- R Crinkle bow at WR: shot 1 W 0-3.2: Crinkle at x 1720 is cut at 0.0 s
+- R Crinkle puff at WL: beat 0.5-1.7 Crinkle puff : only Pip puffs up
+- R Crinkle draw at WL: shot 1 W 0-3.2: Crinkle at x 20 is cut at 0.0 s
+- R Crinkle pass at WL: beat 0.9-2.1 Crinkle hand_over marker Pip: no hand-over pair for Crinkle (left) and Pip (right) here: their reach bands don't meet clear of 
 - R Pip walk_to at WL: beat 0.5-2.5 Pip walk_to C: 760 u in 2 s is faster than 300 u/s: give it at least 2.5 s
 - R Pip walk_to at A: beat 0.5-2.5 Pip walk_to C: 660 u in 2 s is faster than 300 u/s: give it at least 2.2 s
 - R Pip walk_to at B: beat 0.5-2.5 Pip walk_to D: 640 u in 2 s is faster than 300 u/s: give it at least 2.1 s
 - R Pip walk_to at C: beat 0.5-2.5 Pip walk_to A: 660 u in 2 s is faster than 300 u/s: give it at least 2.2 s
 - R Pip walk_to at D: beat 0.5-2.5 Pip walk_to B: 640 u in 2 s is faster than 300 u/s: give it at least 2.1 s
 - R Pip walk_to at E: beat 0.5-2.5 Pip walk_to C: 640 u in 2 s is faster than 300 u/s: give it at least 2.1 s
-- R Pip point at WL: beat 0.5-1.2 Pip point E: (1600, 1280) is 1335 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip point at A: beat 0.5-1.2 Pip point E: (1600, 1280) is 1235 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip point at B: beat 0.5-1.2 Pip point E: (1600, 1280) is 896 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip point at C: beat 0.5-1.2 Pip point E: (1600, 1280) is 578 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip point at D: beat 0.5-1.2 Pip point E: (1600, 1280) is 263 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip point at E: beat 0.5-1.2 Pip point A: (300, 1280) is 1235 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip point at WR: beat 0.5-1.2 Pip point A: (300, 1280) is 1355 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
-- R Pip pick_up at WL: beat 0.5-1.5 Pip pick_up block: (390, 1340) is 124 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
+- R Pip point at WL: beat 0.5-1.2 Pip point E: (1600, 1280) is 1335 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=
+- R Pip point at A: beat 0.5-1.2 Pip point E: (1600, 1280) is 1235 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=
+- R Pip point at B: beat 0.5-1.2 Pip point E: (1600, 1280) is 896 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=0
+- R Pip point at C: beat 0.5-1.2 Pip point E: (1600, 1280) is 578 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=0
+- R Pip point at D: beat 0.5-1.2 Pip point E: (1600, 1280) is 263 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=0
+- R Pip point at E: beat 0.5-1.2 Pip point A: (300, 1280) is 1235 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=0
+- R Pip point at WR: beat 0.5-1.2 Pip point A: (300, 1280) is 1355 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq=0
+- R Pip pick_up at WL: beat 0.5-1.5 Pip pick_up block: (390, 1340) is 124 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch 
 - R Pip pick_up at A: beat 0.5-1.5 Pip pick_up block: block at (390, 1340) would sit by Pip's head (bottom y 1348): use another spot or mark
 - R Pip pick_up at B: beat 0.5-1.5 Pip pick_up block: Pip faces right: turn to reach (390, 1340)
 - R Pip put_down at WL: beat 0.5-1.5 Pip put_down A: block at x 300 would be on or by Pip's feet (120-292)
-- R Pip put_down at B: beat 0.5-1.5 Pip put_down C: (960, 1422) is 263 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
+- R Pip put_down at B: beat 0.5-1.5 Pip put_down C: (960, 1422) is 263 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (sq
 - R Pip put_down at C: beat 0.5-1.5 Pip put_down B: Pip faces right: turn to reach (640, 1422)
 - R Pip put_down at D: beat 0.5-1.5 Pip put_down C: Pip faces right: turn to reach (960, 1422)
 - R Pip put_down at E: beat 0.5-1.5 Pip put_down D: Pip faces right: turn to reach (1280, 1422)
 - R Pip put_down at WR: beat 0.5-1.5 Pip put_down A: Pip faces right: turn to reach (300, 1422)
-- R Pip place_on at WL: beat 0.5-1.5 Pip place_on box_top: (390, 1340) is 124 u from Pip's shoulder; the reach is 72: stand closer (a work spot <mark>.L/.R)
+- R Pip place_on at WL: beat 0.5-1.5 Pip place_on box_top: (390, 1340) is 124 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crou
 - R Pip place_on at A: beat 0.5-1.5 Pip place_on box_top: block at (390, 1340) would sit by Pip's head (bottom y 1348): use another spot or mark
 - R Pip place_on at B: beat 0.5-1.5 Pip place_on box_top: Pip faces right: turn to reach (390, 1340)
 - R Pip drop at WL: beat 0.5-1.5 Pip drop : block at x 230 would be on or by Pip's feet (120-292)
@@ -184,5 +239,22 @@ Kit code hash f35dd9321822. ok = the kit accepts the move and the rendered frame
 - R Pip drop at E: beat 0.5-1.5 Pip drop : block at x 1630 would be on or by Pip's feet (1520-1692)
 - R Pip drop at WR: beat 0.5-1.5 Pip drop : block at x 1750 would be on or by Pip's feet (1640-1812)
 - R Pip hand_over at WL: no hand-over pair for Pip (left) and Crinkle (right): their reach bands don't meet
+- R Pip take at WL: beat 0.9-2.1 Pip take marker: (511, 1349) is 244 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Pip take at A: beat 0.9-2.1 Pip take marker: (611, 1349) is 244 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Pip take at B: beat 0.9-2.1 Pip take marker: (951, 1349) is 244 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (s
+- R Pip take at C: beat 0.9-2.1 Pip take marker: (1271, 1349) is 244 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (
+- R Pip take at D: beat 0.9-2.1 Pip take marker: (1591, 1349) is 244 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (
+- R Pip take at E: beat 0.9-2.1 Pip take marker: (1829, 1329) is 164 u from Pip's shoulder; the reach is 72: stand closer (x:<n>), lean (lean=4-12) or crouch (
+- R Pip take at WR: beat 0.9-2.1 Pip take marker: marker at Pip's paw would come within 10 u of Pip's head
+- R Pip draw at WL: beat 0.5-1.9 Pip draw lantern.eye_l: the marker's end would come within 10 u of Pip's head drawing (163, 1412): stand further off or lower (
+- R Pip draw at A: beat 0.5-1.9 Pip draw lantern.eye_l: (263, 1412) is 186 u from Pip's shoulder; the reach is 122: stand closer (x:<n>), lean (lean=4-12) or c
+- R Pip draw at B: beat 0.5-1.9 Pip draw lantern.eye_l: (603, 1412) is 234 u from Pip's shoulder; the reach is 122: stand closer (x:<n>), lean (lean=4-12) or c
+- R Pip draw at C: beat 0.5-1.9 Pip draw lantern.eye_l: (923, 1412) is 234 u from Pip's shoulder; the reach is 122: stand closer (x:<n>), lean (lean=4-12) or c
+- R Pip draw at D: beat 0.5-1.9 Pip draw lantern.eye_l: (1243, 1412) is 234 u from Pip's shoulder; the reach is 122: stand closer (x:<n>), lean (lean=4-12) or 
+- R Pip draw at E: beat 0.5-1.9 Pip draw lantern.eye_l: (1563, 1412) is 234 u from Pip's shoulder; the reach is 122: stand closer (x:<n>), lean (lean=4-12) or 
+- R Pip draw at WR: beat 0.5-1.9 Pip draw lantern.eye_l: (1683, 1412) is 234 u from Pip's shoulder; the reach is 122: stand closer (x:<n>), lean (lean=4-12) or 
+- R Pip pass at D: shot 1 W 0-3.2: Crinkle at x 1700 is cut at 0.0 s
+- R Pip pass at E: beat 0.9-2.1 Pip hand_over marker Crinkle: no hand-over pair for Pip (left) and Crinkle (right) here: their reach bands don't meet clear of 
+- R Pip pass at WR: 2.5 s: marker carried by Crinkle is 0 u from Pip's head; need 10 (put it down, pass it on or stand apart)
 
-Result: PASS (173 ok, 163 refused, 0 failed of 336)
+Result: PASS (267 ok, 237 refused, 0 failed of 504)

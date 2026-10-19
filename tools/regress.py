@@ -10,6 +10,7 @@ still lets the good input through. No model calls, no network; scratch files go 
 import contextlib
 import io
 import json
+import copy
 import os
 import subprocess
 import sys
@@ -611,6 +612,83 @@ case("KIT trial bugs: a floor prop (the lantern) leaves hand-over pairs alone; a
 case("KIT framing_check knows vertical: Crinkle whole in VC 2.0x (540 u wide) fails",
      any("not inside" in f or "wide" in f for f in
          frow("VC@C 2x x 690-1230 y 702-1662", "Crinkle", "Crinkle x 960")))
+
+# ---- stage kit v2: the kit works staging out (intent rows, depth, lean/crouch, take, gags, group frames)
+def kitv2(start, beats=(), shots=()):
+    t = SK.Table("ep98", "porch", "vert")
+    t.start = dict(start)
+    t.beats, t.shots = list(beats), list(shots)
+    return t
+
+
+def kitp_land(t, beats):
+    t = copy.deepcopy(t)
+    t.beats = list(beats)
+    return kitp(t)
+
+
+def kitp(t):
+    try:
+        return SK.Sim(t).problems()
+    except SK.Refused as e:
+        return [str(e)]
+
+
+LANT = {"Snip": ("x:400", "right"), "Crinkle": ("x:1300", "left"), "marker": ("Snip", ""),
+        "lantern": ("C", "")}
+try:
+    _t, _rows, _shot = SK.solve(kitv2(LANT), 0.5, 1.9, "Snip", "draw", "lantern.eye_l")
+    _ok = _rows[0][3] == "walk_to" and _rows[-1][3] == "draw" and _shot and not kitp(_t)
+except SK.Refused as e:
+    _ok, _rows, _t = False, [], kitv2(LANT)
+case("KIT v2 intent row: 'Snip draw lantern.eye_l' gets a stand x (walk), the draw and a legal frame", _ok, str(_rows)[:120])
+case("KIT v2 depth: feet may hide behind the lantern while the paw works; an idle Pip with her head by it is refused",
+     not kitp(kitv2(LANT, [(0.5, 1.4, "Snip", "walk_to", "x:720"), (1.4, 2.4, "Snip", "draw", "lantern.eye_l")]))
+     and 720 + SK.geom("Snip", 1)["feet"][1] > 840 + 10
+     and any("Pip's head" in p or "Pip's resting" in p for p in kitp(kitv2({"Pip": ("x:800", "right"), "lantern": ("C", "")}))))
+PASS = {"Pip": ("C.L", "right"), "Snip": ("x:300", "right"), "Crinkle": ("x:1300", "left"), "marker": ("Pip", ""),
+        "lantern": ("C", "")}
+_pp = SK.Table("ep98", "playroom", "land")
+_pp.start = {"Pip": ("B", "right"), "Crinkle": ("x:1060", "left"), "marker": ("Pip", "")}
+_pp.shots = [(0, 3.2, "W")]
+_far = copy.deepcopy(_pp)
+_far.start["Crinkle"] = ("x:1500", "left")
+try:
+    _, _pr, _ = SK.solve(_pp, 0.9, 2.1, "Pip", "hand_over", "marker Crinkle", add_shot=False)
+except SK.Refused as e:
+    _pr = [("", "", "", "", str(e))]
+case("KIT v2 Crinkle-Pip pass: the solver finds the lean/crouch pass Pip -> Crinkle; with Crinkle 860 u off it's refused",
+     "hand_over" in _pr[-1][3] and any("pair" in p for p in kitp_land(_far, [(0.9, 2.1, "Pip", "hand_over", "marker Crinkle")])),
+     str(_pr)[:160])
+TK = {"Pip": ("x:300", "right"), "Snip": ("x:712", "right"), "Crinkle": ("x:1300", "left"), "marker": ("Snip", ""),
+      "lantern": ("C", "")}
+_d = [(0.0, 1.2, "Snip", "draw", "lantern.eye_l 0-0.67")]
+case("KIT v2 take: Crinkle pinches the marker from Snip's paw at the C after walking in; from x 1300 it's out of reach",
+     not kitp(kitv2(TK, _d + [(1.2, 1.8, "Crinkle", "walk_to", "x:1149"), (1.8, 2.8, "Crinkle", "take", "marker")]))
+     and any("reach" in p for p in kitp(kitv2(TK, _d + [(1.2, 2.8, "Crinkle", "take", "marker")]))))
+G3 = {"Snip": ("B", "right"), "Crinkle": ("D", "left"), "Pip": ("WL", "right")}
+_spin = SK.Table("ep98", "playroom", "land")
+_spin.start = dict(G3)
+_spin.beats = [(0.5, 1.3, "Snip", "spin", "left")]
+case("KIT v2 gags: sway, wiggle up, spin, bow pass in W; spin ends facing the other way; only Pip puffs",
+     all(not kit(G3, [(0.5, 1.7, "Snip", m, a)], [(0, 2, "W")]) for m, a in
+         (("sway", ""), ("wiggle", "up"), ("bow", ""))) and not kit(G3, [(0.5, 1.3, "Snip", "spin", "left")], [(0, 2, "W")])
+     and SK.Sim(_spin).facing("Snip", 1.4) < 0 and any("only Pip" in p for p in kit(G3, [(0.5, 1.7, "Snip", "puff", "")]))
+     and not kit(G3, [(0.5, 1.7, "Pip", "puff", "")], [(0, 2, "W")]))
+_gt = kitv2({"Snip": ("C.L", "right"), "Crinkle": ("C.R", "left")})
+_gp = SK.Sim(_gt).group_presets(0, 2)
+_gw = next(n for n in _gp if n.startswith("VW"))
+case("KIT v2 vertical frames centred on the group: VW@x<centre> holds Snip and Crinkle at C.L / C.R whole",
+     SK.preset("VM@x960")[2][0] == 960 - 1080 / 1.38 / 2 and not SK.Sim(_gt).shot_problems(0, 2, _gw)
+     and all(SK.status_ext(*SK.Sim(_gt).extent(w, 1.0), SK.preset(_gw)[2]) == "in" for w in ("Snip", "Crinkle")))
+_busy = kitv2(LANT)
+try:
+    SK.solve(_busy, 0.0, 0.5, "Snip", "draw", "lantern.eye_l", add_shot=False)
+    _msg = ""
+except SK.Refused as e:
+    _msg = str(e)
+case("KIT v2 no solution: the refusal lists the nearest rows that work (later, or the partner moving)",
+     "nearest that work" in _msg, _msg[-160:])
 
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:
