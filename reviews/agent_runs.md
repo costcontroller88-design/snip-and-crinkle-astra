@@ -45,3 +45,4 @@
 | 18 Oct 23:44 | safety-checker | FAIL | 19 / 21 / 14 | 66k | 1k | FAIL: over budget: tool_calls 21 > budget 14 | no |
 | 18 Oct 23:44 | fresh-eyes-reviewer | DONE | 6 / 6 / 10 | 18k | 1k | FAIL: check 1 (loudness): evidence has no number or file path: 'n/a, storyboard mode'; fix: cite the still or the measured number | no |
 | 18 Oct 23:44 | fresh-eyes-reviewer | DONE | 6 / 5 / 10 | 19k | 1k | PASS | no |
+| 19 Oct 20:05 | story-designer | PARTIAL | 20 / 22 / 25 | 114k | 3k | PASS | no |

@@ -550,6 +550,68 @@ case("M77 ... a code change after the sweep refuses gate1b again",
      run_quiet(gate.main, ["set", "ep97", "gate1b", "PASS", "--evidence", plan, "--file", G, "--clearance", ST]) == 1)
 case("M77 an owner-ok still records (M44)", g97("--owner-ok", "go ahead, I checked it") == 0)
 
+# ---- stage kit (docs/stage_kit_proposal.md): the menu refuses the framing and clearance mistakes up front
+sys.path.insert(0, os.path.join(ROOT, "episodes"))
+import stage_kit as SK  # noqa: E402
+
+
+def kit(start, beats=(), shots=(), set_name="playroom", view="land"):
+    t = SK.Table("ep98", set_name, view)
+    t.start = dict(start)
+    t.beats, t.shots = list(beats), list(shots)
+    try:
+        return SK.Sim(t).problems()
+    except SK.Refused as e:
+        return [str(e)]
+
+
+ST3 = {"Snip": ("B", "right"), "Crinkle": ("D", "left"), "Pip": ("WL", "right")}
+case("KIT presets reproduce the proposal's table (ML holds Snip at A-C, cuts her at D; MR cuts Crinkle at A)",
+     SK.status("Snip", SK.MARKS["C"], SK.PRESETS["ML"][2]) == "in"
+     and SK.status("Snip", SK.MARKS["D"], SK.PRESETS["ML"][2]) == "cut"
+     and SK.status("Crinkle", SK.MARKS["A"], SK.PRESETS["MR"][2]) == "cut"
+     and SK.status("Pip", SK.MARKS["WR"], SK.PRESETS["W"][2]) == "in"
+     and SK.status("Snip", SK.MARKS["WR"], SK.PRESETS["W"][2]) == "cut")
+case("KIT M73 a 2.0x shot never holds Snip whole: CL with Snip on stage is refused; Pip alone in CL passes",
+     any("Snip" in p and "cut" in p for p in kit({"Snip": ("A", "right")}, shots=[(0, 2, "CL")]))
+     and not kit({"Pip": ("A", "right"), "Snip": ("E", "left")}, shots=[(0, 2, "CL")]))
+case("KIT spacing: Snip on B and Crinkle on C (one mark apart) is refused; B and D pass",
+     any("apart" in p for p in kit({"Snip": ("B", "right"), "Crinkle": ("C", "left")}))
+     and not kit(ST3, shots=[(0, 2, "W")]))
+case("KIT M34 a walk that crosses a medium window's edge mid-shot is refused (cut on the way)",
+     any("cut" in p for p in kit({"Snip": ("A", "right")}, [(0.5, 4.0, "Snip", "walk_to", "E")], [(0, 4, "ML")]))
+     and not kit({"Snip": ("A", "right")}, [(0.5, 2.5, "Snip", "walk_to", "C")], [(0, 3, "ML")]))
+case("KIT a walk through another character is refused",
+     any("apart" in p for p in kit(ST3, [(0.5, 3.0, "Snip", "walk_to", "E")])))
+case("KIT hop: Snip may hop in W, not in ML (no headroom)",
+     not kit(ST3, [(0.5, 1.3, "Snip", "hop", "")], [(0, 2, "W")])
+     and any("hopping" in p for p in kit(ST3, [(0.5, 1.3, "Snip", "hop", "")], [(0, 2, "ML")])))
+HO = {"Snip": ("C.L", "right"), "Crinkle": ("C.R", "left"), "block": ("Snip", "")}
+case("KIT hand_over only on a facing pair: C.L/C.R passes; B/D is refused",
+     not kit(HO, [(0.5, 1.7, "Snip", "hand_over", "block Crinkle")])
+     and any("pair" in p for p in kit({"Snip": ("B", "right"), "Crinkle": ("D", "left"), "block": ("Snip", "")},
+                                      [(0.5, 1.7, "Snip", "hand_over", "block Crinkle")])))
+case("KIT a prop put down on someone's feet is refused",
+     any("feet" in p for p in kit({"Snip": ("B", "right"), "Crinkle": ("D", "left"), "block": ("Snip", "")},
+                                  [(0.5, 1.5, "Snip", "put_down", "D")])))
+case("KIT react is held >= 1.0 s; an unknown move or emote is refused",
+     any("1.0 s" in p for p in kit(ST3, [(0.5, 1.0, "Snip", "react", "sad")]))
+     and any("react takes" in p for p in kit(ST3, [(0.5, 1.6, "Snip", "react", "angry")])))
+_tv = SK.Table("ep98", "porch", "vert")
+_tv.start = {"Snip": ("C.L", "right"), "Crinkle": ("C.R", "left"), "block": ("Snip", "")}
+_tv.shots = [(0, 2, "VW@C")]
+_rows = SK.Sim(_tv).framing_rows()
+_md = "| # | Time (s) | Shot | Whole in frame | At | Preset |\n|---|---|---|---|---|---|\n" + "\n".join(_rows)
+case("KIT the rows stage.py writes pass framing_check, vertical windows included",
+     not kit(_tv.start, shots=_tv.shots, set_name="porch", view="vert") and _rows and not framing_check.check(_md))
+_lan = {"Snip": ("A.L", "right"), "Crinkle": ("A.R", "left"), "marker": ("Snip", ""), "lantern": ("D", "")}
+case("KIT trial bugs: a floor prop (the lantern) leaves hand-over pairs alone; a bespoke row never exempts framing",
+     not kit(_lan, [(0.5, 1.7, "Snip", "hand_over", "marker Crinkle")], set_name="porch", view="vert")
+     and any("cut" in p for p in kit(ST3, [(0.5, 2.0, "Snip", "bespoke", "x")], [(0, 2, "ML")])))
+case("KIT framing_check knows vertical: Crinkle whole in VC 2.0x (540 u wide) fails",
+     any("not inside" in f or "wide" in f for f in
+         frow("VC@C 2x x 690-1230 y 702-1662", "Crinkle", "Crinkle x 960")))
+
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:
     if not ok or "-v" in sys.argv:

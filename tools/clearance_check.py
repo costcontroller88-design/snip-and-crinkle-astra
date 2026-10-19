@@ -10,7 +10,8 @@ frame and finds every prop pixel: the frame minus its background and minus the c
 the cushion, the "?"). It measures the gap from the props to each character's head (Crinkle's scarf too, when the
 script has head_scarf), feet (the lowest 60 u of the figure) and paws (a 30 u disc at each paw). A gap under --need
 fails, unless --allow names that <who>.<part> (sn, pp, cr; head, feet, paws), for all times or "@<time>": a held prop
-touches its holder's paws by design. A frame that can't be rendered is "not checked" and the sweep can't PASS.
+touches its holder's paws by design (a stage-kit script lists those itself in CLEARANCE_ALLOW, made by
+episodes/stage_kit.export from its beat table, never by hand). A frame that can't be rendered is "not checked" and the sweep can't PASS.
 
 The result goes to state/clearance.json under the episode (script, code hash, PASS/FAIL, times, allowed contacts).
 tools/gate.py refuses gate1 or gate1b PASS while the episode's newest rough script has no PASS for its current code.
@@ -173,6 +174,7 @@ def name_at(g, info, at):
 
 def sweep(script, need=NEED, extra=(), allow=(), log=print):
     g, bgs = load(script)
+    allow = tuple(allow) + tuple(g.get("CLEARANCE_ALLOW", ()))   # stage kit: the holder's paws while it holds
     res = {"hits": [], "not_checked": [], "times": []}
     for t in frame_times(g, extra):
         del bgs[:]

@@ -2,7 +2,8 @@
 
     python3 tools/framing_check.py reviews/ep12_plan.md      (tools/plan_check.py runs it too)
 
-The frame is 1920 x 1080 units at 1.0x, so a Z x shot shows 1920/Z wide and 1080/Z tall. Every row of the shot list
+The frame is 1920 x 1080 units at 1.0x, so a Z x shot shows 1920/Z wide and 1080/Z tall (a shot labelled V...,
+the stage kit's vertical presets VW/VM/VC, is 1080 x 1920: 1080/Z wide and 1920/Z tall). Every row of the shot list
 (| # | Time (s) | Shot | Whole in frame | ... |) is checked:
   1. height: everyone named whole in frame ("Snip", "Snip incl. ears and feet", "all"; not "Snip's ears") fits the
      frame height with 10 u above and below: Snip (748 u) in a 2.0x shot (540 u) fails (M73). A crouching, sitting
@@ -122,7 +123,8 @@ def check_row(num, row, sz):
         label, zoom, xw, yw = sh[i]
         if not zoom:
             continue
-        w, h = FRAME_W / zoom, FRAME_H / zoom
+        fw, fh = (1080.0, 1920.0) if label.upper().startswith("V") else (FRAME_W, FRAME_H)  # stage kit VW/VM/VC
+        w, h = fw / zoom, fh / zoom
         tag = f"shot {num} {label} {zoom:g}x"
         if xw and abs((xw[1] - xw[0]) - w) > 0.01 * w:
             fails.append(f"{tag}: window x {xw[0]:g}-{xw[1]:g} is {xw[1] - xw[0]:.0f} u wide; {zoom:g}x is {w:.0f} u")
@@ -131,7 +133,7 @@ def check_row(num, row, sz):
         for n in whole:
             if sz[n][0] + 2 * MARGIN > h:
                 fails.append(f"{tag}: {n} is {sz[n][0]:.0f} u tall (+{2 * MARGIN:g} margin) but the frame is {h:.0f} u "
-                             f"tall; whole in needs ≤{FRAME_H / (sz[n][0] + 2 * MARGIN):.2f}x (or mark him crouched)")
+                             f"tall; whole in needs ≤{fh / (sz[n][0] + 2 * MARGIN):.2f}x (or mark him crouched)")
             if xw and n in pos:
                 a, b = pos[n] - sz[n][1], pos[n] + sz[n][2]
                 if a < xw[0] + MARGIN or b > xw[1] - MARGIN:
