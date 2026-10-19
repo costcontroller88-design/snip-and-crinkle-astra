@@ -1373,10 +1373,11 @@ class Sim:
             need = None
         else:
             need = spacing(a, b)
-        if need is not None and xb - xa < need - 0.5:
+        close = need is not None and xb - xa < need - 0.5
+        if close and (pair or xb - xa < 0.5 * need):
             return (f"{t:.1f} s: {a} (x {xa:.0f}) and {b} (x {xb:.0f}) are {xb - xa:.0f} u apart; need {need:.0f} "
                     "(leave one empty mark between them, or use a hand-over pair)")
-        if facing or posed_pair:
+        if facing or posed_pair or close:    # v2: closer than the framing sizes is fine while silhouettes keep 10 u
             want = MARGIN
             for va in self.variants(a, t):
                 for vb in self.variants(b, t):

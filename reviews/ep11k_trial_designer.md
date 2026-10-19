@@ -59,3 +59,26 @@ Criteria: (a) no measure round: met, nothing was measured. (b), (c), (e), (f): n
 (d): will fail. Cheapest fixes, in order: make the lantern's hold_box small so hand_over pairs exist; add a "take"
 move; give work spots a wider reach or put the lantern's drawing points within reach of C.L/C.R; unblock E on the porch
 or add a preset that holds Snip at C.L and Crinkle at C.R.
+
+## Round 2 (kit v2; story restaged by intent rows; stopped at the budget, table not complete)
+
+**Result:** `stage.py show ep11k` = FAIL (7 beats, shots missing; 0 bespoke used). Only 0-5.6 s are staged (draw, take, long hand_over, sad); 5.6-30 s unstaged.
+Layout: Snip C.L, Crinkle C.R, Pip WL (Pip at A was moved to WL so Snip may step back), marker@Snip, lantern C.
+Worked: `draw lantern.eye_l 0.3-0.6` (frame 0 = eye 30% drawn); the solver added Crinkle `walk_to x:1145` before `take marker from Snip` (take across the lantern top works); long `hand_over` 2.4-5.6 (pause as one row); Snip `react sad`.
+
+| # | Refusal | Choice |
+|---|---|---|
+| 1 | `new` with `Snip@x:708` | start spots are marks only; used C.L and a 0.3-0.6 stroke fraction (eye starts 30% done, as designed) |
+| 2 | Snip draw eye_l 0-0.5 from C.L: 196 u vs reach 180 | stroke fraction 0.3-0.6 instead |
+| 3 | Crinkle `take` from C.R: 269 u vs 148 | accepted solver's walk to x:1145 (0.8-1.4); the 0.9 take slips to 1.4 |
+| 4 | Any row after the take: Snip-Crinkle 465 u, need 488 (the take pair is legal only inside its row) | no fix found: Snip walk 1.6/1.9 and Crinkle walk D at 2.4 all refused; poses `lean=12 sq=0.88` typed on `take` are dropped, x stays 1145. Worked around by one long `hand_over` 2.4-5.6 |
+| 5 | Crinkle rest after the give-back: resting paw 0 u from the lantern at 6.0 | not solved; every later Crinkle/Snip row refused |
+| 6 | Snip draw eye_l 0.75-1.0 from 680: 181 vs 180 | solver wants Snip x:709, then (1) of 4/5 again |
+| 7 | Snip draw eye_r: 270 u; solver wants x:806 | not reachable from the left of a 240 u lantern without crowding Crinkle |
+| 8 | shot VM@group 0-5.6: Crinkle at 1272 cut at 0.0 | no frame holds Snip 680 and Crinkle 1272; shots left unwritten |
+| 9 | Gag 1 (Crinkle copies Pip) | Pip and Crinkle never share a frame (Pip must sit left of Snip, 355 u; Crinkle right of the lantern); no row tried |
+
+**Still not expressible:** the take's end state (pair 465 u apart vs 488 spacing; a take leaves nowhere legal to go); two characters plus the lantern in one vertical frame at frame 0; Snip drawing eye_r/nose/smile (reach); a marker pass Snip -> Pip -> Crinkle around a 240 u lantern; Pip beside Crinkle for gag 1; pose args on `take`; unnamed start x.
+Runtime: chained solves for 15+ rows took more than 120 s.
+
+Row 8 update: VM@group refused 1.4-5.6 (Crinkle cut at 1145); the kit offered VW@C and VW@x943 (1x, so the marker is small); VW@C 1.4-5.6 written. 0-1.4 has no legal frame (Crinkle at 1272 and Pip at WL are cut in VW, Crinkle cut in VM).

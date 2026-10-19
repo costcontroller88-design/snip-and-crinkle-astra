@@ -56,3 +56,47 @@ Keep the kit. The landscape menu, spacing, framing, hops and walks work, and the
 judging heads and paws; (2) **lean and crouch reach**, with the work points measured from them; (3) a **take** move,
 plus sway and wiggle moves for gags. Then rerun this trial. If the owner would rather not, use the kit only on
 landscape episodes that have no shared floor prop (Ep 12's playroom fits).
+
+## Round 2: kit v2 (19 Oct 2026)
+
+Kit v2 (commit 5591604, plus a fix commit with this record) works staging out instead of only refusing:
+intent rows (`stage.py beat ep 0.6-2.8 Snip draw lantern.eye_l` writes the walk/turn, the pose `lean= sq=`
+and a frame, or refuses with "nearest that work"), silhouettes from rendered masks, depth behind a front prop
+(feet hidden; heads and resting paws 10 u), take, draw (stroke reveal), sway, wiggle, spin, bow, puff,
+general hand-over pass points with lean/crouch (Crinkle-Pip), group-centred vertical frames (`VM@group`).
+Tests: `stage.py test` PASS (267 ok, 237 refused, 0 failed of 504; the first runs found 4 kit bugs, all
+fixed: arm over the lantern covered the chin, walking-feet allowance, low pass points, carried marker size,
+now measured from its sprite); `regress.py` 149/149 (7 new v2 cases).
+
+### Result: FAIL so far (stopped after the designer step: band SMALL AGENTS ONLY, 60-75%)
+
+| Criterion | Result | Evidence |
+|---|---|---|
+| (a) no measure round | **Met** | every row through `stage.py`; no probes (designer log, `## Round 2` in `reviews/ep11k_trial_designer.md`) |
+| (b) script ≤300 lines | Not run | the animator is outside the 60-75% band; waits for the reset |
+| (c) clearance and framing first time | Not run | no full table |
+| (d) blind retelling matches | **Not yet** | the table covers 0-5.6 s only (draw, the take across the lantern top, give-back, Snip sad) |
+| (e) a sheet in ≤4 agent runs | Not met yet | 1 run, partial sheet `reviews/ep11k_sheet_r2.png` (3 stills) |
+| (f) designer on Sonnet | **Partly** | Sonnet used the solver correctly; 25 calls, 9 refusals, stuck at 5.6 s |
+
+**What blocked the designer (checked):** (1) after the take nobody could step away: a friend turning away from a close
+pair fell back to the v1 spacing (488 u); fixed after the run (silhouettes 10 u apart are enough; regress 149/149).
+(2) `new` refused `x:<n>` start spots; fixed. (3) Long solver chains took >120 s per call. Real limits the kit now
+reports (not bugs): Pip can't draw the nose with her head 10 u clear of the lantern (her head is level with its top);
+a friend can't idle at the lantern with a paw over it (step back after drawing); Snip and Crinkle at their lantern
+work spots don't fit one vertical frame with the marker readable.
+
+### Points (five-hour window)
+
+| Step | Estimate | Real |
+|---|---|---|
+| Kit v2: solver, silhouettes, depth, 8 moves, group frames, tests (4 bug rounds) | 12-15 | **about 32** (28% → 60%) |
+| Trial: designer run (Sonnet) + 2 fixes from it | 10 (whole trial) | **about 14** (60% → 74%), designer step only |
+
+The kit estimate was about 2x low: the move test's renders found four bugs the arithmetic missed, and each round
+re-rendered 504 cases. Nothing retired.
+
+### Next (after the reset, a fresh session; about 15-20 points)
+Re-run the designer from the existing 0-5.6 s table (the two fixes unblock 5.6-30 s); stage Pip's nose as a
+nose-point gag or give the nose to Snip if the owner accepts the change; then the animator (`episodes/ep11k.py`
+≤300 lines + sheet), `clearance_check`, `framing_check`, and a gate 1b blind check of the sheet.

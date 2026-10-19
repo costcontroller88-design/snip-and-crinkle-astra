@@ -67,7 +67,7 @@ def cmd_new(a):
         refuse(f"set is one of {', '.join(SK.SETS)}; view land or vert")
     t = SK.Table(ep, set_name, view, light)
     for item in places.split():
-        m = re.match(r"^(\w+)@([\w.]+)(?::(left|right|front))?$", item)
+        m = re.match(r"^(\w+)@(x:\d+|[\w.]+)(?::(left|right|front))?$", item)
         if not m:
             refuse(f"'{item}': write Who@spot[:facing] or prop@spot / prop@Who")
         who, at, f = m.groups()
