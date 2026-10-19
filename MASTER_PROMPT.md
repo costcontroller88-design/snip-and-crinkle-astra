@@ -55,7 +55,7 @@ a child's safety or parents' trust at risk.
   build, render, commit and push to the private repo; copy finished files to `Videos/`.
 - Only the Lead talks to the owner and acts in Studio. Agents never change anything on YouTube.
 - **Astra** (ChatGPT, private repo `snip-and-crinkle-astra`, brief `docs/ASTRA_MASTER_PROMPT.md`) is the owner's
-  decision maker for the workflow (owner, 19 Oct). When the owner forwards PRs from Astra's
+  decision maker for the workflow and owns that repo completely (owner, 19 Oct). When the owner forwards PRs from Astra's
   `reviews/astra/carry_over.md`, the Lead carries them into this repo one at a time and blocks one only for a failed
   check, a hard-rule or safety problem, or a clash with work in production, writing the reason as a PR comment.
 
