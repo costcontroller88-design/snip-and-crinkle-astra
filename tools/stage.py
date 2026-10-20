@@ -12,6 +12,8 @@ whole table with episodes/stage_kit.py and writes the row, or refuses (exit 1, n
     python3 tools/stage.py legal ep13 2.0-3.4 Snip walk_to       the spots that move would accept
     python3 tools/stage.py show ep13                              the table's problems (none = PASS) and shot coverage
     python3 tools/stage.py sheet ep13 0.5,3.0,6.2 [out.png]       key-beat stills through the shot cameras
+    python3 tools/stage.py covered-sheet ep13 moments.json 0.5,3.0,6.2 build/sb1
+                                                               neutral sheet + checked coverage receipt (M82)
     python3 tools/stage.py test [--quick]                         move test: every move x mark x character, rendered
                                                                   and swept (writes reviews/stage_kit_move_test.md)
 The table lives in reviews/<ep>_stage.md (the story-designer may run this; only stage.py writes the file).
@@ -229,6 +231,24 @@ def cmd_sheet(a):
     print(st.sheet(times, out))
 
 
+def cmd_covered_sheet(a):
+    """Opt-in coverage check; leaves the legacy sheet command unchanged."""
+    if len(a) != 4:
+        sys.exit(__doc__)
+    import storyboard_check
+    ep, requirements, samples, out = a
+    try:
+        times = [float(x) for x in samples.split(",")]
+        st = SK.Stage.load(ep)
+        for t in times:
+            if not any(start <= t < end for start, end, _ in st.table.shots):
+                raise ValueError(f"no explicit shot at {t:g}; refusing the renderer's fallback camera")
+        print(storyboard_check.write_bundle(st.still, times, st.sim.end, requirements, SK.Table.path(ep), out))
+        print("Declared coverage and file integrity PASS; blind story and safety reviews still required.")
+    except (OSError, ValueError, TypeError) as exc:
+        refuse(str(exc))
+
+
 # ---------------------------------------------------------------- move test
 MOVE_CASES = ("enter", "exit", "walk_to", "turn", "look", "nod", "shake", "react", "hop", "hold", "point",
               "pick_up", "put_down", "place_on", "drop", "hand_over",
@@ -408,7 +428,7 @@ def main(argv):
     cmd, a = argv[0], argv[1:]
     try:
         fn = {"new": cmd_new, "beat": cmd_beat, "shot": cmd_shot, "legal": cmd_legal, "show": cmd_show,
-              "menu": cmd_menu, "sheet": cmd_sheet, "test": cmd_test}[cmd]
+              "menu": cmd_menu, "sheet": cmd_sheet, "covered-sheet": cmd_covered_sheet, "test": cmd_test}[cmd]
     except KeyError:
         sys.exit(__doc__)
     try:
