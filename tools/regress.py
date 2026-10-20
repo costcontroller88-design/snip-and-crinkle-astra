@@ -83,6 +83,11 @@ def brief(agent, prompt):
         agent_hooks.ROOT = live
 
 
+pipeline_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_pipeline_check.py")],
+                                capture_output=True, text=True)
+case("ASTRA pipeline evidence bindings and prerequisite checks", pipeline_tests.returncode == 0,
+     pipeline_tests.stdout + pipeline_tests.stderr if pipeline_tests.returncode else "")
+
 # ---- return_check (M38, M50, M56, evidence rule)
 good_ev = [{"name": "loudness", "evidence": "-16.2 LUFS"}, {"name": "file", "evidence": "MASTER_PROMPT.md and 3 s"}]
 case("M56 fragment without its fence fails", return_check.check(ret(good_ev, fence=False)))
