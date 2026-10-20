@@ -585,6 +585,24 @@ def cmd_leadpost(d):
 
 # ---------------------------------------------------------------- selftest (SessionStart health check)
 
+def wiring_checks(root):
+    """Project hooks are required; validate an optional parent installation if present.
+
+    lexists includes broken symlinks: these are broken installs, not absent ones.
+    """
+    paths = [os.path.join(root, ".claude", "settings.json")]
+    parent = os.path.join(os.path.dirname(root), ".claude", "settings.json")
+    if os.path.lexists(parent):
+        paths.append(parent)
+    results = []
+    for sp in paths:
+        hooks = json.dumps(load_json(sp, {}).get("hooks", {}))
+        results.append((f"wiring: {os.path.relpath(sp, os.path.dirname(root))} runs brief, lead, leadpost, leadstop, selftest",
+                       all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "leadstop",
+                                                                         "selftest"))))
+    return results
+
+
 def selftest():
     """[(name, ok)] from sample events fed through dispatch() on scratch state; live files are never touched."""
     import shutil
@@ -662,12 +680,7 @@ def selftest():
         with open(APPROVALS, "a") as f:
             f.write(json.dumps({"time": time.time(), "quote": "yes, schedule it"}) + "\n")
         ok("lead: Studio form_input with a fresh approval allowed", not denies("lead", fi))
-        for sp in (os.path.join(ROOT, ".claude", "settings.json"),
-                   os.path.join(os.path.dirname(ROOT), ".claude", "settings.json")):
-            hooks = json.dumps(load_json(sp, {}).get("hooks", {}))
-            ok(f"wiring: {os.path.relpath(sp, os.path.dirname(ROOT))} runs brief, lead, leadpost, leadstop, selftest",
-               all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "leadstop",
-                                                                         "selftest")))
+        res.extend(wiring_checks(ROOT))
         for name in TEAM:
             head = open(os.path.join(ROOT, ".claude", "agents", f"{name}.md"), encoding="utf-8").read().split("\n---\n")[0]
             ok(f"wiring: {name} runs scope, count, stop", all(f'"$f" {c}' in head for c in ("scope", "count", "stop")))
