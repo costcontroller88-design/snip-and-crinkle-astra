@@ -536,6 +536,11 @@ case("M80 a run that only fixes its return (0 calls) counts 0, the hand-back end
      agent_hooks.transcript_stats(handback_tr("agent-r3.jsonl", [24, 7, 0], end_handback=True))[0] == 0 and
      agent_hooks.transcript_stats(handback_tr("agent-r4.jsonl", [24, 7], end_handback=True))[::3] == (7, 31))
 
+gap_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_stage_gap.py")],
+                           capture_output=True, text=True)
+case("ASTRA optimized silhouette distances equal the original algorithm", gap_tests.returncode == 0,
+     gap_tests.stdout + gap_tests.stderr if gap_tests.returncode else "")
+
 # ---- M73, M74: framing pre-check on the designer's shot rows (tools/framing_check.py; plan_check runs it)
 import framing_check  # noqa: E402
 import plan_check  # noqa: E402

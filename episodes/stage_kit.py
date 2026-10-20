@@ -38,6 +38,7 @@ v2 (19 Oct): the kit works staging out instead of only refusing.
   and a legal frame; it refuses only when nothing works, and then lists the nearest rows that do.
 """
 import copy
+import glob
 import hashlib
 import json
 import math
@@ -58,7 +59,7 @@ if hires.RES == 1.0 and not os.environ.get("STAGE_RES1"):
     hires.set_res(2)
 
 import numpy as np  # noqa: E402
-from PIL import Image, ImageDraw  # noqa: E402
+from PIL import Image, ImageDraw, __version__ as PIL_VERSION  # noqa: E402
 
 import acting as K  # noqa: E402
 import framing_check as FC  # noqa: E402
@@ -305,11 +306,15 @@ def gap(A, B, need=MARGIN):
     """Least distance between two placed profiles, searched up to need + 2 u (a far gap comes back as need + 2)."""
     best, k = need + 2.0, int((need + 2) // BAND) + 1
     for s in range(-k, k + 1):
-        b0, b1 = _shift(B[0], s), _shift(B[1], s)
-        both = ~np.isnan(A[0]) & ~np.isnan(b0)
+        # Compare only overlapping bands. Padding a shifted copy with NaNs
+        # cannot contribute to the minimum and allocated two arrays per shift.
+        sa, sb = (slice(s, None), slice(None, -s)) if s > 0 else \
+                 (slice(None, s), slice(-s, None)) if s < 0 else (slice(None), slice(None))
+        a0, a1, b0, b1 = A[0][sa], A[1][sa], B[0][sb], B[1][sb]
+        both = ~np.isnan(a0) & ~np.isnan(b0)
         if not both.any():
             continue
-        gx = float(np.maximum(np.maximum(b0 - A[1], A[0] - b1), 0.0)[both].min())
+        gx = float(np.maximum(np.maximum(b0 - a1, a0 - b1), 0.0)[both].min())
         best = min(best, math.hypot(gx, max(0.0, (abs(s) - 1) * BAND)))
         if best == 0.0:
             break
@@ -317,21 +322,27 @@ def gap(A, B, need=MARGIN):
 
 
 def _code_key():
+    from handover_check import modules
     h = hashlib.sha1()
-    for f in ("rig2.py", "rig2_pip.py", "acting.py", "characters.py"):
-        p = os.path.join(HERE, f)
-        if os.path.exists(p):
-            h.update(open(p, "rb").read())
-    h.update(repr(sorted(SCALE.items())).encode() + b"v2a")
+    # The old HERE/characters.py lookup silently skipped ROOT/characters.py.
+    # Include the recursive code closure, profile algorithm, fonts and runtime.
+    paths = modules(__file__) + sorted(glob.glob(os.path.join(ROOT, "assets", "fonts", "*.ttf")))
+    for p in paths:
+        h.update(os.path.relpath(p, ROOT).encode())
+        with open(p, "rb") as stream:
+            h.update(stream.read())
+    h.update(repr((sorted(SCALE.items()), np.__version__, PIL_VERSION, "v2b")).encode())
     return h.hexdigest()[:16]
 
 
 def _disk():
     if not _DISK["loaded"]:
         _DISK["loaded"] = True
+        _DISK["key"] = _code_key()
         try:
-            d = json.load(open(CACHE))
-            if d.get("key") == _code_key():
+            with open(CACHE) as stream:
+                d = json.load(stream)
+            if d.get("key") == _DISK["key"]:
                 _DISK["data"] = d["data"]
         except (OSError, ValueError, KeyError):
             pass
@@ -340,8 +351,12 @@ def _disk():
 
 def save_cache():
     if _DISK["dirty"]:
+        if _DISK.get("key") != _code_key():
+            raise Refused("pose dependencies changed during this process; restart before saving the cache")
         os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        json.dump({"key": _code_key(), "data": _DISK["data"]}, open(CACHE, "w"))
+        with open(CACHE + ".tmp", "w") as stream:
+            json.dump({"key": _DISK["key"], "data": _DISK["data"]}, stream)
+        os.replace(CACHE + ".tmp", CACHE)
         _DISK["dirty"] = False
 
 
