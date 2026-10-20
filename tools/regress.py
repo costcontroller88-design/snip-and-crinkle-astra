@@ -98,6 +98,11 @@ case("M61 an absolute path with spaces in the evidence is found",
      not return_check.check(ret([{"name": "x", "evidence": os.path.join(return_check.ROOT, "MASTER_PROMPT.md") + " (Write ok)"}])))
 case("an honest return passes", not return_check.check(ret(good_ev, files=["MASTER_PROMPT.md"])))
 
+shot_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_shot_render.py")],
+                            capture_output=True, text=True)
+case("ASTRA selective rendering, invalidation and encode failures", shot_tests.returncode == 0,
+     shot_tests.stdout + shot_tests.stderr if shot_tests.returncode else "")
+
 # ---- brief_check (M26, M27, M30, M39, M46, M52)
 case("M27 animator brief without 'feasibility first' fails", brief_check.check("animator: ep12 build the episode"))
 case("M26/M30 a budget in the brief fails", brief_check.check("animator: ep12 feasibility first, <=14 calls"))
