@@ -1,5 +1,7 @@
 # GPT production operations — 20 October 2026
 
+> **Active scope — owner instruction, 20 Oct 2026 at 23:15 IST: “only work on shorts”.** Work on standalone Shorts only. Full-episode planning, animation and rendering are outside the active scope. Follow `docs/ASTRA_SHORTS_PIPELINE.md`; earlier episode-package material below is historical and does not authorize full-episode work.
+
 ## Status
 
 GPT role operation is authorized and has begun. This is a source-only recovery

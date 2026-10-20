@@ -1,5 +1,7 @@
 # Production pipeline and the path to 10/10
 
+> **Active scope — owner instruction, 20 Oct 2026 at 23:15 IST: “only work on shorts”.** Work on standalone Shorts only. Full-episode planning, animation and rendering are outside the active scope. Follow `docs/ASTRA_SHORTS_PIPELINE.md`; earlier episode-package material below is historical and does not authorize full-episode work.
+
 Decision: 20 October 2026, following the owner's request for all seven rows to
 reach 10/10. Keep the existing six roles, rig, stage kit and independent gates.
 Improve the system around those assets. A score is earned by observed outcomes;

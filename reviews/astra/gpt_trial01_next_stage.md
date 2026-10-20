@@ -1,78 +1,58 @@
-# Ep12 recovery: coordinator disposition and next executable stage
+# Next executable stage — Shorts only
 
-20 October 2026. This specification follows the original designer and animator
-returns plus the independent concept-safety HOLD. It is not a measured plan or
-a passed gate. The original reports remain unchanged in this draft PR.
+Owner scope change: “only work on shorts”, 20 Oct 2026, 23:15 IST.
+Follow `docs/ASTRA_SHORTS_PIPELINE.md`. No full episode is in the active scope.
 
-## Decision
+## Immediate task after execution recovery
 
-Accept the simpler causal direction for a bounded feasibility prototype only.
-Do not commission the whole 240-second episode or either Short yet. The candidate
-must incorporate the following independent-review changes before full staging:
+1. Recover the active draft branch and surviving local evidence; inspect the
+   actual remote head and local changes before editing. Preserve all attempts.
+2. Verify dependencies and run the existing regression suite; capture actual
+   output rather than relying on the historic 173/173 result.
+3. Reconcile the story Short's compact card and prop/home/route inventory with
+   the independent concept HOLD. Plan only its vertical shots and key moments.
+4. Build a bounded vertical proof of gentle ball contact and Pip's complete
+   pickup/deposit/retrieval; include largest-toy placement only if necessary.
+   Use the existing rig and stage-intent tools. Measure reach, mask clearance,
+   feet, framing, object custody and visible release/contact from real artifacts.
+5. Stop on unsupported movement; return it to design. After feasibility, finish
+   that Short's covered storyboard and independent safety/blind review before a
+   full Short render. Then develop the second, independently complete Short.
 
-1. Snip finishes truck play, places it without watching the approaching ball,
-   withdraws his paw before gentle contact, and shows no targeting or amusement
-   at interrupting Pip. No tipping or contact with feet. A blind reviewer must
-   still assess how the intention reads.
-2. Replace the absolute prohibition on paw entry with low, stable, lidless,
-   shallow toy homes. Placement and retrieval must be possible from outside:
-   feet on clear floor, no head/torso entry, climbing or body weight over openings.
-3. Mark temporary toy positions and complete approach/exit routes. Stop ball
-   play while tidying. Use one worker at a time unless separate routes are
-   demonstrated. No stepping over clutter, obscured feet/route, or crossing
-   another worker's placement area.
-4. Choose substantial rounded play pieces and a substantial soft ball; no loose
-   small components, cords, magnets, battery parts or mouth play. The largest
-   toy must remain manageable with face and feet visible.
-5. Make the second application about finishing one activity before changing
-   games. Do not imply that a separate block area obstructs the already-clear
-   lane. If this cannot sustain meaningful action, revise duration/scope instead
-   of padding the film to four minutes.
-6. Give each Short its own complete object accounting. The story Short shows
-   only obstructions it actually removes; the transformation shows each actor,
-   origin, transfer and home, followed by the same cleared floor.
+## Binding concept-review changes
 
-These are required changes, not claims that revised staging is safe or clear.
+- Snip finishes with the truck without targeting the approaching ball; paw
+  withdrawn before gentle contact; no tipping, foot contact or amused obstruction.
+- Low, stable, lidless, shallow homes permit visible paw placement/retrieval
+  from outside. No head/torso entry, climbing or body weight over openings.
+- Map temporary positions and complete routes. Stop ball play while tidying;
+  one worker at a time unless separate routes are demonstrated.
+- Substantial rounded toys and soft ball; no loose small parts, cords, magnets,
+  battery pieces or mouth play; face and feet remain visible while carrying.
+- Show that play is finished before putting toys home. Each Short must make
+  sense by itself; do not bring the abandoned long-form second-game sequence in
+  merely to fill time.
+- Story Short establishes only obstructions removed on screen. Transformation
+  Short shows each actor, origin, transfer and home, then the same cleared floor.
 
-## First execution after workspace recovery
+These are required changes, not measured safety or clarity findings.
 
-Recover the draft branch and any surviving uncommitted local evidence before
-editing. Preserve the 16:44 IST original start and interruption in the ledger.
-Do not silently overwrite earlier candidate files or live gate state.
+## Evidence and review limits
 
-1. Verify the checkout, dependencies and existing regression suite; capture
-   actual output. The historical 173/173 result cannot stand in for this run.
-2. Reconcile the candidate with the six requirements above. Write a small
-   prop/home/route inventory and explicit stage intent rows.
-3. Test the two semantic actions: ball release/contact/stop, and Pip's complete
-   pickup/deposit/retrieval. Include the largest toy's placement if it needs
-   different reach or visibility. Use existing rig and placement primitives;
-   do not widen exemptions or introduce a general physics/container system.
-4. Produce full-size sampled stills and short motion segments for each action,
-   then measure actual reach, mask clearance, custody continuity and framing.
-   Every reported number must cite a generated artifact or raw check output.
-5. Return unsupported movements to design. Only after this proof and independent
-   safety follow-up may the designer expand to the full measured plan/animatic.
-   Complete missing gag design and last-three-story variety checks at that stage.
+Current creator drafts remain historical; the concept report remains HOLD.
+Old F8 and both Ep12 storyboard mismatches are preserved. New media must not
+inherit an approval or be relabeled to hide prior failures. Record artifact
+rounds and parent recovery history explicitly.
 
-## Review and production limits
+Fresh blind reviewers have no inherited conversation and only neutral media
+plus the rubric. The coordinator does not self-score story or safety.
+No live gate/state writes, production-repository access or publication.
 
-Any future blind review begins in a fresh context with only neutrally named
-media and the rubric. It keeps the cumulative Ep12 recovery-round number. The
-existing two-round evidence contract correctly rejects a later round as proof
-of meeting the target; no override or reset is proposed.
+The existing bundled pipeline checker requires an episode. Add a tested explicit
+Shorts-only profile before automatic acceptance; never satisfy episode fields
+with dummy files or copied Shorts. Keep raw per-Short evidence while that is
+pending. The exact profile requirements are in ASTRA_SHORTS_PIPELINE.md.
 
-The concept reviewer has issued HOLD/PARTIAL, not a Gate 1 or Gate 3 pass. F8 is
-still open on the old build. Removing its props requires a revision-specific
-mapping plus new route evidence; it does not retroactively pass the old action.
-
-Full episode, Shorts, packaging, final technical review and real audience
-validation remain pending. No model token totals, cost saving, rendered duration
-or quality improvement has been measured in this recovery package.
-
-## Why this is the next step
-
-Both maker audits identified floor placement/custody as the first physical
-uncertainty. The independent reviewer separately identified retrieval and route
-contradictions. A small measured proof resolves those uncertainties before
-spending on a four-minute build, without treating source prose as media evidence.
+The workspace remains unavailable. No code, render or measurement is claimed
+in this scope update. Preserve original start/downtime and separately log the
+23:15 IST scope change; no further owner permission is needed to resume.
