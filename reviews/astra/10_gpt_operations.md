@@ -33,7 +33,8 @@ represented as equivalent automatic enforcement.
 | /root/story_designer | Initial story feasibility | Preliminary message: Ep12 has two storyboard mismatches, open F8 and 140s plan; final artifacts not recovered |
 | /root/animator_feasibility | Initial rig feasibility | Preliminary message: rough source lacks full clearance sweep/audio; final artifacts not recovered |
 | /root/designer_recovery | Pinned-source feasibility and candidate design | Original return retained in this draft package |
-| /root/animator_recovery | Pinned-source technical feasibility | Original return retained in this draft package |
+| /root/animator_recovery | Pinned-source technical feasibility | Original return retained; PARTIAL; 27 reads against 8 (M91) |
+| /root/safety_concept | Independent source-only concept review | HOLD/PARTIAL; original report retained; source-order mistake corrected (M92) |
 
 The first two agents were no longer listed as live when the session resumed.
 Their incomplete work is not counted as a completed run. Recovery agents read
@@ -75,3 +76,14 @@ This package must remain a draft while execution and required verification are
 unavailable. No executable production code or existing Claude definitions are
 changed. To roll back the provider decision, stop GPT dispatch and retain its
 evidence; draft documents do not change existing media or gate state.
+
+## Completed recovery evidence
+
+- `gpt_trial01_feasibility.md`: original 240-second candidate plus proposed 48/24-second Shorts; PARTIAL and unmeasured.
+- `gpt_trial01_animator_feasibility.md`: original source audit and implementation prerequisites; PARTIAL.
+- `gpt_trial01_safety_concept.md`: independent HOLD and six required changes; no safety pass.
+- `gpt_trial01_next_stage.md`: coordinator disposition and the exact prototype to run after execution recovers.
+
+Reports were retrieved from their resulting GitHub commits to verify persistence.
+This verifies saved text, not the proposed media or its safety. Draft PR #10 must
+remain unmerged while required execution checks are unavailable.
