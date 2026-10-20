@@ -51,7 +51,9 @@ verdict. Missing production evidence means unproven, even if all unit tests pass
 | 11 | Authorized growth role | 7/28-day exports and comparable-cohort review | Feed observed retention problems into the next card; no claimed improvement without data |
 
 Safety-plan review and blind storyboard review can be independent parallel
-production activities. Astra does not launch or brief the Claude team. A failed
+production activities. On 20 October 2026 the owner authorized Astra to operate
+agents, then selected the available GPT agents. GPT now fills the existing roles;
+Claude-specific hooks and quota counters are not active in this runtime. A failed
 story gate goes back to story/staging; a technical failure goes to the relevant
 script or builder. Two failed blind rounds stop further rendering until design
 changes. No silent third round or reset of the trial clock.
@@ -124,8 +126,9 @@ Astra judged the film safe or clear. Publication still requires fresh owner appr
 
 Work packages remain small PRs, regression PASS before merge, with carry-over and
 rollback instructions. Do not replace the rig, weaken child-safety rules, add paid
-services, publish, access the production repository or launch Claude agents.
-Those boundaries come from docs/ASTRA_MASTER_PROMPT.md and remain in force.
+services, publish or access the production repository. These boundaries remain
+in force. The owner's later authorization permits GPT agent operation inside
+Astra; it does not waive review gates or authorize publication.
 
 ## Implementation status, 20 October 2026
 
