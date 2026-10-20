@@ -1,0 +1,107 @@
+diff --git a/reviews/astra/02_portable_checks.md b/reviews/astra/02_portable_checks.md
+new file mode 100644
+index 0000000..7d07b2a
+--- /dev/null
++++ b/reviews/astra/02_portable_checks.md
+@@ -0,0 +1,19 @@
++# Portable verification — 19 Oct 2026
++
++Evidence: tools/agent_hooks.py baseline lines 665–670 requires an optional parent config; tools/regress.py baseline lines 375–388 already treats it as optional. Audit: 01_audit.md section 0.
++
++Change: selftest now requires the project settings, and checks parent settings only if they exist (including a broken symlink). It uses the original hook predicate. No gates, permission checks, agent files or render code changed.
++
++Measured results:
++- Before, standalone: REGRESS FAIL: 147/148 cases.
++- Before, legacy parent-symlink layout: REGRESS PASS: 149/149 cases.
++- After, standalone: REGRESS PASS: 154/154 cases.
++- After, legacy parent-symlink layout: REGRESS PASS: 155/155 cases.
++- Six added cases: standalone; installed parent; broken parent symlink; parent missing hooks; missing project config; missing project hook. Negative fixtures prove the wiring checks can still fail.
++- git diff --check: PASS.
++
++Independent carry-over: tools/agent_hooks.py and tools/regress.py apply to the baseline; no prior Astra code package is required. Documentation and M86 describe this work only. Rollback: revert the package's squash commit.
++
++Scorecard, in master-prompt row order: 2/2/4/7/1/1/1 (engineering evidence rating, not video scores). Technical readiness rises 6→7 because standalone and original layouts work; story clarity remains the weakest production outcome. No new creative, safety, elapsed-production or audience result claimed.
++
++Own mistake logged: M86 OPEN (oversized local source transfers; corrected and verified). Next: reject contradictory stage briefs, then storyboard coverage.
+diff --git a/tools/agent_hooks.py b/tools/agent_hooks.py
+index 1c22e86..5d4915b 100644
+--- a/tools/agent_hooks.py
++++ b/tools/agent_hooks.py
+@@ -585,6 +585,24 @@ def cmd_leadpost(d):
+ 
+ # ---------------------------------------------------------------- selftest (SessionStart health check)
+ 
++def wiring_checks(root):
++    """Project hooks are required; validate an optional parent installation if present.
++
++    lexists includes broken symlinks: these are broken installs, not absent ones.
++    """
++    paths = [os.path.join(root, ".claude", "settings.json")]
++    parent = os.path.join(os.path.dirname(root), ".claude", "settings.json")
++    if os.path.lexists(parent):
++        paths.append(parent)
++    results = []
++    for sp in paths:
++        hooks = json.dumps(load_json(sp, {}).get("hooks", {}))
++        results.append((f"wiring: {os.path.relpath(sp, os.path.dirname(root))} runs brief, lead, leadpost, leadstop, selftest",
++                       all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "leadstop",
++                                                                         "selftest"))))
++    return results
++
++
+ def selftest():
+     """[(name, ok)] from sample events fed through dispatch() on scratch state; live files are never touched."""
+     import shutil
+@@ -662,12 +680,7 @@ def selftest():
+         with open(APPROVALS, "a") as f:
+             f.write(json.dumps({"time": time.time(), "quote": "yes, schedule it"}) + "\n")
+         ok("lead: Studio form_input with a fresh approval allowed", not denies("lead", fi))
+-        for sp in (os.path.join(ROOT, ".claude", "settings.json"),
+-                   os.path.join(os.path.dirname(ROOT), ".claude", "settings.json")):
+-            hooks = json.dumps(load_json(sp, {}).get("hooks", {}))
+-            ok(f"wiring: {os.path.relpath(sp, os.path.dirname(ROOT))} runs brief, lead, leadpost, leadstop, selftest",
+-               all(f'\\"$f\\" {c} ' in hooks for c in ("brief", "lead", "leadpost", "leadstop",
+-                                                                         "selftest")))
++        res.extend(wiring_checks(ROOT))
+         for name in TEAM:
+             head = open(os.path.join(ROOT, ".claude", "agents", f"{name}.md"), encoding="utf-8").read().split("\n---\n")[0]
+             ok(f"wiring: {name} runs scope, count, stop", all(f'"$f" {c}' in head for c in ("scope", "count", "stop")))
+diff --git a/tools/regress.py b/tools/regress.py
+index 43e87a1..b13bfea 100644
+--- a/tools/regress.py
++++ b/tools/regress.py
+@@ -297,6 +297,34 @@ case("a fresh approve.py record allows the Studio edit",
+      not lead("mcp__claude-in-chrome__form_input", {"ref": "r", "value": "x", "tabId": 7}))
+ 
+ # ---- v4.2 health check (agent_hooks.py selftest; SessionStart)
++wire_parent = os.path.join(TMP, "wiring")
++wire_root = os.path.join(wire_parent, "project")
++os.makedirs(os.path.join(wire_root, ".claude"))
++wire_local = os.path.join(wire_root, ".claude", "settings.json")
++wire_outer = os.path.join(wire_parent, ".claude", "settings.json")
++with open(os.path.join(ROOT, ".claude", "settings.json")) as f:
++    wire_good = f.read()
++with open(wire_local, "w") as f:
++    f.write(wire_good)
++case("ASTRA standalone wiring needs no parent install",
++     len(agent_hooks.wiring_checks(wire_root)) == 1 and all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
++os.makedirs(os.path.dirname(wire_outer))
++os.symlink(wire_local, wire_outer)
++case("ASTRA installed parent wiring is checked",
++     len(agent_hooks.wiring_checks(wire_root)) == 2 and all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
++os.unlink(wire_outer)
++os.symlink(os.path.join(wire_root, "missing.json"), wire_outer)
++case("ASTRA broken parent symlink fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
++os.unlink(wire_outer)
++with open(wire_outer, "w") as f:
++    f.write('{}')
++case("ASTRA present parent without hooks fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
++os.unlink(wire_outer)
++os.unlink(wire_local)
++case("ASTRA missing project config fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
++with open(wire_local, "w") as f:
++    f.write(wire_good.replace('leadpost', 'missing_command'))
++case("ASTRA missing project hook fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
+ st_res = agent_hooks.selftest()
+ case("selftest PASS on the live wiring", all(ok for _, ok in st_res), [n for n, ok in st_res if not ok])
+ keep_st, keep_argv = agent_hooks.selftest, sys.argv
