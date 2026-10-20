@@ -745,6 +745,12 @@ except SK.Refused as e:
 case("KIT v2 no solution: the refusal lists the nearest rows that work (later, or the partner moving)",
      "nearest that work" in _msg, _msg[-160:])
 
+# ---- M82: required storyboard samples and the delivered sheet agree (temporary fixtures only).
+storyboard_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_storyboard_check.py")],
+                                 capture_output=True, text=True)
+case("M82 storyboard coverage and integrity tests", storyboard_tests.returncode == 0,
+     storyboard_tests.stdout + storyboard_tests.stderr if storyboard_tests.returncode else "")
+
 fails = [r for r in results if not r[1]]
 for cid, ok, note in results:
     if not ok or "-v" in sys.argv:
