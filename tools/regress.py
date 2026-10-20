@@ -103,6 +103,33 @@ with open(plan, "w") as f:
     f.write("## Measured checks\n| Check | Need | Measured |\n|---|---|---|\n| lantern gap | 30 | estimate |\n")
 case("M39 'then build' with open estimates fails", brief_check.check("animator: ep99 feasibility first, then build", plan))
 
+# ---- M67/M79: the hook assigns five calls to feasibility only, never production.
+for request in ("Measure + storyboard", "Return measurements and a storyboard", "Fix the code",
+                "Edit episodes/ep99.py", "Render a storyboard", "Code-fix round", "Do not edit; then build",
+                "Measure estimates and then build"):
+    case("M67/M79 feasibility-only rejects: " + request,
+         brief_check.check("animator: ep99\nStage: feasibility only\n" + request))
+for request in ("Measure estimates and return numbers", "Read the existing storyboard; report the render time",
+                "No code edits; do not build or render", "Inspect the build and check the render"):
+    case("M67/M79 feasibility-only allows: " + request,
+         not brief_check.check("animator: ep99\nStage: feasibility only\n" + request))
+case("M67 measure + storyboard stage remains valid",
+     not brief_check.check("animator: ep99\nStage: measure + storyboard (feasibility first)\nRender a storyboard"))
+case("M79 explicit build stage remains valid without open estimates",
+     not brief_check.check("animator: ep99\nStage: feasibility first, then build\nFix the code"))
+band("ANY AGENT: <60%")
+live_root, agent_hooks.ROOT = agent_hooks.ROOT, SCRATCH_ROOT
+try:
+    rejected = hook(agent_hooks.cmd_brief, {"tool_input": {"subagent_type": "animator",
+                    "prompt": "Stage: feasibility only\nRender a storyboard"}})
+    accepted = hook(agent_hooks.cmd_brief, {"tool_input": {"subagent_type": "animator",
+                    "prompt": "Stage: measure + storyboard (feasibility first)\nRender a storyboard"}})
+    case("M67/M79 brief hook rejects for the intended reason and accepts the corrected stage",
+         denied(rejected) and "M67/M79" in json.dumps(rejected) and not denied(accepted))
+finally:
+    agent_hooks.ROOT = live_root
+    os.unlink(agent_hooks.BAND)
+
 # ---- blind_guard (M1, M57): exit 2 blocks
 def guard(tool, ti):
     p = subprocess.run([sys.executable, os.path.join(TOOLS, "blind_guard.py")], cwd=ROOT, capture_output=True,
