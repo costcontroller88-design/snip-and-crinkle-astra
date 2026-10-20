@@ -297,6 +297,34 @@ case("a fresh approve.py record allows the Studio edit",
      not lead("mcp__claude-in-chrome__form_input", {"ref": "r", "value": "x", "tabId": 7}))
 
 # ---- v4.2 health check (agent_hooks.py selftest; SessionStart)
+wire_parent = os.path.join(TMP, "wiring")
+wire_root = os.path.join(wire_parent, "project")
+os.makedirs(os.path.join(wire_root, ".claude"))
+wire_local = os.path.join(wire_root, ".claude", "settings.json")
+wire_outer = os.path.join(wire_parent, ".claude", "settings.json")
+with open(os.path.join(ROOT, ".claude", "settings.json")) as f:
+    wire_good = f.read()
+with open(wire_local, "w") as f:
+    f.write(wire_good)
+case("ASTRA standalone wiring needs no parent install",
+     len(agent_hooks.wiring_checks(wire_root)) == 1 and all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
+os.makedirs(os.path.dirname(wire_outer))
+os.symlink(wire_local, wire_outer)
+case("ASTRA installed parent wiring is checked",
+     len(agent_hooks.wiring_checks(wire_root)) == 2 and all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
+os.unlink(wire_outer)
+os.symlink(os.path.join(wire_root, "missing.json"), wire_outer)
+case("ASTRA broken parent symlink fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
+os.unlink(wire_outer)
+with open(wire_outer, "w") as f:
+    f.write('{}')
+case("ASTRA present parent without hooks fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
+os.unlink(wire_outer)
+os.unlink(wire_local)
+case("ASTRA missing project config fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
+with open(wire_local, "w") as f:
+    f.write(wire_good.replace('leadpost', 'missing_command'))
+case("ASTRA missing project hook fails", not all(ok for _, ok in agent_hooks.wiring_checks(wire_root)))
 st_res = agent_hooks.selftest()
 case("selftest PASS on the live wiring", all(ok for _, ok in st_res), [n for n, ok in st_res if not ok])
 keep_st, keep_argv = agent_hooks.selftest, sys.argv
