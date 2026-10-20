@@ -1,0 +1,121 @@
+diff --git a/reviews/astra/03_brief_consistency.md b/reviews/astra/03_brief_consistency.md
+new file mode 100644
+index 0000000..cbf9e86
+--- /dev/null
++++ b/reviews/astra/03_brief_consistency.md
+@@ -0,0 +1,15 @@
++# Brief consistency — 20 Oct 2026
++
++Evidence: reviews/mistake_log.md:78 (M67) and :90 (M79): production requested under feasibility-only caused an early stop and another round trip. tools/agent_hooks.py:481–489 selects the stage and budget from the first Stage line.
++
++Change: tools/brief_check.py rejects explicit build/render/edit/fix requests or storyboard deliverables under that stage. Measurement references and negated actions remain allowed. The existing pre-call hook already invokes this checker, so no agent contract or live gate changes are needed. This is a bounded phrase check, not a proof that arbitrary English is consistent.
++
++Validation (actual runs):
++- Combined checkout: REGRESS PASS 169/169, up from 154/154.
++- Independent baseline replay in the original parent-settings layout, with only this package's code diff: REGRESS PASS 164/164, up from 149/149. It does not require PR #2.
++- Fifteen new cases cover contradictory briefs, legitimate measurements/negations, corrected stages and the actual pre-call hook. The integration case asserts the M67/M79 rejection reason and acceptance of a corrected stage; all fixtures use temporary state.
++- git diff --check PASS.
++
++Expected gain: avoid the known M67/M79 stop/resume round trip. Production calls/time saved: unmeasured, not claimed. Existing M39 open-estimate checks remain in place. Rollback: revert this package's squash commit.
++
++Scorecard in prompt order: 2/2/4/7/1/1/1; no newly reviewed story or safety evidence. Story clarity remains the weakest production outcome; audience outcome remains unmeasured. M87 OPEN records my initial weak integration assertion and its correction. M88 OPEN records a skipped nested patch and premature draft test total; the corrected independent replay actually passed 164/164.
+diff --git a/tools/brief_check.py b/tools/brief_check.py
+index 1ef5b9d..35e169a 100644
+--- a/tools/brief_check.py
++++ b/tools/brief_check.py
+@@ -5,6 +5,8 @@
+ FAIL (exit 1) when an animator brief does not say "feasibility first" (the animator measures the plan's estimates and returns
+ numbers before any code edit), or when it sets a tool-call budget (the budget lives in the agent file; a brief that
+ names one overrides it, e.g. "<=14 calls", "budget 10").
++M67/M79: FAIL explicit storyboard/build/edit requests under "Stage: feasibility only".
++Negated actions and measurement references remain allowed. This phrase check cannot prove arbitrary prose consistent.
+ With `--plan <plan.md>`: FAIL a brief that goes on to build ("then build") while the plan's `## Measured checks` still has
+ an "estimate" row; send "Stage: feasibility only" first, read the numbers, then SendMessage "build" to the same agent (M39).
+ """
+@@ -15,6 +17,35 @@ BUDGET = re.compile(r"budget|[≤<]=?\s*\d+\s*(?:tool\s*)?(?:calls?|turns?)|\d+\
+                     re.I)
+ 
+ 
++def stage_conflicts(text):
++    """Catch explicit production requests under the hook's feasibility-only stage.
++
++    This is a bounded phrase check, not a natural-language intent classifier.
++    Read/check/measure references are allowed; negated actions are not requests.
++    Match the first Stage line exactly as agent_hooks.stage_of does.
++    """
++    stage = re.search(r"\bstage:\s*(.+)", text, re.I)
++    if not stage or not re.search(r"\bfeasibility only\b", stage.group(1), re.I):
++        return []
++    action = re.compile(
++        r"\b(?:build|render|animate|edit|fix|patch|modify|rewrite)\b"
++        r"|\bcode[- ]fix\b|\bmeasure\s*\+\s*storyboard\b"
++        r"|\b(?:make|create|produce|return|deliver|draw)\b[^.;\n]{0,80}\bstoryboard\b", re.I)
++    conflicts = []
++    # Commas/semicolons separate requests, so 'do not edit; then build' still fails.
++    for clause in re.split(r"[.;\n,]", text):
++        for match in action.finditer(clause):
++            prefix = clause[:match.start()].lower()
++            if re.search(r"\b(?:no|not|never|without|don't|cannot|can't)\b[^;,.]*$", prefix):
++                continue
++            # A measurement/reference can name a build or render without asking for it.
++            if (re.search(r"\b(?:measure|inspect|read|check|estimate|report)\b[^;,.]*$", prefix)
++                    and not re.search(r"\b(?:and|then)\s*$", prefix)):
++                continue
++            conflicts.append(match.group(0))
++    return conflicts
++
++
+ def open_estimates(plan):
+     rows, on = [], False
+     for line in open(plan, encoding="utf-8"):
+@@ -34,6 +65,12 @@ def check(text, plan=None):
+         if est:
+             fails.append(f'{len(est)} open estimate(s) in the plan ({est[0]}...): brief "Stage: feasibility only" first (M39)')
+     agent = text.strip().split(":", 1)[0].strip().lower()
++    if agent == "animator":
++        conflicts = stage_conflicts(text)
++        if conflicts:
++            fails.append('"Stage: feasibility only" also requests production (' + ", ".join(conflicts) +
++                         '); use "Stage: measure + storyboard (feasibility first)" for a storyboard, or '
++                         '"feasibility first, then build" for code changes (M67/M79)')
+     # M46 (twice): "feasibility first" applies to animator build briefs only; a general-purpose agent has no
+     # agent file, so its budget lives in its spec and the budget rule is skipped too.
+     if agent == "animator" and "feasibility first" not in text.lower() and "feasibility only" not in text.lower():
+diff --git a/tools/regress.py b/tools/regress.py
+index b13bfea..83112b8 100644
+--- a/tools/regress.py
++++ b/tools/regress.py
+@@ -103,6 +103,33 @@ with open(plan, "w") as f:
+     f.write("## Measured checks\n| Check | Need | Measured |\n|---|---|---|\n| lantern gap | 30 | estimate |\n")
+ case("M39 'then build' with open estimates fails", brief_check.check("animator: ep99 feasibility first, then build", plan))
+ 
++# ---- M67/M79: the hook assigns five calls to feasibility only, never production.
++for request in ("Measure + storyboard", "Return measurements and a storyboard", "Fix the code",
++                "Edit episodes/ep99.py", "Render a storyboard", "Code-fix round", "Do not edit; then build",
++                "Measure estimates and then build"):
++    case("M67/M79 feasibility-only rejects: " + request,
++         brief_check.check("animator: ep99\nStage: feasibility only\n" + request))
++for request in ("Measure estimates and return numbers", "Read the existing storyboard; report the render time",
++                "No code edits; do not build or render", "Inspect the build and check the render"):
++    case("M67/M79 feasibility-only allows: " + request,
++         not brief_check.check("animator: ep99\nStage: feasibility only\n" + request))
++case("M67 measure + storyboard stage remains valid",
++     not brief_check.check("animator: ep99\nStage: measure + storyboard (feasibility first)\nRender a storyboard"))
++case("M79 explicit build stage remains valid without open estimates",
++     not brief_check.check("animator: ep99\nStage: feasibility first, then build\nFix the code"))
++band("ANY AGENT: <60%")
++live_root, agent_hooks.ROOT = agent_hooks.ROOT, SCRATCH_ROOT
++try:
++    rejected = hook(agent_hooks.cmd_brief, {"tool_input": {"subagent_type": "animator",
++                    "prompt": "Stage: feasibility only\nRender a storyboard"}})
++    accepted = hook(agent_hooks.cmd_brief, {"tool_input": {"subagent_type": "animator",
++                    "prompt": "Stage: measure + storyboard (feasibility first)\nRender a storyboard"}})
++    case("M67/M79 brief hook rejects for the intended reason and accepts the corrected stage",
++         denied(rejected) and "M67/M79" in json.dumps(rejected) and not denied(accepted))
++finally:
++    agent_hooks.ROOT = live_root
++    os.unlink(agent_hooks.BAND)
++
+ # ---- blind_guard (M1, M57): exit 2 blocks
+ def guard(tool, ti):
+     p = subprocess.run([sys.executable, os.path.join(TOOLS, "blind_guard.py")], cwd=ROOT, capture_output=True,

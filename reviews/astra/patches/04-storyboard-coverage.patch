@@ -1,0 +1,549 @@
+diff --git a/docs/STORYBOARD_COVERAGE.md b/docs/STORYBOARD_COVERAGE.md
+new file mode 100644
+index 0000000..ed551a9
+--- /dev/null
++++ b/docs/STORYBOARD_COVERAGE.md
+@@ -0,0 +1,79 @@
++# Storyboard coverage (M82)
++
++Use this before sending a stage-kit storyboard to blind review. It checks that the
++declared key moments have samples on the delivered sheet. It cannot decide what a
++panel means. It neither records nor replaces gate 1, 1b, 2 or 3.
++
++## Builder inputs
++
++Keep a private JSON file beside the plan. Version 1 requires `problem`, `cause`,
++`lesson` and `payoff`; add every story-specific key moment as another unique ID
++(for example `loss` or `reveal`). Choose narrow windows from the actual beat table,
++then have the plan's owner confirm they represent the card. Broad windows or a
++wrong declaration can pass without showing the intended action.
++
++This is a schema example, not an episode or a recommendation for its timing:
++
++```json
++{
++  "version": 1,
++  "moments": [
++    {"id": "cause", "start": 0.2, "end": 0.8},
++    {"id": "problem", "start": 1.2, "end": 1.8},
++    {"id": "lesson", "start": 2.2, "end": 2.8},
++    {"id": "payoff", "start": 3.2, "end": 3.8}
++  ]
++}
++```
++
++Times are seconds. Windows include both endpoints; all times must be finite,
++nonnegative and less than the table duration. Supply increasing, distinct sample
++times (at most 48). Each moment needs at least one sample inside its window. One
++sample may cover multiple declared windows; that is not a semantic judgment.
++
++## Generate and check
++
++```bash
++python3 tools/stage.py covered-sheet epNN reviews/epNN_moments.json 0.4,1.4,2.4,3.4 build/sb01
++python3 tools/storyboard_check.py build/sb01 --requirements reviews/epNN_moments.json --source reviews/epNN_stage.md
++```
++
++The table must already exist. Every sample must have an explicit shot; the tool
++refuses the renderer's fallback camera. It calls the stage's own `still(t)`, saves
++neutral numbered panels, assembles them chronologically without cropping or
++stretching, and labels only panel numbers and timestamps. A completed directory
++appears only after verification. Use a fresh revision directory for each attempt;
++existing results are never overwritten.
++
++Outputs:
++
++| File | Reader | Purpose |
++|---|---|---|
++| `storyboard.png` | Blind reviewer | Actual neutral sheet; no moment names or plot labels |
++| `panel_001.png`, etc. | Builder | Exact sampled images used for the sheet |
++| `receipt.json` | Builder | Times, sizes, panel/sheet hashes, table/requirements hashes and coverage mapping |
++
++Give the reviewer **only** `build/sb01/storyboard.png` and the round number. Keep
++the parent directory neutral too. Do not share the moment file, receipt, source
++table or this checker's detailed errors with a blind reviewer. These files are
++not additional reviewer inputs.
++
++Verification exits 1 for missing samples, invalid declarations, stale table or
++requirements bytes, missing/changed panels, or a sheet that differs from the
++declared panels. It reconstructs the sheet as well as checking hashes. This is
++accidental-staleness/integrity checking, not tamper-proof provenance: the receipt
++is not signed. It does not hash renderer dependencies, so regenerate after any
++renderer change. It cannot prove that supplied declarations match the story card.
++
++The legacy `stage.py sheet` command remains available and **does not** perform
++this coverage check. Use `covered-sheet` for the checked workflow. Bespoke episode
++renderers are not integrated by this change. Clearance, framing, blind review and
++safety checks still run separately; a coverage PASS must never be reported as one
++of those passes.
++
++## Verification and rollback
++
++`python3 tools/test_storyboard_check.py` runs isolated positive and negative
++fixtures, and `python3 tools/regress.py` includes that suite. No live gate or agent
++is invoked. Revert the package commit to remove the command, checker, tests and
++documentation; existing neutral image outputs remain ordinary PNGs.
+diff --git a/docs/TOOLKIT.md b/docs/TOOLKIT.md
+index a622f3a..2049bce 100644
+--- a/docs/TOOLKIT.md
++++ b/docs/TOOLKIT.md
+@@ -25,7 +25,7 @@ here and an API docstring at its top.
+ | `episodes/pilot02_splash_of_blue.py` | Reference episode: `render_world(t, d, cam, bg)`, `make_buses()`, flags `--keys`, `--cuts`, `--still T` |
+ | `episodes/pilot02_short.py` | Reference vertical Short: re-films an episode through a vertical camera, cuts its sound effects, own music bed |
+ | `episodes/stage_kit.py` | Stage kit (19 Oct, `docs/stage_kit_proposal.md`): marks, presets (W/ML/MR/CL/CR; vertical VW/VM/VC@mark), spots (`C.L`/`C.R`: prop work spot or hand-over pair), 16 checked moves, `Sim` (rules, arithmetic), `Stage` (performers, `still`, `sheet`), `export(globals(), ST)` for clearance_check; trial 19 Oct FAIL (`reviews/stage_kit_trial.md`) |
+-| `tools/stage.py` | The designer's only way to write `reviews/<ep>_stage.md`: `menu`, `new`, `beat`, `shot`, `legal`, `show`, `sheet`; each call re-checks the table or refuses with the legal choices; `test` = the move test (`reviews/stage_kit_move_test.md`) |
++| `tools/stage.py` | The designer's only way to write `reviews/<ep>_stage.md`: `menu`, `new`, `beat`, `shot`, `legal`, `show`, `sheet`, `covered-sheet` (declared moment coverage; docs/STORYBOARD_COVERAGE.md); each call re-checks the table or refuses with the legal choices; `test` = the move test (`reviews/stage_kit_move_test.md`) |
+ | `tools/check_video.py` | `--landscape --no-loop --cuts t1,t2,...`; vertical Shorts 12-180 s; `--dur 15-30` (transformation Short) or `12-60` (story Short); prints RESULT: PASS |
+ | `tools/build_agents.py` | Writes `.claude/agents/` from MASTER_PROMPT.md Appendix A `--allow-growth`: write even if a block has >10% more words than at the newest `agents-*` tag (otherwise exit 1, nothing written; M10). |
+ | `tools/blind_guard.py` | PreToolUse hook in the fresh-eyes-reviewer's frontmatter (Read, Bash, Glob, Grep): exit 2 on reviews/, episodes/, output/, Videos/, docs/ (except its reference), MASTER_PROMPT/HANDOFF/CLAUDE.md (M1); test: pipe `{"tool_name":"Read","tool_input":{"file_path":"reviews/x"}}` |
+diff --git a/reviews/astra/04_storyboard_coverage.md b/reviews/astra/04_storyboard_coverage.md
+new file mode 100644
+index 0000000..406bddc
+--- /dev/null
++++ b/reviews/astra/04_storyboard_coverage.md
+@@ -0,0 +1,16 @@
++# Storyboard coverage — 20 Oct 2026
++
++Evidence: reviews/mistake_log.md:93 (M82) and reviews/ep12_ledger.md:24: the delivered sheet omitted key moments despite repeated look checks. Existing episodes/stage_kit.py:1800–1817 composes whatever sample times it receives.
++
++Change: a new `stage.py covered-sheet` command renders declared samples through the actual stage cameras. A private requirements file must declare problem, cause, lesson, payoff and any extra moments. Missing time-window samples fail before rendering; timestamps without an explicit shot fail instead of using a fallback camera. A private receipt binds table/requirements hashes, samples, panel sizes and image hashes. Verification reconstructs the neutral sheet and compares pixels. Existing output revisions are preserved, incomplete bundles are removed. The existing sheet command is unchanged and does not gain coverage checking.
++
++Validation (actual runs):
++- Combined REGRESS PASS 170/170 (previous 169/169). The added regression case runs 15 focused tests, all PASS.
++- Independent replay: this package's code diff and new modules on the original baseline with parent settings: REGRESS PASS 150/150 (baseline149). Neither PR #2 nor #3 is required.
++- Actual rig: four stills at 0.4, 1.4, 2.4, 3.4 seconds from a temporary four-second, single-character stage; bundle rendered in 12.364 seconds. CLI verification PASS, four declared moments covered.
++- Visual inspection: 1488×616 sheet, four ordered panels, no crop/stretch, neutral numeric labels. This stationary fixture tests rendering, not a story. No clarity/safety verdict is inferred.
++- Python compilation and git diff --check PASS.
++
++Limitations: declarations are supplied by the builder; their story meaning cannot be validated by this script. Broad or mistaken windows can pass. The receipt is unsigned and does not hash renderer code, so regenerate after renderer changes. The command is opt-in and covers stage-kit sheets only; adoption, fewer blind-review rounds and production savings are unmeasured. Share only the neutral storyboard PNG, never requirements or receipts, with the blind reviewer. No gate state or agent contract changed.
++
++Carry independently with docs/STORYBOARD_COVERAGE.md and the toolkit pointer. Rollback: revert this package's squash commit. Scorecard in prompt order remains 2/2/4/7/1/1/1. Story clarity is the weakest measured production outcome; audience evidence, elapsed delivery and shot reuse remain unproven. No new own mistake was found in this package.
+diff --git a/tools/regress.py b/tools/regress.py
+index 83112b8..0168728 100644
+--- a/tools/regress.py
++++ b/tools/regress.py
+@@ -745,6 +745,12 @@ except SK.Refused as e:
+ case("KIT v2 no solution: the refusal lists the nearest rows that work (later, or the partner moving)",
+      "nearest that work" in _msg, _msg[-160:])
+ 
++# ---- M82: required storyboard samples and the delivered sheet agree (temporary fixtures only).
++storyboard_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_storyboard_check.py")],
++                                 capture_output=True, text=True)
++case("M82 storyboard coverage and integrity tests", storyboard_tests.returncode == 0,
++     storyboard_tests.stdout + storyboard_tests.stderr if storyboard_tests.returncode else "")
++
+ fails = [r for r in results if not r[1]]
+ for cid, ok, note in results:
+     if not ok or "-v" in sys.argv:
+diff --git a/tools/stage.py b/tools/stage.py
+index f494a37..b24e479 100644
+--- a/tools/stage.py
++++ b/tools/stage.py
+@@ -12,6 +12,8 @@ whole table with episodes/stage_kit.py and writes the row, or refuses (exit 1, n
+     python3 tools/stage.py legal ep13 2.0-3.4 Snip walk_to       the spots that move would accept
+     python3 tools/stage.py show ep13                              the table's problems (none = PASS) and shot coverage
+     python3 tools/stage.py sheet ep13 0.5,3.0,6.2 [out.png]       key-beat stills through the shot cameras
++    python3 tools/stage.py covered-sheet ep13 moments.json 0.5,3.0,6.2 build/sb1
++                                                               neutral sheet + checked coverage receipt (M82)
+     python3 tools/stage.py test [--quick]                         move test: every move x mark x character, rendered
+                                                                   and swept (writes reviews/stage_kit_move_test.md)
+ The table lives in reviews/<ep>_stage.md (the story-designer may run this; only stage.py writes the file).
+@@ -229,6 +231,24 @@ def cmd_sheet(a):
+     print(st.sheet(times, out))
+ 
+ 
++def cmd_covered_sheet(a):
++    """Opt-in coverage check; leaves the legacy sheet command unchanged."""
++    if len(a) != 4:
++        sys.exit(__doc__)
++    import storyboard_check
++    ep, requirements, samples, out = a
++    try:
++        times = [float(x) for x in samples.split(",")]
++        st = SK.Stage.load(ep)
++        for t in times:
++            if not any(start <= t < end for start, end, _ in st.table.shots):
++                raise ValueError(f"no explicit shot at {t:g}; refusing the renderer's fallback camera")
++        print(storyboard_check.write_bundle(st.still, times, st.sim.end, requirements, SK.Table.path(ep), out))
++        print("Declared coverage and file integrity PASS; blind story and safety reviews still required.")
++    except (OSError, ValueError, TypeError) as exc:
++        refuse(str(exc))
++
++
+ # ---------------------------------------------------------------- move test
+ MOVE_CASES = ("enter", "exit", "walk_to", "turn", "look", "nod", "shake", "react", "hop", "hold", "point",
+               "pick_up", "put_down", "place_on", "drop", "hand_over",
+@@ -408,7 +428,7 @@ def main(argv):
+     cmd, a = argv[0], argv[1:]
+     try:
+         fn = {"new": cmd_new, "beat": cmd_beat, "shot": cmd_shot, "legal": cmd_legal, "show": cmd_show,
+-              "menu": cmd_menu, "sheet": cmd_sheet, "test": cmd_test}[cmd]
++              "menu": cmd_menu, "sheet": cmd_sheet, "covered-sheet": cmd_covered_sheet, "test": cmd_test}[cmd]
+     except KeyError:
+         sys.exit(__doc__)
+     try:
+diff --git a/tools/storyboard_check.py b/tools/storyboard_check.py
+new file mode 100644
+index 0000000..09b48e0
+--- /dev/null
++++ b/tools/storyboard_check.py
+@@ -0,0 +1,175 @@
++"""Build and verify neutral storyboard sheets with declared moment coverage.
++
++    python3 tools/storyboard_check.py BUNDLE --requirements moments.json --source table.md
++
++Generation is exposed by stage.py covered-sheet. A PASS proves file integrity and
++declared time coverage only. Meaning, clarity and safety require independent review.
++The requirements and receipt are private to the builder; share only storyboard.png.
++"""
++import argparse
++import hashlib
++import json
++import math
++import os
++from pathlib import Path
++import shutil
++import tempfile
++
++from PIL import Image, ImageDraw, ImageOps
++
++REQUIRED = {"problem", "cause", "lesson", "payoff"}
++MAX_PANELS = 48
++
++
++def digest(path):
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def number(value):
++    return type(value) in (int, float) and math.isfinite(value)
++
++
++def coverage(requirements, times, duration):
++    """Raise ValueError for invalid declarations or a missing time-window sample."""
++    if not number(duration) or duration <= 0:
++        raise ValueError("duration must be finite and positive")
++    if not isinstance(times, list) or not 1 <= len(times) <= MAX_PANELS:
++        raise ValueError(f"supply 1–{MAX_PANELS} panel times")
++    if any(not number(t) or not 0 <= t < duration for t in times):
++        raise ValueError("panel times must be finite and within [0, duration)")
++    if any(a >= b for a, b in zip(times, times[1:])):
++        raise ValueError("panel times must be strictly increasing")
++    if not isinstance(requirements, dict) or requirements.get("version") != 1:
++        raise ValueError("requirements version must be 1")
++    moments = requirements.get("moments")
++    if not isinstance(moments, list) or not moments:
++        raise ValueError("moments must be a nonempty list")
++    ids, hits = set(), {}
++    for moment in moments:
++        if not isinstance(moment, dict):
++            raise ValueError("each moment must be an object")
++        name, start, end = (moment.get(k) for k in ("id", "start", "end"))
++        if not isinstance(name, str) or not name.strip() or name in ids:
++            raise ValueError("moment IDs must be nonempty and unique")
++        ids.add(name)
++        if not number(start) or not number(end) or not 0 <= start <= end < duration:
++            raise ValueError(f"invalid moment window: {name}")
++        hits[name] = [i + 1 for i, t in enumerate(times) if start <= t <= end]
++        if not hits[name]:
++            raise ValueError(f"missing panel for moment: {name} ({start:g}–{end:g})")
++    missing = REQUIRED - ids
++    if missing:
++        raise ValueError("missing required moments: " + ", ".join(sorted(missing)))
++    return hits
++
++
++def compose(images, times):
++    """Chronological panels, with only panel numbers and timestamps as labels."""
++    portrait = images[0].height > images[0].width
++    w, h = (270, 480) if portrait else (480, 270)
++    cols = min(3, len(images))
++    rows = (len(images) + cols - 1) // cols
++    sheet = Image.new("RGB", (cols * (w + 12) + 12, rows * (h + 32) + 12), (250, 248, 242))
++    draw = ImageDraw.Draw(sheet)
++    for i, (im, t) in enumerate(zip(images, times)):
++        x, y = 12 + (i % cols) * (w + 12), 12 + (i // cols) * (h + 32)
++        # Contain, never crop or stretch a panel to make it fit.
++        thumb = ImageOps.contain(im, (w, h), Image.Resampling.LANCZOS)
++        sheet.paste(thumb, (x + (w - thumb.width) // 2, y + (h - thumb.height) // 2))
++        draw.text((x, y + h + 5), f"{i + 1}   {t:g}", fill=(60, 50, 50))
++    return sheet
++
++
++def write_bundle(render_frame, times, duration, requirements_path, source_path, output):
++    """Render exact samples, then publish a fresh directory only after verification.
++
++    render_frame is the source renderer, not a set of manually labelled images.
++    Paths and hashes bind the table and moment file; renderer code is not certified.
++    """
++    requirements_path, source_path, output = map(Path, (requirements_path, source_path, output))
++    requirements = json.loads(requirements_path.read_text())
++    hits = coverage(requirements, times, duration)
++    bindings = {"requirements_sha256": digest(requirements_path), "source_sha256": digest(source_path)}
++    if output.exists():
++        raise ValueError("output already exists; use a new revision directory")
++    output.parent.mkdir(parents=True, exist_ok=True)
++    temp = Path(tempfile.mkdtemp(prefix=".storyboard-", dir=output.parent))
++    try:
++        images, panels = [], []
++        for i, t in enumerate(times, 1):
++            frame = render_frame(t)
++            if not isinstance(frame, Image.Image):
++                raise ValueError("renderer must return a Pillow image")
++            # Copy pixels into a fresh image; do not propagate source metadata.
++            image = Image.frombytes("RGB", frame.size, frame.convert("RGB").tobytes())
++            path = temp / f"panel_{i:03d}.png"
++            image.save(path)
++            images.append(image)
++            panels.append({"time": t, "file": path.name, "size": list(image.size), "sha256": digest(path)})
++        compose(images, times).save(temp / "storyboard.png")
++        receipt = {"version": 1, "duration": duration, **bindings, "panels": panels,
++                   "coverage": hits, "sheet_sha256": digest(temp / "storyboard.png")}
++        (temp / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
++        verify(temp, requirements_path, source_path)
++        os.rename(temp, output)
++    finally:
++        if temp.exists():
++            shutil.rmtree(temp)
++    return output / "storyboard.png"
++
++
++def verify(bundle, requirements_path, source_path):
++    """Fail for stale inputs, corrupt panels, altered sheet, or missing coverage."""
++    bundle = Path(bundle)
++    receipt = json.loads((bundle / "receipt.json").read_text())
++    if not isinstance(receipt, dict) or receipt.get("version") != 1:
++        raise ValueError("receipt version must be 1")
++    for key, path in (("requirements_sha256", requirements_path), ("source_sha256", source_path)):
++        if receipt.get(key) != digest(path):
++            raise ValueError(f"stale or changed input: {key}")
++    panels = receipt.get("panels")
++    if not isinstance(panels, list) or not all(isinstance(p, dict) for p in panels):
++        raise ValueError("invalid panels list")
++    times = [p.get("time") for p in panels]
++    hits = coverage(json.loads(Path(requirements_path).read_text()), times, receipt.get("duration"))
++    if hits != receipt.get("coverage"):
++        raise ValueError("receipt coverage does not match panel times")
++    images = []
++    for i, panel in enumerate(panels, 1):
++        expected = f"panel_{i:03d}.png"
++        if panel.get("file") != expected:
++            raise ValueError("panels must use consecutive neutral filenames")
++        path = bundle / expected
++        if path.is_symlink() or panel.get("sha256") != digest(path):
++            raise ValueError(f"changed panel: {expected}")
++        with Image.open(path) as image:
++            if image.format != "PNG" or list(image.size) != panel.get("size"):
++                raise ValueError(f"invalid panel image: {expected}")
++            images.append(image.convert("RGB"))
++    sheet = bundle / "storyboard.png"
++    if sheet.is_symlink() or receipt.get("sheet_sha256") != digest(sheet):
++        raise ValueError("changed storyboard sheet")
++    expected = compose(images, times)
++    with Image.open(sheet) as actual:
++        if actual.size != expected.size or actual.convert("RGB").tobytes() != expected.tobytes():
++            raise ValueError("sheet does not contain the declared panels in order")
++    return hits
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("bundle")
++    parser.add_argument("--requirements", required=True)
++    parser.add_argument("--source", required=True)
++    args = parser.parse_args()
++    try:
++        hits = verify(args.bundle, args.requirements, args.source)
++    except (OSError, ValueError, TypeError, KeyError) as exc:
++        print(f"storyboard_check: FAIL: {exc}")
++        return 1
++    print(f"storyboard_check: PASS: {len(hits)} declared moments covered; integrity only, not a story/safety verdict")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/test_storyboard_check.py b/tools/test_storyboard_check.py
+new file mode 100644
+index 0000000..c25e36c
+--- /dev/null
++++ b/tools/test_storyboard_check.py
+@@ -0,0 +1,178 @@
++"""M82: temporary-file tests; no live story, agent or gate state is used."""
++import copy
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++from types import SimpleNamespace
++import unittest
++from unittest.mock import patch
++
++from PIL import Image
++
++import storyboard_check as sb
++
++
++class StoryboardTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory(prefix="snc_storyboard_")
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.source = self.root / "table.md"
++        self.source.write_text("synthetic fixture, not a story\n")
++        self.requirements = {"version": 1, "moments": [
++            {"id": name, "start": i, "end": i + 0.8}
++            for i, name in enumerate(("cause", "problem", "lesson", "payoff"))]}
++        self.req = self.root / "moments.json"
++        self.req.write_text(json.dumps(self.requirements))
++        self.times = [0.4, 1.4, 2.4, 3.4]
++        self.out = self.root / "revision1"
++        self.rendered = []
++
++    def frame(self, t):
++        self.rendered.append(t)
++        return Image.new("RGB", (320, 180), (int(t * 50), 80, 170))
++
++    def build(self):
++        return sb.write_bundle(self.frame, self.times, 4, self.req, self.source, self.out)
++
++    def verify(self):
++        return sb.verify(self.out, self.req, self.source)
++
++    def mutate_receipt(self, mutate):
++        path = self.out / "receipt.json"
++        data = json.loads(path.read_text())
++        mutate(data)
++        path.write_text(json.dumps(data))
++
++    def test_good_sheet_is_neutral_and_uses_exact_samples(self):
++        path = self.build()
++        self.assertEqual(self.rendered, self.times)
++        self.assertEqual(self.verify(), {"cause": [1], "problem": [2], "lesson": [3], "payoff": [4]})
++        self.assertEqual(path.name, "storyboard.png")
++        with Image.open(path) as image:
++            self.assertEqual(image.info, {})
++            self.assertEqual(image.size, (1488, 616))
++            self.assertEqual(image.getpixel((20, 20)), (20, 80, 170))
++            self.assertEqual(image.getpixel((512, 20)), (70, 80, 170))
++
++    def test_missing_moment_fails_before_render(self):
++        self.times.pop(0)
++        with self.assertRaisesRegex(ValueError, "missing panel for moment: cause"):
++            self.build()
++        self.assertEqual(self.rendered, [])
++        self.assertFalse(self.out.exists())
++
++    def test_omitted_required_declaration_fails(self):
++        req = copy.deepcopy(self.requirements)
++        req["moments"].pop()
++        with self.assertRaisesRegex(ValueError, "missing required moments: payoff"):
++            sb.coverage(req, self.times, 4)
++
++    def test_extra_moment_is_checked(self):
++        req = copy.deepcopy(self.requirements)
++        req["moments"].append({"id": "reveal", "start": 3.6, "end": 3.8})
++        with self.assertRaisesRegex(ValueError, "missing panel for moment: reveal"):
++            sb.coverage(req, self.times, 4)
++
++    def test_invalid_times_and_ranges_fail(self):
++        for times in ([], [True], [-1], [float("nan")], [float("inf")], [4],
++                      list(reversed(self.times)), [0.4, 0.4, 1.4, 2.4, 3.4]):
++            with self.subTest(times=times), self.assertRaises(ValueError):
++                sb.coverage(self.requirements, times, 4)
++        for start, end in ((-1, 1), (2, 1), (0, 4), (False, 1), (0, float("nan"))):
++            req = copy.deepcopy(self.requirements)
++            req["moments"][0].update(start=start, end=end)
++            with self.subTest(start=start, end=end), self.assertRaises(ValueError):
++                sb.coverage(req, self.times, 4)
++
++    def test_duplicate_moment_ids_fail(self):
++        req = copy.deepcopy(self.requirements)
++        req["moments"].append(req["moments"][0])
++        with self.assertRaisesRegex(ValueError, "unique"):
++            sb.coverage(req, self.times, 4)
++
++    def test_missing_or_changed_panel_fails(self):
++        self.build()
++        panel = self.out / "panel_001.png"
++        panel.write_bytes(b"corrupt")
++        with self.assertRaisesRegex(ValueError, "changed panel"):
++            self.verify()
++        panel.unlink()
++        with self.assertRaises(OSError):
++            self.verify()
++
++    def test_stale_table_and_requirements_fail(self):
++        self.build()
++        for path in (self.source, self.req):
++            original = path.read_bytes()
++            path.write_bytes(original + b" ")
++            with self.assertRaisesRegex(ValueError, "stale or changed input"):
++                self.verify()
++            path.write_bytes(original)
++
++    def test_sheet_pixels_checked_even_if_hash_updated(self):
++        self.build()
++        path = self.out / "storyboard.png"
++        with Image.open(path) as image:
++            image.putpixel((20, 20), (255, 0, 0))
++            image.save(path)
++        self.mutate_receipt(lambda data: data.update(sheet_sha256=sb.digest(path)))
++        with self.assertRaisesRegex(ValueError, "sheet does not contain"):
++            self.verify()
++
++    def test_panel_order_and_path_escape_fail(self):
++        self.build()
++        self.mutate_receipt(lambda data: data["panels"][0].update(file="../table.md"))
++        with self.assertRaisesRegex(ValueError, "neutral filenames"):
++            self.verify()
++
++    def test_declared_coverage_cannot_disagree_with_samples(self):
++        self.build()
++        self.mutate_receipt(lambda data: data["coverage"].update(cause=[2]))
++        with self.assertRaisesRegex(ValueError, "coverage does not match"):
++            self.verify()
++
++    def test_existing_revision_is_preserved(self):
++        self.build()
++        original = (self.out / "receipt.json").read_bytes()
++        with self.assertRaisesRegex(ValueError, "already exists"):
++            self.build()
++        self.assertEqual(original, (self.out / "receipt.json").read_bytes())
++
++    def test_renderer_failure_leaves_no_completed_bundle(self):
++        def broken(t):
++            raise RuntimeError("render failed")
++        with self.assertRaises(RuntimeError):
++            sb.write_bundle(broken, self.times, 4, self.req, self.source, self.out)
++        self.assertFalse(self.out.exists())
++        self.assertEqual(list(self.root.glob(".storyboard-*")), [])
++
++    def test_cli_exit_codes(self):
++        self.build()
++        cmd = [sys.executable, sb.__file__, str(self.out), "--requirements", str(self.req),
++               "--source", str(self.source)]
++        self.assertEqual(subprocess.run(cmd, capture_output=True).returncode, 0)
++        (self.out / "panel_002.png").unlink()
++        self.assertEqual(subprocess.run(cmd, capture_output=True).returncode, 1)
++
++    def test_stage_command_uses_renderer_and_refuses_camera_gap(self):
++        import stage
++        stub = SimpleNamespace(still=self.frame, sim=SimpleNamespace(end=4),
++                               table=SimpleNamespace(shots=[(0, 4, "W")]))
++        args = ["fixture", str(self.req), "0.4,1.4,2.4,3.4", str(self.out)]
++        with patch.object(stage.SK.Stage, "load", return_value=stub), \
++                patch.object(stage.SK.Table, "path", return_value=str(self.source)):
++            stage.cmd_covered_sheet(args)
++            self.assertEqual(self.rendered, self.times)
++            stub.table.shots = [(1, 4, "W")]
++            args[-1] = str(self.root / "revision2")
++            with self.assertRaises(SystemExit) as exc:
++                stage.cmd_covered_sheet(args)
++            self.assertEqual(exc.exception.code, 1)
++            self.assertFalse(Path(args[-1]).exists())
++
++
++if __name__ == "__main__":
++    unittest.main()
