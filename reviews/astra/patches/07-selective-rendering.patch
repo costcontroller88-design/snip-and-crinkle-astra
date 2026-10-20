@@ -1,0 +1,565 @@
+diff --git a/docs/SELECTIVE_RENDERING.md b/docs/SELECTIVE_RENDERING.md
+new file mode 100644
+index 0000000..4c31fa1
+--- /dev/null
++++ b/docs/SELECTIVE_RENDERING.md
+@@ -0,0 +1,92 @@
++# Selective shot rendering
++
++`episodes/shot_render.py` is an opt-in drawing cache and encoder. Existing episode
++scripts and `acting.render_video` keep their current behavior. Use this adapter
++only when the renderer can declare each shot's complete inputs. Do not omit
++dependencies merely to get cache hits.
++
++## Contract
++
++```python
++import shot_render
++
++shots = [
++    {"id": "s01", "start": 0, "frames": 30, "seed": 1,
++     "config": {"camera": "W", "incoming_state": {}, "beats": []}},
++    {"id": "s02", "start": 30, "frames": 30, "seed": 2,
++     "config": {"camera": "M", "incoming_state": {}, "beats": []}}
++]
++result = shot_render.render(shots, draw, dependencies, "build/shot-cache", size=(1920, 1080))
++shot_render.encode(result, "build/continuous-audio.wav", "build/revision02.mp4")
++```
++
++`draw(shot, absolute_drawing_index)` returns a Pillow image at the requested size.
++There are 15 drawings per second, repeated twice for 30fps. Shot ranges must be
++consecutive from drawing zero. Size must contain positive even dimensions.
++
++The callback must be deterministic from the shot configuration, seed, drawing
++index and declared dependencies. Put all pose/prop incoming states, camera,
++actions, timings, per-shot assets and random seeds in those inputs. Materialize
++cross-shot state explicitly: if an earlier edit changes a later shot's incoming
++state, invalidate that later shot too. A duration change shifts subsequent
++absolute drawing indices and correctly invalidates later shots. The cache does
++not infer data flow from arbitrary Python code or automatically slice stage tables.
++
++`dependencies` must contain the drawing entry script and all transitive imported
++code, external configuration, generated assets and fonts used by it. The cache
++also hashes its own implementation and records Python/Pillow/NumPy versions.
++Dependencies are rehashed on every invocation and checked again before a new shot
++is published. No process-lifetime hash memoization hides source changes.
++
++A shared code/asset change intentionally invalidates every dependent shot. A
++shot-local edit belongs in that shot's `config`, or a properly scoped independent
++renderer contract. Hiding local edits in shared Python constants forces a broad
++invalidation. The same `dependencies` collection applies to all shots in this API.
++
++## Integrity and failure behavior
++
++- Each content-keyed directory holds lossless RGB PNGs and a completion receipt
++  containing sizes and SHA-256 hashes. Cache hits verify every frame.
++- Missing, corrupt, unstamped or wrong-size entries are misses. Render failures
++  leave no completed shot; new directories are published atomically.
++- Only one writer uses a cache at a time. A lock fails fast if occupied. After a
++  killed process, remove a stale lock only after confirming no writer remains.
++- Caller shot dictionaries are copied before hashing/drawing. Hidden callback
++  state is still the caller's responsibility; the cache cannot authenticate it.
++- Encode rechecks frame hashes, refuses audio shorter than the visual timeline,
++  and preserves existing output revisions. Failed encoding removes its partial file.
++
++The final encoder uses one continuous WAV and the established H.264/AAC/loudnorm
++settings, re-encoding the output each time. This prevents independently normalized
++audio fragments at shot boundaries. Audio-only changes reuse drawings but still
++run the full final encode. All final-MP4 checks remain mandatory: matching two
++outputs does not demonstrate good audio, framing, story clarity or safety.
++
++This initial implementation draws cache misses serially. It is a correctness
++baseline; cold renders may be slower than the existing multiprocess renderer.
++It saves repeated drawing work, not the complete encoding cost. Cache storage
++grows by revision and needs deliberate retention management; no automatic deletion
++policy is introduced. Never place renders or cache directories in git.
++
++## Reproduce the engineering trial
++
++```bash
++python3 tools/test_shot_render.py
++python3 tools/benchmark_shot_render.py build/astra/shot-trial-new
++```
++
++The benchmark uses the actual stage rig in a synthetic 0.6-second sequence,
++generated tone audio, three shots and nine drawings. It records cold/warm/edit/
++clean timings, verifies only the edited middle shot redraws, and compares lossless
++frame hashes plus decoded MP4 video/audio. Its output directory must be new.
++The nine focused tests also exercise seeds, shared dependencies, missing/corrupt
++cache, interrupted rendering, busy locks, short audio and failed encoding cleanup.
++
++Adoption gate: before using it for a production episode, compare a full cached
++render with a clean render, pass existing video/clearance/framing checks and get
++the normal independent reviews. A 10/10 selective-rendering rating requires the
++production trials defined in docs/ASTRA_PRODUCTION_PIPELINE.md, not this small test.
++
++Rollback: switch the episode back to its previous rendering call and revert the
++carried package commit. Existing PNG cache files can be ignored; final media files
++remain ordinary MP4s. No live gate format or rendering default was changed.
+diff --git a/episodes/shot_render.py b/episodes/shot_render.py
+new file mode 100644
+index 0000000..a6c6b64
+--- /dev/null
++++ b/episodes/shot_render.py
+@@ -0,0 +1,207 @@
++"""Lossless per-shot drawing cache and one continuous final audio encode.
++
++Opt-in API: render(shots, draw, dependencies, cache, size); encode(result, wav, out).
++draw(shot, absolute_drawing_index) must be deterministic from the declared shot,
++seed and dependencies. No hidden mutable state or undeclared files. Existing
++episode renderers are unchanged; see docs/SELECTIVE_RENDERING.md for adoption.
++"""
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import shutil
++import subprocess
++import sys
++import tempfile
++import time
++import wave
++
++import numpy as np
++from PIL import Image, __version__ as PIL_VERSION
++
++DPS, FPS = 15, 30
++
++
++def digest(path):
++    h = hashlib.sha256()
++    with Path(path).open("rb") as stream:
++        for block in iter(lambda: stream.read(1024 * 1024), b""):
++            h.update(block)
++    return h.hexdigest()
++
++
++def dependency_hashes(paths):
++    if not paths:
++        raise ValueError("declare drawing code and asset dependencies")
++    paths = {Path(p).resolve() for p in paths} | {Path(__file__).resolve()}
++    return {str(p): digest(p) for p in sorted(paths)}
++
++
++def validate(shots, size):
++    if (not isinstance(size, (tuple, list)) or len(size) != 2 or
++            any(type(x) is not int or x <= 0 or x % 2 for x in size)):
++        raise ValueError("size must contain two positive even integers")
++    if not isinstance(shots, list) or not shots:
++        raise ValueError("provide at least one shot")
++    end, ids = 0, set()
++    for shot in shots:
++        if not isinstance(shot, dict):
++            raise ValueError("each shot must be an object")
++        ident = shot.get("id")
++        if not isinstance(ident, str) or not re.fullmatch(r"[a-zA-Z0-9_-]+", ident) or ident in ids:
++            raise ValueError("shot IDs must be unique neutral identifiers")
++        ids.add(ident)
++        if type(shot.get("start")) is not int or shot["start"] != end:
++            raise ValueError("shots must cover consecutive drawing indices from zero")
++        if type(shot.get("frames")) is not int or shot["frames"] <= 0:
++            raise ValueError("shot frames must be a positive integer")
++        if type(shot.get("seed")) is not int or not isinstance(shot.get("config"), dict):
++            raise ValueError("each shot needs an integer seed and explicit config")
++        json.dumps(shot, sort_keys=True, allow_nan=False)
++        end += shot["frames"]
++    return end
++
++
++def valid_cache(folder, key, frames, size):
++    try:
++        if folder.is_symlink():
++            return False
++        receipt = json.loads((folder / "receipt.json").read_text())
++        hashes = receipt["frame_sha256"]
++        if receipt["key"] != key or len(hashes) != frames or receipt["size"] != list(size):
++            return False
++        for i, expected in enumerate(hashes):
++            path = folder / f"d{i:05d}.png"
++            if path.is_symlink() or digest(path) != expected:
++                return False
++            with Image.open(path) as image:
++                if image.size != tuple(size) or image.mode != "RGB" or image.format != "PNG":
++                    return False
++                image.verify()
++        return True
++    except (OSError, ValueError, KeyError, TypeError):
++        return False
++
++
++def render(shots, draw, dependencies, cache, size=(1920, 1080)):
++    """Cache complete shots atomically; return ordered frame paths and measured reuse.
++
++    This serial renderer deliberately favors verified correctness over worker
++    scaling. Only one writer may use a cache at a time; a lock fails fast.
++    """
++    # Freeze caller input so mutating a spec during drawing cannot alter the key.
++    shots = json.loads(json.dumps(shots, allow_nan=False))
++    count = validate(shots, size)
++    dependencies = list(dependencies)
++    stamp = dependency_hashes(dependencies)
++    cache = Path(cache).resolve()
++    cache.mkdir(parents=True, exist_ok=True)
++    lock = cache / ".writer.lock"
++    fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
++    os.close(fd)
++    started, paths, frame_hashes, stats = time.perf_counter(), [], [], []
++    try:
++        for shot in shots:
++            recipe = {"version": 1, "shot": shot, "dependencies": stamp, "size": list(size),
++                      "dps": DPS, "fps": FPS, "pillow": PIL_VERSION, "numpy": np.__version__,
++                      "python": sys.version}
++            key = hashlib.sha256(json.dumps(recipe, sort_keys=True).encode()).hexdigest()
++            folder = cache / key
++            tick = time.perf_counter()
++            hit = valid_cache(folder, key, shot["frames"], size)
++            if not hit:
++                if folder.is_symlink():
++                    raise ValueError("cache entry must not be a symlink")
++                temp = Path(tempfile.mkdtemp(prefix=".shot-", dir=cache))
++                try:
++                    hashes = []
++                    for local in range(shot["frames"]):
++                        # A private copy keeps a callback from modifying the keyed recipe.
++                        frame = draw(json.loads(json.dumps(shot)), shot["start"] + local)
++                        if not isinstance(frame, Image.Image) or frame.size != tuple(size):
++                            raise ValueError("renderer returned the wrong image size/type")
++                        path = temp / f"d{local:05d}.png"
++                        clean = Image.frombytes("RGB", frame.size, frame.convert("RGB").tobytes())
++                        clean.save(path)
++                        hashes.append(digest(path))
++                    if dependency_hashes(dependencies) != stamp:
++                        raise ValueError("dependencies changed during rendering")
++                    (temp / "receipt.json").write_text(json.dumps(
++                        {"key": key, "recipe": recipe, "size": list(size), "frame_sha256": hashes}, indent=2))
++                    if folder.exists():
++                        shutil.rmtree(folder)  # Only the derived, corrupt hash entry is replaced.
++                    os.rename(temp, folder)
++                finally:
++                    if temp.exists():
++                        shutil.rmtree(temp)
++            paths.extend(str(folder / f"d{i:05d}.png") for i in range(shot["frames"]))
++            frame_hashes.extend(json.loads((folder / "receipt.json").read_text())["frame_sha256"])
++            stats.append({"id": shot["id"], "key": key, "cache_hit": hit,
++                          "drawings": 0 if hit else shot["frames"], "seconds": time.perf_counter() - tick})
++        if dependency_hashes(dependencies) != stamp:
++            raise ValueError("dependencies changed during rendering")
++    finally:
++        lock.unlink()
++    return {"frames": paths, "frame_sha256": frame_hashes, "size": list(size), "drawings": count, "duration": count / DPS,
++            "rendered_drawings": sum(s["drawings"] for s in stats), "shots": stats,
++            "seconds": time.perf_counter() - started}
++
++
++def encode(result, wav, output):
++    """Always remux/re-encode continuous final audio; do not cache per-shot sound.
++
++    Keeps the existing acting renderer's 15-drawing/30-frame cadence and encode
++    settings. Final MP4 checks remain mandatory. Never publishes a failed encode.
++    """
++    output = Path(output)
++    if output.exists():
++        raise ValueError("output exists; use a new revision filename")
++    if (len(result["frames"]) != result["drawings"] or
++            len(result["frame_sha256"]) != result["drawings"] or
++            result["duration"] != result["drawings"] / DPS):
++        raise ValueError("inconsistent render result")
++    with wave.open(str(wav), "rb") as audio:
++        if audio.getnframes() / audio.getframerate() + 1e-9 < result["duration"]:
++            raise ValueError("audio is shorter than the visual timeline")
++    output.parent.mkdir(parents=True, exist_ok=True)
++    fd, name = tempfile.mkstemp(prefix=".encode-", suffix=".mp4", dir=output.parent)
++    os.close(fd)
++    temp = Path(name)
++    w, h = result["size"]
++    command = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
++               "-s", f"{w}x{h}", "-r", str(FPS), "-i", "-", "-i", str(wav),
++               "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
++               "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
++               "-t", str(result["duration"]), "-movflags", "+faststart", str(temp)]
++    try:
++        with tempfile.TemporaryFile() as errors:
++            proc = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=errors)
++            try:
++                for path, expected in zip(result["frames"], result["frame_sha256"]):
++                    if digest(path) != expected:
++                        raise ValueError("cached frame changed before encode")
++                    with Image.open(path) as image:
++                        raw = image.convert("RGB").tobytes()
++                        if image.size != (w, h):
++                            raise ValueError("cached frame size changed before encode")
++                    for _ in range(FPS // DPS):
++                        proc.stdin.write(raw)
++                proc.stdin.close()
++                code = proc.wait()
++                if code:
++                    errors.seek(0)
++                    raise RuntimeError("ffmpeg failed: " + errors.read().decode(errors="replace")[-2000:])
++            finally:
++                if proc.poll() is None:
++                    proc.kill()
++                    proc.wait()
++                if not proc.stdin.closed:
++                    try:
++                        proc.stdin.close()
++                    except BrokenPipeError:
++                        pass
++            os.rename(temp, output)
++    finally:
++        temp.unlink(missing_ok=True)
++    return str(output)
+diff --git a/reviews/astra/07_selective_rendering.md b/reviews/astra/07_selective_rendering.md
+new file mode 100644
+index 0000000..85435dd
+--- /dev/null
++++ b/reviews/astra/07_selective_rendering.md
+@@ -0,0 +1,18 @@
++# Selective rendering — 20 October 2026
++
++Problem: episodes/acting.py:423–454 redraws the whole timeline; episodes/framestore.py:1–15 stamps a complete script/dependency closure. The audit's shot-reuse rating was 1/10. A shot-local edit needed an explicit dependency boundary and verified cached output.
++
++Change: opt-in episodes/shot_render.py stores completed shots as lossless RGB drawings with content keys, dependency hashes and per-frame integrity checks. It freezes caller inputs; checks dependencies again before publishing; refuses concurrent writers; redraws missing/corrupt/incomplete shots; and cleans failed attempts. Encoding uses the established 15-drawing/30fps cadence and one continuous final WAV, checks cached frames again, rejects short audio and preserves existing outputs. Current episode renderers are unchanged.
++
++Actual results:
++- Nine focused tests PASS. Combined REGRESS PASS 172/172. Independent baseline replay in the legacy layout: REGRESS PASS 150/150; no earlier Astra implementation dependency.
++- Reproducible actual-stage-rig fixture: three shots, nine drawings, 0.6 seconds. Cold: 9 drawings in 23.1297s; warm: 0 in 0.0098s; middle-shot edit: 3 in 7.4248s; clean edited rebuild: 9 in 15.0893s. Times cover drawing/cache work, excluding final encoding. Cold/warm process effects prevent treating the first cold time as a controlled speed ratio.
++- The edit reused the first/third shots, reducing redrawn frames 9→3. All edited cached frame hashes equal the clean rebuild. Decoded MP4 frame hashes and decoded audio bytes also match exactly.
++- ffprobe: H.264 1920×1080, 30fps, 18 frames; AAC; duration 0.600000s. This is an engineering fixture, not a final-video quality or story pass.
++- Python compilation and git diff --check PASS. Reproduce with tools/benchmark_shot_render.py and a new output directory.
++
++Limitations: caller must explicitly declare complete shot inputs and transitive code/assets. Hidden mutable state cannot be inferred. Shared code changes invalidate all dependent shots; changed duration/incoming state may correctly invalidate later shots. Cache misses draw serially; cold speed may be worse than the old multiprocess renderer. Final encoding still runs in full; production adaptation, cache retention and full-length equivalence are not completed by this API.
++
++Scorecard: 2/2/4/7/1/4/1. Selective rendering rises 1→4 because the actual-rig fixture now demonstrates correct reuse; 10 still requires production integration and repeated trials. No clarity/safety/delivery/audience improvement is claimed. M90 OPEN records a corrected pipe-cleanup error and invalid positive audio fixture.
++
++Carry the renderer, tests, benchmark, docs/SELECTIVE_RENDERING.md and report. Rollback: revert the destination commit and retain the existing rendering call. No live gates, agent contracts or production accounts were touched.
+diff --git a/tools/benchmark_shot_render.py b/tools/benchmark_shot_render.py
+new file mode 100644
+index 0000000..460bbdf
+--- /dev/null
++++ b/tools/benchmark_shot_render.py
+@@ -0,0 +1,76 @@
++"""Reproducible engineering fixture, not a story or safety/clarity review.
++
++    python3 tools/benchmark_shot_render.py build/astra/shot-trial-01
++
++Three 0.2-second rig shots; cold, warm, middle-shot edit and clean rebuild.
++All images/audio are generated in this project. Writes no live gates or reviews.
++"""
++import json
++import math
++from pathlib import Path
++import struct
++import subprocess
++import sys
++import wave
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path[:0] = [str(ROOT), str(ROOT / "episodes")]
++import shot_render as sr
++import stage_kit as sk
++
++
++def main(output):
++    output = Path(output).resolve()
++    output.mkdir(parents=True, exist_ok=False)
++    shots = [{"id": f"s{i}", "start": i * 3, "frames": 3, "seed": 1,
++              "config": {"facing": "front", "mark": "C"}} for i in range(3)]
++    stages = {}
++
++    def draw(shot, index):
++        key = json.dumps(shot["config"], sort_keys=True)
++        if key not in stages:
++            table = sk.Table("fixture", "playroom", "land")
++            table.start = {"Snip": (shot["config"]["mark"], shot["config"]["facing"])}
++            table.beats = [(0, .2, "Snip", "hold", "")]
++            table.shots = [(0, .2, "W")]
++            stages[key] = sk.Stage(table)
++        return stages[key].still((index - shot["start"]) / sr.DPS)
++
++    dependencies = (list(ROOT.glob("*.py")) + list((ROOT / "episodes").glob("*.py")) +
++                    list((ROOT / "assets/fonts").glob("*.ttf")) + [Path(__file__)])
++    results = {}
++    for label in ("cold", "warm", "edited", "clean"):
++        if label == "edited":
++            shots[1]["config"]["facing"] = "right"
++        cache = output / ("clean-cache" if label == "clean" else "cache")
++        results[label] = sr.render(shots, draw, dependencies, cache)
++        print(label, json.dumps({k: results[label][k] for k in ("seconds", "rendered_drawings")}), flush=True)
++    assert [results[k]["rendered_drawings"] for k in results] == [9, 0, 3, 9]
++    assert [s["cache_hit"] for s in results["edited"]["shots"]] == [True, False, True]
++    assert results["edited"]["frame_sha256"] == results["clean"]["frame_sha256"]
++    wav = output / "tone.wav"
++    with wave.open(str(wav), "wb") as stream:
++        stream.setparams((1, 2, 48000, 0, "NONE", "not compressed"))
++        stream.writeframes(b"".join(struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * i / 48000)))
++                                   for i in range(48000)))
++    for label in ("edited", "clean"):
++        sr.encode(results[label], wav, output / f"{label}.mp4")
++    def video_hashes(path):
++        text = subprocess.check_output(["ffmpeg", "-v", "error", "-i", str(path), "-map", "0:v:0",
++                                        "-f", "framemd5", "-"], text=True)
++        return [line for line in text.splitlines() if not line.startswith("#")]
++    def audio_bytes(path):
++        return subprocess.check_output(["ffmpeg", "-v", "error", "-i", str(path), "-map", "0:a:0",
++                                        "-f", "s16le", "-acodec", "pcm_s16le", "-"])
++    assert video_hashes(output / "edited.mp4") == video_hashes(output / "clean.mp4")
++    assert audio_bytes(output / "edited.mp4") == audio_bytes(output / "clean.mp4")
++    report = {"results": results, "frame_pixels_equal": True, "decoded_video_equal": True,
++              "decoded_audio_equal": True, "fixture_only": True}
++    (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
++    print("PASS: cold 9, warm 0, edited 3, clean 9 drawings; cached and clean video/audio agree.")
++
++
++if __name__ == "__main__":
++    if len(sys.argv) != 2:
++        raise SystemExit(__doc__)
++    main(sys.argv[1])
+diff --git a/tools/regress.py b/tools/regress.py
+index 72507f0..8f2d240 100644
+--- a/tools/regress.py
++++ b/tools/regress.py
+@@ -98,6 +98,11 @@ case("M61 an absolute path with spaces in the evidence is found",
+      not return_check.check(ret([{"name": "x", "evidence": os.path.join(return_check.ROOT, "MASTER_PROMPT.md") + " (Write ok)"}])))
+ case("an honest return passes", not return_check.check(ret(good_ev, files=["MASTER_PROMPT.md"])))
+ 
++shot_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_shot_render.py")],
++                            capture_output=True, text=True)
++case("ASTRA selective rendering, invalidation and encode failures", shot_tests.returncode == 0,
++     shot_tests.stdout + shot_tests.stderr if shot_tests.returncode else "")
++
+ # ---- brief_check (M26, M27, M30, M39, M46, M52)
+ case("M27 animator brief without 'feasibility first' fails", brief_check.check("animator: ep12 build the episode"))
+ case("M26/M30 a budget in the brief fails", brief_check.check("animator: ep12 feasibility first, <=14 calls"))
+diff --git a/tools/test_shot_render.py b/tools/test_shot_render.py
+new file mode 100644
+index 0000000..841fc2a
+--- /dev/null
++++ b/tools/test_shot_render.py
+@@ -0,0 +1,126 @@
++"""Selective rendering tests use only generated temporary images and sound."""
++import copy
++import json
++import math
++from pathlib import Path
++import struct
++import sys
++import tempfile
++import unittest
++import wave
++
++from PIL import Image
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "episodes"))
++import shot_render as sr
++
++
++class ShotTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.dep = self.root / "renderer.py"
++        self.dep.write_text("synthetic renderer version 1")
++        self.shots = [{"id": f"s{i}", "start": i * 3, "frames": 3, "seed": i,
++                       "config": {"red": i * 60}} for i in range(3)]
++        self.calls = []
++        self.wav = self.root / "audio.wav"
++        with wave.open(str(self.wav), "wb") as f:
++            f.setparams((1, 2, 48000, 0, "NONE", "not compressed"))
++            f.writeframes(b"".join(struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * i / 48000)))
++                                  for i in range(48000)))
++
++    def draw(self, shot, index):
++        self.calls.append((shot["id"], index))
++        return Image.new("RGB", (16, 16), (shot["config"]["red"], index * 10, shot["seed"]))
++
++    def run_render(self, cache="cache", draw=None):
++        return sr.render(self.shots, draw or self.draw, [self.dep], self.root / cache, (16, 16))
++
++    def test_cold_warm_and_local_edit_match_clean_pixels(self):
++        cold = self.run_render()
++        self.assertEqual(cold["rendered_drawings"], 9)
++        self.calls.clear()
++        warm = self.run_render()
++        self.assertEqual(warm["rendered_drawings"], 0)
++        self.assertEqual(self.calls, [])
++        self.shots[1]["config"]["red"] = 111
++        changed = self.run_render()
++        self.assertEqual([s["cache_hit"] for s in changed["shots"]], [True, False, True])
++        self.assertEqual(changed["rendered_drawings"], 3)
++        self.assertEqual(changed["frame_sha256"], self.run_render("clean")["frame_sha256"])
++
++    def test_seed_and_shared_dependency_invalidate(self):
++        self.run_render()
++        self.shots[2]["seed"] += 1
++        self.assertEqual([s["cache_hit"] for s in self.run_render()["shots"]], [True, True, False])
++        self.dep.write_text("same-process version 2")
++        self.assertEqual(self.run_render()["rendered_drawings"], 9)
++
++    def test_corrupt_missing_and_unstamped_shots_redraw(self):
++        first = self.run_render()
++        Path(first["frames"][0]).write_bytes(b"corrupt")
++        Path(first["frames"][3]).unlink()
++        (Path(first["frames"][6]).parent / "receipt.json").unlink()
++        recovered = self.run_render()
++        self.assertEqual(recovered["rendered_drawings"], 9)
++        self.assertEqual(recovered["frame_sha256"], first["frame_sha256"])
++
++    def test_failed_render_leaves_no_complete_shot_or_lock(self):
++        def broken(shot, index):
++            raise RuntimeError("intentional fixture failure")
++        with self.assertRaises(RuntimeError):
++            self.run_render(draw=broken)
++        self.assertEqual(list((self.root / "cache").iterdir()), [])
++
++    def test_dependency_change_during_draw_is_refused(self):
++        def unstable(shot, index):
++            self.dep.write_text(str(index))
++            return self.draw(shot, index)
++        with self.assertRaisesRegex(ValueError, "dependencies changed"):
++            self.run_render(draw=unstable)
++        self.assertEqual(list((self.root / "cache").iterdir()), [])
++
++    def test_invalid_timeline_and_config_fail(self):
++        for field, value in (("start", 4), ("frames", 0), ("seed", True), ("config", []), ("id", "s0")):
++            before = copy.deepcopy(self.shots)
++            self.shots[1][field] = value
++            with self.subTest(field=field), self.assertRaises(ValueError):
++                self.run_render()
++            self.shots = before
++
++    def test_busy_cache_fails_without_breaking_lock(self):
++        cache = self.root / "cache"
++        cache.mkdir()
++        lock = cache / ".writer.lock"
++        lock.write_text("another writer")
++        with self.assertRaises(FileExistsError):
++            self.run_render()
++        self.assertTrue(lock.exists())
++
++    def test_encode_preserves_complete_output_and_rejects_short_audio(self):
++        result = self.run_render()
++        target = self.root / "out.mp4"
++        self.assertEqual(sr.encode(result, self.wav, target), str(target))
++        self.assertTrue(target.stat().st_size > 0)
++        with self.assertRaisesRegex(ValueError, "output exists"):
++            sr.encode(result, self.wav, target)
++        with wave.open(str(self.wav), "wb") as f:
++            f.setparams((1, 2, 48000, 0, "NONE", "not compressed"))
++            f.writeframes(b"\x00\x00")
++        with self.assertRaisesRegex(ValueError, "audio is shorter"):
++            sr.encode(result, self.wav, self.root / "short.mp4")
++        self.assertFalse((self.root / "short.mp4").exists())
++
++    def test_encode_rechecks_cache_and_cleans_partial_output(self):
++        result = self.run_render()
++        Path(result["frames"][4]).write_bytes(b"changed")
++        with self.assertRaisesRegex(ValueError, "cached frame changed"):
++            sr.encode(result, self.wav, self.root / "bad.mp4")
++        self.assertFalse((self.root / "bad.mp4").exists())
++        self.assertEqual(list(self.root.glob(".encode-*")), [])
++
++
++if __name__ == "__main__":
++    unittest.main()

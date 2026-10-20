@@ -1,0 +1,382 @@
+diff --git a/episodes/stage_kit.py b/episodes/stage_kit.py
+index 17966d9..0eec51a 100644
+--- a/episodes/stage_kit.py
++++ b/episodes/stage_kit.py
+@@ -38,6 +38,7 @@ v2 (19 Oct): the kit works staging out instead of only refusing.
+   and a legal frame; it refuses only when nothing works, and then lists the nearest rows that do.
+ """
+ import copy
++import glob
+ import hashlib
+ import json
+ import math
+@@ -58,7 +59,7 @@ if hires.RES == 1.0 and not os.environ.get("STAGE_RES1"):
+     hires.set_res(2)
+ 
+ import numpy as np  # noqa: E402
+-from PIL import Image, ImageDraw  # noqa: E402
++from PIL import Image, ImageDraw, __version__ as PIL_VERSION  # noqa: E402
+ 
+ import acting as K  # noqa: E402
+ import framing_check as FC  # noqa: E402
+@@ -305,11 +306,15 @@ def gap(A, B, need=MARGIN):
+     """Least distance between two placed profiles, searched up to need + 2 u (a far gap comes back as need + 2)."""
+     best, k = need + 2.0, int((need + 2) // BAND) + 1
+     for s in range(-k, k + 1):
+-        b0, b1 = _shift(B[0], s), _shift(B[1], s)
+-        both = ~np.isnan(A[0]) & ~np.isnan(b0)
++        # Compare only overlapping bands. Padding a shifted copy with NaNs
++        # cannot contribute to the minimum and allocated two arrays per shift.
++        sa, sb = (slice(s, None), slice(None, -s)) if s > 0 else \
++                 (slice(None, s), slice(-s, None)) if s < 0 else (slice(None), slice(None))
++        a0, a1, b0, b1 = A[0][sa], A[1][sa], B[0][sb], B[1][sb]
++        both = ~np.isnan(a0) & ~np.isnan(b0)
+         if not both.any():
+             continue
+-        gx = float(np.maximum(np.maximum(b0 - A[1], A[0] - b1), 0.0)[both].min())
++        gx = float(np.maximum(np.maximum(b0 - a1, a0 - b1), 0.0)[both].min())
+         best = min(best, math.hypot(gx, max(0.0, (abs(s) - 1) * BAND)))
+         if best == 0.0:
+             break
+@@ -317,21 +322,27 @@ def gap(A, B, need=MARGIN):
+ 
+ 
+ def _code_key():
++    from handover_check import modules
+     h = hashlib.sha1()
+-    for f in ("rig2.py", "rig2_pip.py", "acting.py", "characters.py"):
+-        p = os.path.join(HERE, f)
+-        if os.path.exists(p):
+-            h.update(open(p, "rb").read())
+-    h.update(repr(sorted(SCALE.items())).encode() + b"v2a")
++    # The old HERE/characters.py lookup silently skipped ROOT/characters.py.
++    # Include the recursive code closure, profile algorithm, fonts and runtime.
++    paths = modules(__file__) + sorted(glob.glob(os.path.join(ROOT, "assets", "fonts", "*.ttf")))
++    for p in paths:
++        h.update(os.path.relpath(p, ROOT).encode())
++        with open(p, "rb") as stream:
++            h.update(stream.read())
++    h.update(repr((sorted(SCALE.items()), np.__version__, PIL_VERSION, "v2b")).encode())
+     return h.hexdigest()[:16]
+ 
+ 
+ def _disk():
+     if not _DISK["loaded"]:
+         _DISK["loaded"] = True
++        _DISK["key"] = _code_key()
+         try:
+-            d = json.load(open(CACHE))
+-            if d.get("key") == _code_key():
++            with open(CACHE) as stream:
++                d = json.load(stream)
++            if d.get("key") == _DISK["key"]:
+                 _DISK["data"] = d["data"]
+         except (OSError, ValueError, KeyError):
+             pass
+@@ -340,8 +351,12 @@ def _disk():
+ 
+ def save_cache():
+     if _DISK["dirty"]:
++        if _DISK.get("key") != _code_key():
++            raise Refused("pose dependencies changed during this process; restart before saving the cache")
+         os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+-        json.dump({"key": _code_key(), "data": _DISK["data"]}, open(CACHE, "w"))
++        with open(CACHE + ".tmp", "w") as stream:
++            json.dump({"key": _DISK["key"], "data": _DISK["data"]}, stream)
++        os.replace(CACHE + ".tmp", CACHE)
+         _DISK["dirty"] = False
+ 
+ 
+diff --git a/reviews/astra/08_stage_profiling.md b/reviews/astra/08_stage_profiling.md
+new file mode 100644
+index 0000000..c4d5a97
+--- /dev/null
++++ b/reviews/astra/08_stage_profiling.md
+@@ -0,0 +1,18 @@
++# Staging profile and cache correctness — 20 October 2026
++
++Evidence: reviews/astra/01_audit.md section 3 and reviews/stage_kit_trial.md record slow/rejected staging work. A bounded three-case profile now reproduces a literal accepted row, a solved draw request and a refusal, each in an isolated process with an empty private pose-cache path. It records unprofiled cold/warm times, a third profiled call, outcome hashes and code hashes. A timeout remains a timeout and retains completed measurements; it never becomes a pass. No live table, gate or pose-cache file is written by the profiler.
++
++Measured hotspot: the baseline draw profile called gap 1,731 times and _shift 33,270 times; gap consumed 0.175s of the 0.234s profiled call. Refusal used gap 806 times. Replace padded shifted-array copies with overlapping slices; preserve the distance formula, thresholds, sampling, candidate ordering and refusal behavior.
++
++Also fix a correctness defect found during this inspection: the old _code_key tried episodes/characters.py, silently skipping the actual root characters.py. The new persisted pose key includes the existing recursive module-discovery closure, the stage algorithm, fonts, NumPy/Pillow versions and scales. A changed key rejects old disk poses; changes during a running process prevent saving them under a new key. Save completion is atomic. Static discovery remains limited to ordinary Python imports; undeclared dynamic runtime assets must not be assumed covered.
++
++Actual validation:
++- Four focused tests PASS: 512 seeded random profile comparisons plus 12 empty/touching/far comparisons, real dependency-closure checks, stale persisted-cache rejection and mid-process change refusal/atomic fresh save.
++- Combined REGRESS PASS 173/173; independent baseline with parent settings PASS 150/150. No earlier Astra package required.
++- Paired six-batch benchmark, 1,000 profile pairs per batch, alternating original/optimized order: medians 0.0450409s → 0.0347209s (22.9% lower), identical values. Seed 20261020. Reproduce: python3 tools/benchmark_stage_gap.py.
++- All three solver cases completed cold/warm/profiled, and every final outcome hash matches baseline, including exact refusal text and accepted rows/shot choices.
++- Baseline draw cold/warm: 4.9579/0.1505s; final 5.1569/0.1248s. Baseline refusal: 4.2999/0.0864s; final 4.4643/0.0767s. These single-case wall times include warm-up/runtime variation, so no general end-to-end speedup is claimed. The paired distance benchmark supports the local optimization only.
++- No case timed out at 45s. Historical >120s production stalls were not reproduced by these three fixtures; longer production tables remain a profiling/adoption requirement.
++- Python checks and git diff --check PASS. Existing ResourceWarnings from the module-discovery reader are observable in focused-test logs; no assertion failed.
++
++Carry stage_kit.py, test_stage_gap.py, the profiler/microbenchmark, regression integration and this report. Use python3 tools/profile_stage_solver.py <new-report.json> --timeout 45. Rollback: revert the destination package; old/new pose-cache keys differ, so incompatible entries are ignored. Scores stay 2/2/4/7/1/4/1; no new production clarity, safety or delivery evidence is claimed.
+diff --git a/tools/benchmark_stage_gap.py b/tools/benchmark_stage_gap.py
+new file mode 100644
+index 0000000..1cdfe74
+--- /dev/null
++++ b/tools/benchmark_stage_gap.py
+@@ -0,0 +1,37 @@
++"""Paired microbenchmark, alternating order; stdout is JSON, never a production quality score."""
++import json
++import statistics
++import time
++
++import numpy as np
++from test_stage_gap import reference_gap, sk
++
++
++def main():
++    rng = np.random.default_rng(20261020)
++    pairs = []
++    for _ in range(1000):
++        a0 = rng.uniform(0, 20, 300)
++        a1 = a0 + rng.uniform(2, 20, 300)
++        b0 = rng.uniform(20, 80, 300)
++        b1 = b0 + rng.uniform(2, 20, 300)
++        for lo, hi in ((a0, a1), (b0, b1)):
++            holes = rng.random(300) < .6
++            lo[holes] = hi[holes] = np.nan
++        pairs.append(((a0, a1), (b0, b1)))
++    times, checks = {"original": [], "sliced": []}, {}
++    for repeat in range(6):
++        order = [("original", reference_gap), ("sliced", sk.gap)]
++        if repeat % 2:
++            order.reverse()
++        for label, function in order:
++            started = time.perf_counter()
++            checks[label] = [function(a, b, 10) for a, b in pairs]
++            times[label].append(time.perf_counter() - started)
++    assert checks["original"] == checks["sliced"]
++    print(json.dumps({"times": times, "median_seconds": {k: statistics.median(v) for k, v in times.items()},
++                      "pairs": 1000, "repeats": 6, "identical_results": True}, indent=2))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/profile_stage_solver.py b/tools/profile_stage_solver.py
+new file mode 100644
+index 0000000..6910f6e
+--- /dev/null
++++ b/tools/profile_stage_solver.py
+@@ -0,0 +1,110 @@
++"""Bounded, reproducible staging profiles. No tables/gates/cache files are written.
++
++    python3 tools/profile_stage_solver.py build/astra/stage-profile.json --timeout 45
++
++Each case has its own process and empty private pose cache. The first two solves
++are unprofiled cold/warm measurements; a third captures hotspots. Timeouts retain
++any completed measurements and are not reported as successful solves.
++"""
++import argparse
++import cProfile
++import hashlib
++import json
++from pathlib import Path
++import pstats
++import subprocess
++import sys
++import tempfile
++import time
++
++ROOT = Path(__file__).resolve().parents[1]
++CASES = ("literal", "draw", "refusal")
++
++
++def worker(case):
++    sys.path[:0] = [str(ROOT), str(ROOT / "episodes")]
++    import stage_kit as sk
++    with tempfile.TemporaryDirectory(prefix="snc_stage_profile_") as temp:
++        sk.CACHE = str(Path(temp) / "poses.json")
++        sk._DISK.update(loaded=False, dirty=False, data={})
++        table = sk.Table("fixture", "playroom" if case == "literal" else "porch",
++                         "land" if case == "literal" else "vert")
++        if case == "literal":
++            table.start = {"Snip": ("C", "front")}
++            args = (.5, 1.5, "Snip", "hold", "")
++        else:
++            table.start = {"Snip": ("x:400", "right"), "Crinkle": ("x:1300", "left"),
++                           "marker": ("Snip", ""), "lantern": ("C", "")}
++            args = (.5, 1.9, "Snip", "draw", "lantern.eye_l") if case == "draw" else \
++                   (0, .5, "Snip", "draw", "lantern.eye_l")
++
++        def solve():
++            try:
++                new, rows, shot = sk.solve(table, *args)
++                return {"result": "ACCEPTED", "rows": rows, "shot": shot,
++                        "remaining_problems": sk.Sim(new).problems()}
++            except sk.Refused as exc:
++                return {"result": "REFUSED", "reason": str(exc)}
++
++        for phase in ("cold", "warm", "profiled"):
++            profile = cProfile.Profile() if phase == "profiled" else None
++            if profile:
++                profile.enable()
++            started = time.perf_counter()
++            outcome = solve()
++            seconds = time.perf_counter() - started
++            if profile:
++                profile.disable()
++            record = {"case": case, "phase": phase, "seconds": seconds, "outcome": outcome,
++                      "outcome_sha256": hashlib.sha256(json.dumps(outcome, sort_keys=True).encode()).hexdigest()}
++            if profile:
++                stats = pstats.Stats(profile)
++                hot = sorted(stats.stats.items(), key=lambda item: item[1][3], reverse=True)[:15]
++                record["hotspots"] = [{"file": str(Path(key[0]).relative_to(ROOT)) if str(key[0]).startswith(str(ROOT)) else key[0],
++                                       "line": key[1], "function": key[2], "calls": val[1],
++                                       "self_seconds": val[2], "cumulative_seconds": val[3]} for key, val in hot]
++            print(json.dumps(record), flush=True)
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("output", nargs="?", type=Path)
++    parser.add_argument("--timeout", type=float, default=45)
++    parser.add_argument("--worker", choices=CASES)
++    args = parser.parse_args()
++    if args.worker:
++        worker(args.worker)
++        return 0
++    if args.output is None or not 1 <= args.timeout <= 60:
++        parser.error("output required; timeout must be between 1 and 60 seconds per case")
++    if args.output.exists():
++        parser.error("output exists; use a new report path")
++    cases = []
++    for case in CASES:
++        command = [sys.executable, __file__, "--worker", case]
++        try:
++            result = subprocess.run(command, capture_output=True, text=True, timeout=args.timeout)
++            stdout, error = result.stdout, result.stderr
++            status = "COMPLETE" if result.returncode == 0 else "ERROR"
++        except subprocess.TimeoutExpired as exc:
++            stdout = exc.stdout.decode() if isinstance(exc.stdout, bytes) else (exc.stdout or "")
++            error, status = "per-case time limit exceeded", "TIMEOUT"
++        records = []
++        for line in stdout.splitlines():
++            try:
++                records.append(json.loads(line))
++            except ValueError:
++                pass
++        consistent = len({r["outcome_sha256"] for r in records}) <= 1
++        cases.append({"case": case, "status": status, "consistent": consistent, "runs": records, "error": error})
++        print(case, status, [(r["phase"], round(r["seconds"], 4), r["outcome"]["result"]) for r in records], flush=True)
++    files = list(ROOT.glob("*.py")) + list((ROOT / "episodes").glob("*.py")) + [Path(__file__)]
++    report = {"timeout_seconds": args.timeout, "cases": cases,
++              "code_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}}
++    args.output.parent.mkdir(parents=True, exist_ok=True)
++    args.output.write_text(json.dumps(report, indent=2) + "\n")
++    return 0 if all(c["status"] == "COMPLETE" and c["consistent"] for c in cases) else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/regress.py b/tools/regress.py
+index 8f2d240..0273b4b 100644
+--- a/tools/regress.py
++++ b/tools/regress.py
+@@ -536,6 +536,11 @@ case("M80 a run that only fixes its return (0 calls) counts 0, the hand-back end
+      agent_hooks.transcript_stats(handback_tr("agent-r3.jsonl", [24, 7, 0], end_handback=True))[0] == 0 and
+      agent_hooks.transcript_stats(handback_tr("agent-r4.jsonl", [24, 7], end_handback=True))[::3] == (7, 31))
+ 
++gap_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_stage_gap.py")],
++                           capture_output=True, text=True)
++case("ASTRA optimized silhouette distances equal the original algorithm", gap_tests.returncode == 0,
++     gap_tests.stdout + gap_tests.stderr if gap_tests.returncode else "")
++
+ # ---- M73, M74: framing pre-check on the designer's shot rows (tools/framing_check.py; plan_check runs it)
+ import framing_check  # noqa: E402
+ import plan_check  # noqa: E402
+diff --git a/tools/test_stage_gap.py b/tools/test_stage_gap.py
+new file mode 100644
+index 0000000..1590871
+--- /dev/null
++++ b/tools/test_stage_gap.py
+@@ -0,0 +1,88 @@
++"""Compare optimized geometry with the frozen original algorithm, including holes/edges."""
++import math
++import json
++from pathlib import Path
++import sys
++import tempfile
++import unittest
++from unittest.mock import patch
++
++import numpy as np
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "episodes"))
++import stage_kit as sk
++
++
++def reference_gap(a, b, need):
++    best, k = need + 2.0, int((need + 2) // sk.BAND) + 1
++    for s in range(-k, k + 1):
++        b0, b1 = sk._shift(b[0], s), sk._shift(b[1], s)
++        both = ~np.isnan(a[0]) & ~np.isnan(b0)
++        if not both.any():
++            continue
++        gx = float(np.maximum(np.maximum(b0 - a[1], a[0] - b1), 0.0)[both].min())
++        best = min(best, math.hypot(gx, max(0.0, (abs(s) - 1) * sk.BAND)))
++        if best == 0.0:
++            break
++    return best
++
++
++class GapTests(unittest.TestCase):
++    def test_seeded_profile_equivalence(self):
++        rng = np.random.default_rng(20261020)
++        for i in range(512):
++            n = (1, 8, 300)[i % 3]
++            a0, b0 = rng.uniform(-100, 100, (2, n))
++            a1, b1 = a0 + rng.uniform(0, 30, n), b0 + rng.uniform(0, 30, n)
++            for lo, hi in ((a0, a1), (b0, b1)):
++                holes = rng.random(n) < .7
++                lo[holes] = hi[holes] = np.nan
++            need = (0, 1, 10, 30, 40)[i % 5]
++            a, b = (a0, a1), (b0, b1)
++            with self.subTest(i=i):
++                self.assertEqual(sk.gap(a, b, need), reference_gap(a, b, need))
++
++    def test_empty_touching_and_far_profiles(self):
++        blank = (np.full(8, np.nan), np.full(8, np.nan))
++        a = (np.zeros(8), np.ones(8) * 10)
++        touching = (np.ones(8) * 10, np.ones(8) * 20)
++        far = (np.ones(8) * 100, np.ones(8) * 110)
++        for left, right in ((blank, blank), (a, blank), (a, touching), (a, far)):
++            for need in (0, 10, 40):
++                self.assertEqual(sk.gap(left, right, need), reference_gap(left, right, need))
++
++    def test_real_dependency_closure_includes_root_character_and_algorithm(self):
++        from handover_check import modules
++        files = {Path(p).resolve() for p in modules(sk.__file__)}
++        self.assertIn(Path(sk.ROOT) / "characters.py", files)
++        self.assertIn(Path(sk.ROOT) / "paperlib.py", files)
++        self.assertIn(Path(sk.__file__).resolve(), files)
++
++    def test_changed_dependency_rejects_persisted_poses(self):
++        with tempfile.TemporaryDirectory() as temp:
++            source = Path(temp) / "characters.py"
++            source.write_text("original geometry")
++            cache = Path(temp) / "poses.json"
++            with patch("handover_check.modules", return_value=[str(source)]), \
++                    patch.object(sk, "CACHE", str(cache)), \
++                    patch.object(sk, "_DISK", {"loaded": False, "dirty": False, "data": {}}):
++                key = sk._code_key()
++                cache.write_text(json.dumps({"key": key, "data": {"sentinel": "old pose"}}))
++                self.assertEqual(sk._disk(), {"sentinel": "old pose"})
++                source.write_text("changed geometry")
++                self.assertNotEqual(sk._code_key(), key)
++                sk._DISK["dirty"] = True
++                with self.assertRaisesRegex(sk.Refused, "dependencies changed"):
++                    sk.save_cache()
++                self.assertEqual(json.loads(cache.read_text())["key"], key)
++                sk._DISK.update(loaded=False, dirty=False, data={})
++                self.assertEqual(sk._disk(), {})
++                sk._DISK["data"]["sentinel"] = "fresh pose"
++                sk._DISK["dirty"] = True
++                sk.save_cache()
++                self.assertEqual(json.loads(cache.read_text())["key"], sk._code_key())
++                self.assertFalse(Path(str(cache) + ".tmp").exists())
++
++
++if __name__ == "__main__":
++    unittest.main()

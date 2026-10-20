@@ -126,3 +126,12 @@ Work packages remain small PRs, regression PASS before merge, with carry-over an
 rollback instructions. Do not replace the rig, weaken child-safety rules, add paid
 services, publish, access the production repository or launch Claude agents.
 Those boundaries come from docs/ASTRA_MASTER_PROMPT.md and remain in force.
+
+## Implementation status, 20 October 2026
+
+Engineering milestones 1–3 are implemented in merged PRs #6–#8: evidence auditing,
+selective rendering and bounded staging profiling/optimization. Combined regression
+is PASS 173/173. This completes the initial engineering work, not the production
+acceptance trial. Milestones 4–6 still require complete production packages,
+independent reviewers and sufficiently observed real audience results. Current
+scores: 2/2/4/7/1/4/1; details in reviews/astra/09_delivery_status.md.

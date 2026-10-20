@@ -1,0 +1,421 @@
+diff --git a/docs/ASTRA_PRODUCTION_PIPELINE.md b/docs/ASTRA_PRODUCTION_PIPELINE.md
+new file mode 100644
+index 0000000..b2553a1
+--- /dev/null
++++ b/docs/ASTRA_PRODUCTION_PIPELINE.md
+@@ -0,0 +1,128 @@
++# Production pipeline and the path to 10/10
++
++Decision: 20 October 2026, following the owner's request for all seven rows to
++reach 10/10. Keep the existing six roles, rig, stage kit and independent gates.
++Improve the system around those assets. A score is earned by observed outcomes;
++implementation tests are not substitutes for production evidence.
++
++## What 10/10 means
++
++These are acceptance criteria chosen before new results, not forecasts. The
++master prompt's per-episode targets remain unchanged. Ten means those targets
++are demonstrated consistently, including failure handling and reproducibility.
++Use three consecutive complete production packages as the reliability trial;
++preserve every failed attempt and round in the denominator. Do not cherry-pick.
++
++| Row | Acceptance for a 10/10 workflow rating | Evidence still needed |
++|---|---|---|
++| Storyboard understanding | Three consecutive first-round matches on problem, cause and lesson; declared moments covered on the actual sheet | Fresh blind retellings and separate comparisons with cards |
++| Video story clarity | Episode and both Shorts score at least 8 overall and clarity within two rounds in each of three packages; calibrated independent reviewers | Neutral videos, original reports, reviewer identities, rounds and timestamps |
++| Safety readiness | Gates 1 and 3 pass without structural fixes on all three packages; sources current; all hazard-specific restrictions respected | Independent safety reports bound to exact plan/video/package revisions |
++| Technical readiness | Final episode and two Shorts pass video, loudness, silence, framing, clearance and regression checks in each package; failures and stale evidence demonstrably block acceptance | Full-length final files, raw check logs, input/code hashes; no waived failures |
++| Delivery speed | Each of three paragraph-to-episode-plus-two-Shorts packages completes within 48 elapsed hours and at most two full build rounds | Start/end timestamps, all attempts, render minutes, agent calls and measured token/usage counters |
++| Selective re-rendering | Shot-local fixes redraw only affected shots, repeat runs redraw none; clean and cached output pixels agree; dependency/camera/seed changes invalidate correctly; final audio remains continuous | Automated negative tests plus real multi-shot production trials and render receipts |
++| Audience evidence | Three successive age-aligned comparisons show improving average view duration and returning-viewer measures with enough data to interpret; growth reviewer accepts the evidence strength | Authorized 7/28-day exports, equal format/windows, views and uncertainty; never synthetic fixtures |
++
++The existing roadmap's approximately 300-view floor is a minimum screening rule,
++not proof of statistical significance. Sparse returning-viewer data, traffic mix
++changes or incomparable durations leave this row unproven. Report confidence and
++alternative explanations. Growth cannot be guaranteed by software or a deadline.
++
++The starting ratings remain 2/2/4/7/1/1/1. Revise each row only from the applicable
++evidence above. The rating is workflow reliability, not a claim that every film
++deserves a perfect artistic score. No script awards an independent story/safety
++verdict. Missing production evidence means unproven, even if all unit tests pass.
++
++## One production package
++
++| Order | Owner | Work and output | Acceptance / failure route |
++|---|---|---|---|
++| 1 | Owner/production Lead | One paragraph and run start timestamp; one active package | Record scope and preserve all attempts |
++| 2 | Story-designer | One concrete causal lesson, wrong-to-right action, current source, key moments, three-part comedy; varied setting/engine/music | Check story card; remove ambiguity in the card before staging |
++| 3 | Stage scripts + animator | Stage intent rows, measured geometry and camera coverage; cheap rough stills | Clearance and framing pass; unsupported geometry returns an explicit problem to design |
++| 4a | Safety-checker | Review card, measured plan and lesson source | Gate 1; structural failure returns to design |
++| 4b | Sheet script + fresh reviewer | Covered neutral sheet, fresh retelling, separate problem/cause/lesson comparison | Gate 1b; a mismatch fixes the cause/action/panel, not the review wording |
++| 5 | Animator + render scripts | Build from approved beats; explicit shot dependencies, deterministic seeds and camera; render affected shots | Stop on build failure; cache only complete verified shots |
++| 6 | Scripts | Assemble visual stream with one continuous episode audio master; check final encoded output | Video/loudness/silence/jump/framing/clearance checks must pass on this revision |
++| 7 | Fresh reviewer | Neutral full video, no card/title/plan; new reviewer each round | Gate 2: at least 8 overall and clarity, at most two rounds; otherwise park and diagnose |
++| 8 | Animator + scripts | Two distinct marked beats with vertical camera, context and ending; reuse performance assets | Both Shorts get their own technical and blind checks; never rely on the episode's pass |
++| 9 | Packaging + safety | Source-bound text/covers, final gate 3 on episode, both Shorts and text | Changed media/text invalidates its prior evidence |
++| 10 | Owner | Watch complete package, decide whether to publish | Fresh explicit approval; pipeline does not upload or publish |
++| 11 | Authorized growth role | 7/28-day exports and comparable-cohort review | Feed observed retention problems into the next card; no claimed improvement without data |
++
++Safety-plan review and blind storyboard review can be independent parallel
++production activities. Astra does not launch or brief the Claude team. A failed
++story gate goes back to story/staging; a technical failure goes to the relevant
++script or builder. Two failed blind rounds stop further rendering until design
++changes. No silent third round or reset of the trial clock.
++
++## Implemented evidence contract
++
++`tools/pipeline_check.py` reads a package manifest and checks 15 documentary
++requirements and their prerequisites. It binds each report to its current input
++files and binds the storyboard comparison to the actual retelling. It rejects
++missing/changed reports, missing Shorts, stale media, declared maker-as-reviewer,
++non-blind reviews, low scores, excess rounds, structural safety fixes and owner
++overrides as evidence of meeting this quality target.
++
++```bash
++python3 tools/pipeline_check.py template build/run01/manifest.json
++python3 tools/pipeline_check.py check build/run01/manifest.json
++```
++
++Keep all run artifacts beneath that directory (copy the actual source snapshots
++and media, or use links resolving inside the run). `episode_source`, `rough` and
++Short source artifacts must be dependency manifests containing the hashes of all
++their code/assets, not only the entry script. Update them when a dependency changes.
++The checker validates the supplied snapshots; it does not discover undeclared
++dependencies. Keep private manifests and reports away from blind reviewers.
++
++The template deliberately contains no PASS entries. Each evidence record names
++the check, role, raw report and hash, and an exact map of input artifact hashes.
++Example record schema (placeholder values; never evidence):
++
++```json
++{
++  "result": "PASS",
++  "role": "fresh-eyes-reviewer",
++  "report": "private/review.txt",
++  "report_sha256": "<SHA256 of original report>",
++  "inputs": {"episode": "<SHA256 of the reviewed MP4>"},
++  "reviewer": "<independent reviewer identity>",
++  "blind": true,
++  "round": 1,
++  "overall": 8,
++  "clarity": 8
++}
++```
++
++The checker is a read-only evidence auditor, not an authenticated review service
++or replacement for gate.py. It cannot tell whether someone invented a report or
++lied about their identity; the production Lead must verify provenance. Technical
++records must cite the actual checker output, not a hand-written assurance. A
++`DOCUMENTED_PASS` means the documentary contract is satisfied. It never means
++Astra judged the film safe or clear. Publication still requires fresh owner approval.
++
++## Engineering sequence and stop conditions
++
++1. Production contract + evidence checker: make missing/stale evidence visible.
++   Exit: positive/negative fixtures pass; empty real run remains blocked.
++2. Selective shot renderer: explicit local inputs, dependency hashes and integrity
++   receipts; continuous final audio. Exit: cold/warm/one-shot-edit tests, corrupted
++   cache refusal, clean-vs-cached pixel equivalence and measured real-rig reuse.
++3. Stage-kit profiling: capture deterministic expensive/rejected solver cases;
++   optimize the dominant measured cost while preserving legal results and geometry
++   checks. Exit: before/after time distribution and identical accepted/refused cases.
++4. Production integration: the authorized production team uses the checked sheet,
++   evidence contract and shot adapter for one complete episode plus two Shorts.
++   Exit: final technical checks and independent gates pass; no Astra self-review.
++5. Reliability trial: three consecutive packages with complete timing/retry records.
++   Exit: per-row acceptance above. Preserve failures and rollback regressions.
++6. Audience validation: compare sufficiently observed published packages at equal
++   ages. Exit: growth reviewer accepts improvement and uncertainty; otherwise
++   diagnose and iterate. This step needs real data over time.
++
++Work packages remain small PRs, regression PASS before merge, with carry-over and
++rollback instructions. Do not replace the rig, weaken child-safety rules, add paid
++services, publish, access the production repository or launch Claude agents.
++Those boundaries come from docs/ASTRA_MASTER_PROMPT.md and remain in force.
+diff --git a/reviews/astra/06_production_pipeline.md b/reviews/astra/06_production_pipeline.md
+new file mode 100644
+index 0000000..21af0dd
+--- /dev/null
++++ b/reviews/astra/06_production_pipeline.md
+@@ -0,0 +1,16 @@
++# Production pipeline — 20 October 2026
++
++The owner requested all seven scorecard rows at 10/10. docs/ASTRA_PRODUCTION_PIPELINE.md now defines the full paragraph-to-episode-plus-two-Shorts workflow, failure routing, six implementation/adoption milestones and measurable acceptance criteria. Ten requires repeated production outcomes; it is not awarded from a code test.
++
++Evidence problem: reviews/astra/01_audit.md sections 2–5 records failed story rounds and no complete <=48-hour episode-plus-two-Shorts trial; tools/gate.py:1–16 accepts existing report paths without binding report contents to the reviewed media. This package does not change that gate tracker. It adds a read-only companion, tools/pipeline_check.py, to detect stale/missing evidence across 15 prerequisites. Changed videos, plans, reports and retellings invalidate the corresponding documentary result. Declared maker-as-reviewer, non-blind review, poor scores, excess rounds, structural safety fixes and override-based acceptance are blocked.
++
++Actual validation:
++- Nine focused tests PASS, including changed retelling invalidating an old comparison.
++- Combined REGRESS PASS 171/171.
++- Independent replay on the original baseline in the supported parent-settings layout: REGRESS PASS 150/150. Neither earlier Astra implementation is required.
++- Initialized an empty real run under build/astra/production-pipeline: ready_for_owner_review=false, all 15 checks BLOCKED. No fabricated reviews entered.
++- git diff --check PASS. No live gate state written; no agent launched or briefed.
++
++Limitations: this validates documentary contracts and hashes, not reviewer identity/authenticity, semantics, policy or source freshness. Dependency snapshots must be complete. Ready-for-owner-review never authorizes publication. Independent reviews and authorized audience exports remain external requirements. Scores remain 2/2/4/7/1/1/1 until outcome evidence warrants change.
++
++Carry: checker, its test, regression integration and the production-pipeline document/report. Rollback: revert the destination package commit. Next implementation: selective rendering with corruption/invalidation/equivalence tests and a measured actual-rig trial.
+diff --git a/tools/pipeline_check.py b/tools/pipeline_check.py
+new file mode 100644
+index 0000000..dc12d7c
+--- /dev/null
++++ b/tools/pipeline_check.py
+@@ -0,0 +1,148 @@
++"""Read-only production evidence checker. Never writes live gates or launches agents.
++
++    python3 tools/pipeline_check.py template build/run/manifest.json
++    python3 tools/pipeline_check.py check build/run/manifest.json
++
++This validates documented evidence and its binding to current files. It does not
++authenticate reviewer identities, interpret stories, or certify safety itself.
++"""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++
++# check: (required artifacts, prerequisites, declared reviewer role)
++CHECKS = {
++    "story_card": (("brief", "card"), (), "story-designer"),
++    "plan_safety": (("card", "stage"), ("story_card",), "safety-checker"),
++    "clearance": (("stage", "rough"), ("story_card",), "script"),
++    "framing": (("stage", "rough"), ("story_card",), "script"),
++    "coverage": (("stage", "moments", "storyboard"), ("clearance", "framing"), "script"),
++    "storyboard_review": (("storyboard",), ("coverage",), "fresh-eyes-reviewer"),
++    "storyboard_match": (("card", "storyboard", "storyboard_retelling"), ("storyboard_review",), "story-comparison"),
++    "episode_qa": (("episode", "episode_source"), ("plan_safety", "storyboard_match"), "script"),
++    "short1_qa": (("short1", "short1_source"), ("episode_qa",), "script"),
++    "short2_qa": (("short2", "short2_source"), ("episode_qa",), "script"),
++    "episode_review": (("episode",), ("episode_qa",), "fresh-eyes-reviewer"),
++    "short1_review": (("short1",), ("short1_qa",), "fresh-eyes-reviewer"),
++    "short2_review": (("short2",), ("short2_qa",), "fresh-eyes-reviewer"),
++    "packaging": (("episode", "short1", "short2", "package"),
++                  ("episode_review", "short1_review", "short2_review"), "packaging"),
++    "final_safety": (("episode", "short1", "short2", "package"),
++                     ("packaging", "plan_safety"), "safety-checker"),
++}
++ARTIFACTS = sorted({a for inputs, _, _ in CHECKS.values() for a in inputs})
++
++
++def sha256(path):
++    h = hashlib.sha256()
++    with Path(path).open("rb") as stream:
++        for block in iter(lambda: stream.read(1024 * 1024), b""):
++            h.update(block)
++    return h.hexdigest()
++
++
++def bound_file(root, name):
++    if not isinstance(name, str) or not name:
++        raise ValueError("missing file path")
++    path = (root / name).resolve()
++    if not path.is_relative_to(root.resolve()) or not path.is_file():
++        raise ValueError("file must exist inside the run directory")
++    return path
++
++
++def evaluate(manifest, root):
++    if not isinstance(manifest, dict) or manifest.get("version") != 1:
++        raise ValueError("manifest version must be 1")
++    root = Path(root)
++    makers, artifacts, evidence = (manifest.get(k) for k in ("makers", "artifacts", "evidence"))
++    if (not isinstance(makers, list) or not makers or
++            not all(isinstance(m, str) and m.strip() for m in makers) or
++            not isinstance(artifacts, dict) or not isinstance(evidence, dict)):
++        raise ValueError("makers, artifacts and evidence are required")
++    makers = {m.strip().casefold() for m in makers}
++    results, hashes = {}, {}
++    for name in ARTIFACTS:
++        try:
++            hashes[name] = sha256(bound_file(root, artifacts.get(name)))
++        except (OSError, ValueError):
++            hashes[name] = None
++    for name, (inputs, prerequisites, role) in CHECKS.items():
++        reasons, rec = [], evidence.get(name)
++        if not isinstance(rec, dict):
++            rec = {}
++        if rec.get("result") != "PASS":
++            reasons.append("missing PASS evidence")
++        if rec.get("role") != role:
++            reasons.append("wrong or missing evidence role")
++        if rec.get("override"):
++            reasons.append("overrides do not count as acceptance evidence")
++        try:
++            if sha256(bound_file(root, rec.get("report"))) != rec.get("report_sha256"):
++                reasons.append("report changed since evidence was recorded")
++        except (OSError, ValueError):
++            reasons.append("missing evidence report")
++        bound = rec.get("inputs")
++        if not isinstance(bound, dict):
++            bound = {}
++        if set(bound) != set(inputs):
++            reasons.append("input bindings do not match this check's contract")
++        for artifact in inputs:
++            if not hashes[artifact] or bound.get(artifact) != hashes[artifact]:
++                reasons.append(f"missing or stale input: {artifact}")
++        if role in ("fresh-eyes-reviewer", "safety-checker"):
++            reviewer = rec.get("reviewer", "")
++            if not isinstance(reviewer, str) or not reviewer.strip() or reviewer.strip().casefold() in makers:
++                reasons.append("independent reviewer identity required")
++        if role == "fresh-eyes-reviewer":
++            if rec.get("blind") is not True:
++                reasons.append("blind-review declaration required")
++            if type(rec.get("round")) is not int or not 1 <= rec["round"] <= 2:
++                reasons.append("review round must be 1 or 2")
++            if name != "storyboard_review":
++                for metric in ("overall", "clarity"):
++                    value = rec.get(metric)
++                    if type(value) not in (int, float) or not 8 <= value <= 10:
++                        reasons.append(f"{metric} must be at least 8/10")
++        if name == "storyboard_match" and rec.get("match") is not True:
++            reasons.append("independent retelling comparison has not matched")
++        if name == "storyboard_review" and rec.get("report_sha256") != hashes["storyboard_retelling"]:
++            reasons.append("review report must be the current storyboard retelling")
++        if role == "safety-checker" and (type(rec.get("structural_fixes")) is not int or rec["structural_fixes"] != 0):
++            reasons.append("safety target requires no structural fix")
++        for previous in prerequisites:
++            if results[previous]["status"] != "DOCUMENTED_PASS":
++                reasons.append(f"prerequisite not accepted: {previous}")
++        results[name] = {"status": "BLOCKED" if reasons else "DOCUMENTED_PASS", "reasons": reasons}
++    ready = all(r["status"] == "DOCUMENTED_PASS" for r in results.values())
++    return {"ready_for_owner_review": ready, "checks": results,
++            "notice": "Documented evidence only; reviewer authenticity and judgments require independent verification. "
++                      "This does not record gates or authorize publication."}
++
++
++def template():
++    return {"version": 1, "makers": ["Astra"], "artifacts": {a: "" for a in ARTIFACTS}, "evidence": {}}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("command", choices=("template", "check"))
++    parser.add_argument("manifest", type=Path)
++    args = parser.parse_args()
++    if args.command == "template":
++        args.manifest.parent.mkdir(parents=True, exist_ok=True)
++        with args.manifest.open("x") as stream:
++            json.dump(template(), stream, indent=2)
++            stream.write("\n")
++        return 0
++    try:
++        result = evaluate(json.loads(args.manifest.read_text()), args.manifest.parent)
++    except (ValueError, OSError) as exc:
++        print(json.dumps({"ready_for_owner_review": False, "error": str(exc)}))
++        return 1
++    print(json.dumps(result, indent=2))
++    return 0 if result["ready_for_owner_review"] else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/regress.py b/tools/regress.py
+index 0168728..72507f0 100644
+--- a/tools/regress.py
++++ b/tools/regress.py
+@@ -83,6 +83,11 @@ def brief(agent, prompt):
+         agent_hooks.ROOT = live
+ 
+ 
++pipeline_tests = subprocess.run([sys.executable, os.path.join(TOOLS, "test_pipeline_check.py")],
++                                capture_output=True, text=True)
++case("ASTRA pipeline evidence bindings and prerequisite checks", pipeline_tests.returncode == 0,
++     pipeline_tests.stdout + pipeline_tests.stderr if pipeline_tests.returncode else "")
++
+ # ---- return_check (M38, M50, M56, evidence rule)
+ good_ev = [{"name": "loudness", "evidence": "-16.2 LUFS"}, {"name": "file", "evidence": "MASTER_PROMPT.md and 3 s"}]
+ case("M56 fragment without its fence fails", return_check.check(ret(good_ev, fence=False)))
+diff --git a/tools/test_pipeline_check.py b/tools/test_pipeline_check.py
+new file mode 100644
+index 0000000..095230a
+--- /dev/null
++++ b/tools/test_pipeline_check.py
+@@ -0,0 +1,89 @@
++"""Adversarial evidence fixtures, not production gate records."""
++import copy
++from pathlib import Path
++import tempfile
++import unittest
++
++import pipeline_check as pipeline
++
++
++class PipelineTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.manifest = pipeline.template()
++        for a in pipeline.ARTIFACTS:
++            (self.root / a).write_text("synthetic " + a)
++            self.manifest["artifacts"][a] = a
++        for name, (inputs, _, role) in pipeline.CHECKS.items():
++            report = self.root / (name + ".txt")
++            report.write_text("Synthetic fixture; this is not a real review.")
++            self.manifest["evidence"][name] = {
++                "result": "PASS", "role": role, "report": report.name,
++                "report_sha256": pipeline.sha256(report),
++                "inputs": {a: pipeline.sha256(self.root / a) for a in inputs},
++                "reviewer": "independent-fixture", "blind": True, "round": 1,
++                "overall": 8, "clarity": 8, "match": True, "structural_fixes": 0}
++        self.manifest["artifacts"]["storyboard_retelling"] = "storyboard_review.txt"
++        self.manifest["evidence"]["storyboard_match"]["inputs"]["storyboard_retelling"] = pipeline.sha256(
++            self.root / "storyboard_review.txt")
++
++    def check(self):
++        return pipeline.evaluate(self.manifest, self.root)
++
++    def test_complete_documentary_fixture(self):
++        self.assertTrue(self.check()["ready_for_owner_review"])
++
++    def test_empty_template_blocks(self):
++        result = pipeline.evaluate(pipeline.template(), self.root)
++        self.assertFalse(result["ready_for_owner_review"])
++        self.assertEqual(sum(r["status"] == "BLOCKED" for r in result["checks"].values()), 15)
++
++    def test_changed_video_invalidates_reviews_and_release(self):
++        (self.root / "episode").write_text("changed")
++        result = self.check()
++        self.assertEqual(result["checks"]["episode_review"]["status"], "BLOCKED")
++        self.assertEqual(result["checks"]["final_safety"]["status"], "BLOCKED")
++
++    def test_changed_report_fails(self):
++        (self.root / "plan_safety.txt").write_text("edited")
++        self.assertFalse(self.check()["ready_for_owner_review"])
++
++    def test_wrong_identity_role_blindness_and_scores_fail(self):
++        for field, value in (("reviewer", " astra "), ("role", "script"), ("blind", False),
++                             ("clarity", 7), ("overall", float("nan")), ("round", 3),
++                             ("round", True), ("override", "owner approved")):
++            with self.subTest(field=field, value=value):
++                old = copy.deepcopy(self.manifest)
++                self.manifest["evidence"]["episode_review"][field] = value
++                self.assertFalse(self.check()["ready_for_owner_review"])
++                self.manifest = old
++
++    def test_safety_fix_or_missing_short_blocks(self):
++        self.manifest["evidence"]["plan_safety"]["structural_fixes"] = 1
++        self.assertFalse(self.check()["ready_for_owner_review"])
++        self.manifest["evidence"]["plan_safety"]["structural_fixes"] = 0
++        (self.root / "short2").unlink()
++        self.assertFalse(self.check()["ready_for_owner_review"])
++
++    def test_story_mismatch_blocks_full_build_evidence(self):
++        self.manifest["evidence"]["storyboard_match"]["match"] = False
++        result = self.check()
++        self.assertIn("prerequisite not accepted: storyboard_match", result["checks"]["episode_qa"]["reasons"])
++
++    def test_new_retelling_invalidates_old_comparison(self):
++        report = self.root / "storyboard_review.txt"
++        report.write_text("a new independent retelling")
++        self.manifest["evidence"]["storyboard_review"]["report_sha256"] = pipeline.sha256(report)
++        self.assertEqual(self.check()["checks"]["storyboard_match"]["status"], "BLOCKED")
++
++    def test_missing_binding_and_path_escape_fail(self):
++        self.manifest["evidence"]["storyboard_review"]["inputs"] = {}
++        self.assertFalse(self.check()["ready_for_owner_review"])
++        self.manifest["artifacts"]["card"] = "../outside.txt"
++        self.assertIn("missing or stale input: card", self.check()["checks"]["story_card"]["reasons"])
++
++
++if __name__ == "__main__":
++    unittest.main()
